@@ -1,5 +1,5 @@
 from aiogram import Router, F, Bot
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -18,33 +18,16 @@ router = Router()
 def is_admin(user_id: int) -> bool:
     return str(user_id) == str(ADMIN_ID)
 
-class AddTourStates(StatesGroup):
-    name = State()
-    location = State()
-    details = State()
-    price = State()
-    description = State()  # Новый шаг для кастомного текста
-    photo = State()
-
-class EditTourStates(StatesGroup):
-    waiting_for_value = State()
-
-def format_post_text(data: dict) -> str:
-    # Забираем кастомное описание (если оно есть)
-    desc = data.get('description') or data.get('Описание') or ""
-    
-    post = ""
-    if desc and str(desc).strip():
-        post += f"{str(desc).strip()}\n\n"
-        
-    post += (
-        f"🔥 <b>{data.get('name', data.get('Название'))}</b>\n"
-        f"📍 <b>Локация:</b> {data.get('location', data.get('Локация'))}\n"
-        f"ℹ️ <b>Детали:</b> {data.get('details', data.get('Детали'))}\n"
-        f"💰 <b>Цена:</b> {data.get('price', data.get('Цена'))}\n\n"
-        f"<i>Для бронирования обращайтесь к менеджеру!</i>"
+# --- КЛАВИАТУРЫ ---
+def get_main_keyboard() -> ReplyKeyboardMarkup:
+    # Постоянная нижняя клавиатура, заменяет ввод команд
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="➕ Добавить тур")],
+            [KeyboardButton(text="🗂 Управление турами")]
+        ],
+        resize_keyboard=True
     )
-    return post
 
 def get_publish_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
@@ -58,6 +41,33 @@ def get_publish_keyboard() -> InlineKeyboardMarkup:
         ]
     )
 
+# --- СОСТОЯНИЯ FSM ---
+class AddTourStates(StatesGroup):
+    name = State()
+    location = State()
+    details = State()
+    price = State()
+    description = State()
+    photo = State()
+
+class EditTourStates(StatesGroup):
+    waiting_for_value = State()
+
+def format_post_text(data: dict) -> str:
+    desc = data.get('description') or data.get('Описание') or ""
+    post = ""
+    if desc and str(desc).strip():
+        post += f"{str(desc).strip()}\n\n"
+        
+    post += (
+        f"🔥 <b>{data.get('name', data.get('Название'))}</b>\n"
+        f"📍 <b>Локация:</b> {data.get('location', data.get('Локация'))}\n"
+        f"ℹ️ <b>Детали:</b> {data.get('details', data.get('Детали'))}\n"
+        f"💰 <b>Цена:</b> {data.get('price', data.get('Цена'))}\n\n"
+        f"<i>Для бронирования обращайтесь к менеджеру!</i>"
+    )
+    return post
+
 # --- СТАРТ И ДОБАВЛЕНИЕ ТУРА ---
 
 @router.message(Command("start"))
@@ -67,13 +77,14 @@ async def cmd_start(message: Message):
         return
     await message.answer(
         "👋 Привет! Я панель управления агентством <b>Withiv</b>.\n\n"
-        "Доступные команды:\n"
-        "➕ /add_tour — Добавить новый тур\n"
-        "🗂 /manage — Управление турами (просмотр, редактирование, удаление)",
+        "Воспользуйтесь кнопками внизу экрана для управления контентом.",
+        reply_markup=get_main_keyboard(),
         parse_mode="HTML"
     )
 
+# Обрабатываем и команду /add_tour, и нажатие на новую текстовую кнопку
 @router.message(Command("add_tour"))
+@router.message(F.text == "➕ Добавить тур")
 async def cmd_add_tour(message: Message, state: FSMContext):
     if not is_admin(message.from_user.id):
         return
@@ -105,8 +116,8 @@ async def process_price(message: Message, state: FSMContext):
     await state.set_state(AddTourStates.description)
     await message.answer(
         "📝 <b>Дополнительное описание (Текст поста)</b>\n"
-        "Напишите красивое вступление для этого тура. Можно использовать любые эмодзи, абзацы и жирный шрифт — оно появится в самом верху поста в Telegram.\n\n"
-        "<i>Если описание не нужно и вы хотите оставить строгий шаблон, просто отправьте минус <code>-</code></i>",
+        "Напишите красивое вступление для этого тура. Можно использовать любые эмодзи, абзацы и жирный шрифт.\n\n"
+        "<i>Если описание не нужно, просто отправьте минус <code>-</code></i>",
         parse_mode="HTML"
     )
 
@@ -115,7 +126,6 @@ async def process_description(message: Message, state: FSMContext):
     text = message.html_text or ""
     raw_text = message.text or ""
     
-    # Если прислали минус, оставляем описание пустым
     if raw_text.strip() == '-':
         desc = ""
     else:
@@ -157,14 +167,14 @@ async def process_cancel(callback: CallbackQuery, state: FSMContext):
 async def process_publish(callback: CallbackQuery, state: FSMContext, bot: Bot):
     data = await state.get_data()
     if not data:
-        await callback.message.edit_caption(caption="❌ Данные устарели. Начните заново через /add_tour")
+        await callback.message.edit_caption(caption="❌ Данные устарели. Начните заново.")
         return
 
     destination = callback.data.split("_")[1]
     post_text = format_post_text(data)
     msg_id = ""
     
-    await callback.message.edit_caption(caption="⏳ Публикую...")
+    await callback.message.edit_caption(caption="⏳ Публикую и сохраняю в базу...")
     
     try:
         if destination in ['both', 'channel']:
@@ -184,14 +194,14 @@ async def process_publish(callback: CallbackQuery, state: FSMContext, bot: Bot):
             data.get('photo_url'),
             destination,
             msg_id,
-            data.get('description', '')  # Сохраняем кастомный текст в столбец H
+            data.get('description', '')
         ]
         await append_tour_to_sheet(row)
 
         labels = {
-            'both': "✅ Опубликовано в канал и добавлено на сайт!",
+            'both': "✅ Опубликовано в канал и сохранено в таблицу сайта!",
             'channel': "✅ Опубликовано только в Telegram-канал!",
-            'site': "✅ Добавлено только на сайт!"
+            'site': "✅ Сохранено в таблицу только для сайта!"
         }
         await callback.message.edit_caption(caption=labels[destination])
         await state.clear()
@@ -201,7 +211,9 @@ async def process_publish(callback: CallbackQuery, state: FSMContext, bot: Bot):
 
 # --- УПРАВЛЕНИЕ СУЩЕСТВУЮЩИМИ ТУРАМИ (/manage) ---
 
+# Обрабатываем и команду /manage, и нажатие на кнопку
 @router.message(Command("manage"))
+@router.message(F.text == "🗂 Управление турами")
 async def cmd_manage(message: Message):
     if not is_admin(message.from_user.id):
         return
@@ -283,7 +295,6 @@ async def finish_edit_tour(message: Message, state: FSMContext, bot: Bot):
         target_tour = next((t for t in tours if t["row_index"] == row_idx), None)
         
         if target_tour:
-            # Подменяем обновленное значение прямо в словаре, чтобы не делать лишний запрос
             if col_idx == 3:
                 target_tour["Детали"] = new_val
             elif col_idx == 4:
