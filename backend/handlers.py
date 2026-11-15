@@ -18,9 +18,7 @@ router = Router()
 def is_admin(user_id: int) -> bool:
     return str(user_id) == str(ADMIN_ID)
 
-# --- КЛАВИАТУРЫ ---
 def get_main_keyboard() -> ReplyKeyboardMarkup:
-    # Постоянная нижняя клавиатура, заменяет ввод команд
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="➕ Добавить тур")],
@@ -41,7 +39,6 @@ def get_publish_keyboard() -> InlineKeyboardMarkup:
         ]
     )
 
-# --- СОСТОЯНИЯ FSM ---
 class AddTourStates(StatesGroup):
     name = State()
     location = State()
@@ -68,8 +65,6 @@ def format_post_text(data: dict) -> str:
     )
     return post
 
-# --- СТАРТ И ДОБАВЛЕНИЕ ТУРА ---
-
 @router.message(Command("start"))
 async def cmd_start(message: Message):
     if not is_admin(message.from_user.id):
@@ -82,7 +77,6 @@ async def cmd_start(message: Message):
         parse_mode="HTML"
     )
 
-# Обрабатываем и команду /add_tour, и нажатие на новую текстовую кнопку
 @router.message(Command("add_tour"))
 @router.message(F.text == "➕ Добавить тур")
 async def cmd_add_tour(message: Message, state: FSMContext):
@@ -151,7 +145,7 @@ async def process_photo(message: Message, state: FSMContext, bot: Bot):
         await wait_msg.delete()
         await message.answer_photo(
             photo=photo_url,
-            caption=preview_text,
+            caption=preview_text[:1020],
             reply_markup=get_publish_keyboard(),
             parse_mode="HTML"
         )
@@ -167,7 +161,8 @@ async def process_cancel(callback: CallbackQuery, state: FSMContext):
 async def process_publish(callback: CallbackQuery, state: FSMContext, bot: Bot):
     data = await state.get_data()
     if not data:
-        await callback.message.edit_caption(caption="❌ Данные устарели. Начните заново.")
+        await callback.message.answer("❌ Данные устарели. Начните заново.")
+        await callback.answer()
         return
 
     destination = callback.data.split("_")[1]
@@ -181,7 +176,7 @@ async def process_publish(callback: CallbackQuery, state: FSMContext, bot: Bot):
             sent_msg = await bot.send_photo(
                 chat_id=CHANNEL_ID,
                 photo=data.get('photo_url'),
-                caption=post_text,
+                caption=post_text[:1024],
                 parse_mode="HTML"
             )
             msg_id = str(sent_msg.message_id)
@@ -207,11 +202,12 @@ async def process_publish(callback: CallbackQuery, state: FSMContext, bot: Bot):
         await state.clear()
 
     except Exception as e:
-        await callback.message.edit_caption(caption=f"❌ Ошибка при публикации: {str(e)}")
+        # Отправляем ошибку отдельным сообщением, чтобы не упереться в лимит длины подписи
+        await callback.message.edit_caption(caption="❌ Произошла ошибка при сохранении.")
+        await callback.message.answer(f"<b>Детали ошибки:</b>\n<code>{repr(e)}</code>", parse_mode="HTML")
 
 # --- УПРАВЛЕНИЕ СУЩЕСТВУЮЩИМИ ТУРАМИ (/manage) ---
 
-# Обрабатываем и команду /manage, и нажатие на кнопку
 @router.message(Command("manage"))
 @router.message(F.text == "🗂 Управление турами")
 async def cmd_manage(message: Message):
@@ -245,7 +241,7 @@ async def cmd_manage(message: Message):
             ])
             await message.answer(text, reply_markup=kb, parse_mode="HTML")
     except Exception as e:
-        await wait_msg.edit_text(f"❌ Ошибка чтения таблицы: {str(e)}")
+        await wait_msg.edit_text(f"❌ Ошибка чтения таблицы:\n<code>{repr(e)}</code>", parse_mode="HTML")
 
 @router.callback_query(F.data.startswith("del_"))
 async def process_delete_tour(callback: CallbackQuery, bot: Bot):
@@ -268,7 +264,7 @@ async def process_delete_tour(callback: CallbackQuery, bot: Bot):
         else:
             await callback.message.edit_text("⚠️ Тур не найден (возможно, уже удален).")
     except Exception as e:
-        await callback.message.edit_text(f"❌ Ошибка удаления: {str(e)}")
+        await callback.message.edit_text(f"❌ Ошибка удаления:\n<code>{repr(e)}</code>", parse_mode="HTML")
 
 @router.callback_query(F.data.startswith("edit_"))
 async def start_edit_tour(callback: CallbackQuery, state: FSMContext):
@@ -307,7 +303,7 @@ async def finish_edit_tour(message: Message, state: FSMContext, bot: Bot):
                     await bot.edit_message_caption(
                         chat_id=CHANNEL_ID,
                         message_id=int(msg_id),
-                        caption=new_caption,
+                        caption=new_caption[:1024],
                         parse_mode="HTML"
                     )
                 except Exception:
@@ -316,4 +312,4 @@ async def finish_edit_tour(message: Message, state: FSMContext, bot: Bot):
         await wait_msg.edit_text("✅ Данные успешно обновлены на сайте и в канале!")
         await state.clear()
     except Exception as e:
-        await wait_msg.edit_text(f"❌ Ошибка обновления: {str(e)}")
+        await wait_msg.edit_text(f"❌ Ошибка обновления:\n<code>{repr(e)}</code>", parse_mode="HTML")
