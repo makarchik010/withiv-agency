@@ -31,22 +31,11 @@ def _append_tour_sync(row: list):
     sh = _get_spreadsheet()
     worksheet = sh.worksheet("Tours")
     
-    # Забираем все значения из первого столбца (Название)
-    col_a = worksheet.col_values(1)
+    # Очищаем данные от None и принудительно переводим все в текст, чтобы код не зависал
+    clean_row = [str(item) if item is not None else "" for item in row]
     
-    target_row = None
-    # Ищем первую пустую ячейку начиная со 2-й строки (1-я — шапка)
-    for idx in range(2, len(col_a) + 1):
-        if not str(col_a[idx - 1]).strip():
-            target_row = idx
-            break
-            
-    # Если пустых строк в середине нет, пишем в конец таблицы
-    if target_row is None:
-        target_row = len(col_a) + 1
-        
-    # ИСПРАВЛЕНО: Теперь диапазон A:H (под 8 элементов, включая Описание)
-    worksheet.update(range_name=f"A{target_row}:H{target_row}", values=[row])
+    # Железобетонный метод вставки (сам найдет конец таблицы)
+    worksheet.append_row(clean_row, value_input_option='USER_ENTERED')
 
 async def append_tour_to_sheet(row: list):
     await asyncio.to_thread(_append_tour_sync, row)
@@ -58,6 +47,7 @@ def _get_tours_sync(only_for_site: bool = False):
     
     result = []
     for idx, r in enumerate(records, start=2):
+        # Игнорируем случайные пустые строки
         if not str(r.get("Название", "")).strip():
             continue
             
@@ -82,7 +72,7 @@ async def delete_tour_from_sheet(row_index: int):
 def _update_tour_field_sync(row_index: int, col_index: int, new_value: str):
     sh = _get_spreadsheet()
     worksheet = sh.worksheet("Tours")
-    worksheet.update_cell(row_index, col_index, new_value)
+    worksheet.update_cell(row_index, col_index, str(new_value))
 
 async def update_tour_field(row_index: int, col_index: int, new_value: str):
     await asyncio.to_thread(_update_tour_field_sync, row_index, col_index, new_value)
