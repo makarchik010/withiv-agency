@@ -45,8 +45,8 @@ def _append_tour_sync(row: list):
     if target_row is None:
         target_row = len(col_a) + 1
         
-    # Вписываем данные тура строго в найденную свободную строку (диапазон A:G)
-    worksheet.update(range_name=f"A{target_row}:G{target_row}", values=[row])
+    # ИСПРАВЛЕНО: Теперь диапазон A:H (под 8 элементов, включая Описание)
+    worksheet.update(range_name=f"A{target_row}:H{target_row}", values=[row])
 
 async def append_tour_to_sheet(row: list):
     await asyncio.to_thread(_append_tour_sync, row)
@@ -57,16 +57,14 @@ def _get_tours_sync(only_for_site: bool = False):
     records = worksheet.get_all_records()
     
     result = []
-    # Индекс строки в таблице начинается с 2 (1-я строка — шапка)
     for idx, r in enumerate(records, start=2):
-        # Пропускаем пустые строки, если они образовались после ручной очистки
         if not str(r.get("Название", "")).strip():
             continue
             
         dest = str(r.get("Место публикации", "")).strip()
         if only_for_site and dest not in ["both", "site"]:
             continue
-        r["row_index"] = idx  # Запоминаем номер строки для редактирования/удаления
+        r["row_index"] = idx
         result.append(r)
     return result
 
