@@ -15,7 +15,6 @@ from services import (
 
 router = Router()
 
-# Проверка на админа
 def is_admin(user_id: int) -> bool:
     return str(user_id) == str(ADMIN_ID)
 
@@ -24,19 +23,28 @@ class AddTourStates(StatesGroup):
     location = State()
     details = State()
     price = State()
+    description = State()  # Новый шаг для кастомного текста
     photo = State()
 
 class EditTourStates(StatesGroup):
     waiting_for_value = State()
 
 def format_post_text(data: dict) -> str:
-    return (
-        f"🔥 <b>ГОРЯЩИЙ ТУР: {data.get('name', data.get('Название'))}</b>\n\n"
+    # Забираем кастомное описание (если оно есть)
+    desc = data.get('description') or data.get('Описание') or ""
+    
+    post = ""
+    if desc and str(desc).strip():
+        post += f"{str(desc).strip()}\n\n"
+        
+    post += (
+        f"🔥 <b>{data.get('name', data.get('Название'))}</b>\n"
         f"📍 <b>Локация:</b> {data.get('location', data.get('Локация'))}\n"
         f"ℹ️ <b>Детали:</b> {data.get('details', data.get('Детали'))}\n"
         f"💰 <b>Цена:</b> {data.get('price', data.get('Цена'))}\n\n"
         f"<i>Для бронирования обращайтесь к менеджеру!</i>"
     )
+    return post
 
 def get_publish_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
@@ -94,8 +102,28 @@ async def process_details(message: Message, state: FSMContext):
 @router.message(AddTourStates.price)
 async def process_price(message: Message, state: FSMContext):
     await state.update_data(price=message.text)
+    await state.set_state(AddTourStates.description)
+    await message.answer(
+        "📝 <b>Дополнительное описание (Текст поста)</b>\n"
+        "Напишите красивое вступление для этого тура. Можно использовать любые эмодзи, абзацы и жирный шрифт — оно появится в самом верху поста в Telegram.\n\n"
+        "<i>Если описание не нужно и вы хотите оставить строгий шаблон, просто отправьте минус <code>-</code></i>",
+        parse_mode="HTML"
+    )
+
+@router.message(AddTourStates.description)
+async def process_description(message: Message, state: FSMContext):
+    text = message.html_text or ""
+    raw_text = message.text or ""
+    
+    # Если прислали минус, оставляем описание пустым
+    if raw_text.strip() == '-':
+        desc = ""
+    else:
+        desc = text
+        
+    await state.update_data(description=desc)
     await state.set_state(AddTourStates.photo)
-    await message.answer("Остался последний шаг. Отправьте <b>фотографию</b> для тура:", parse_mode="HTML")
+    await message.answer("📸 Остался последний шаг. Отправьте <b>фотографию</b> для тура:", parse_mode="HTML")
 
 @router.message(AddTourStates.photo, F.photo)
 async def process_photo(message: Message, state: FSMContext, bot: Bot):
@@ -132,14 +160,13 @@ async def process_publish(callback: CallbackQuery, state: FSMContext, bot: Bot):
         await callback.message.edit_caption(caption="❌ Данные устарели. Начните заново через /add_tour")
         return
 
-    destination = callback.data.split("_")[1]  # both, channel, site
+    destination = callback.data.split("_")[1]
     post_text = format_post_text(data)
     msg_id = ""
     
     await callback.message.edit_caption(caption="⏳ Публикую...")
     
     try:
-        # 1. Публикуем в Telegram-канал, если нужно
         if destination in ['both', 'channel']:
             sent_msg = await bot.send_photo(
                 chat_id=CHANNEL_ID,
@@ -149,7 +176,6 @@ async def process_publish(callback: CallbackQuery, state: FSMContext, bot: Bot):
             )
             msg_id = str(sent_msg.message_id)
             
-        # 2. Записываем в Google Таблицу (записываем всегда, чтобы видеть в /manage)
         row = [
             data.get('name'),
             data.get('location'),
@@ -157,7 +183,8 @@ async def process_publish(callback: CallbackQuery, state: FSMContext, bot: Bot):
             data.get('price'),
             data.get('photo_url'),
             destination,
-            msg_id
+            msg_id,
+            data.get('description', '')  # Сохраняем кастомный текст в столбец H
         ]
         await append_tour_to_sheet(row)
 
@@ -208,7 +235,6 @@ async def cmd_manage(message: Message):
     except Exception as e:
         await wait_msg.edit_text(f"❌ Ошибка чтения таблицы: {str(e)}")
 
-# Удаление тура (из таблицы и из канала)
 @router.callback_query(F.data.startswith("del_"))
 async def process_delete_tour(callback: CallbackQuery, bot: Bot):
     row_idx = int(callback.data.split("_")[1])
@@ -223,7 +249,7 @@ async def process_delete_tour(callback: CallbackQuery, bot: Bot):
                 try:
                     await bot.delete_message(chat_id=CHANNEL_ID, message_id=int(msg_id))
                 except Exception:
-                    pass  # Если пост уже удалили руками из канала, просто игнорируем
+                    pass
                     
             await delete_tour_from_sheet(row_idx)
             await callback.message.edit_text("🗑 Тур успешно удален с сайта и из канала!")
@@ -232,7 +258,6 @@ async def process_delete_tour(callback: CallbackQuery, bot: Bot):
     except Exception as e:
         await callback.message.edit_text(f"❌ Ошибка удаления: {str(e)}")
 
-# Запуск редактирования поля (col_idx: 3 = Детали, 4 = Цена)
 @router.callback_query(F.data.startswith("edit_"))
 async def start_edit_tour(callback: CallbackQuery, state: FSMContext):
     _, col_idx, row_idx = callback.data.split("_")
@@ -252,13 +277,18 @@ async def finish_edit_tour(message: Message, state: FSMContext, bot: Bot):
     
     wait_msg = await message.answer("⏳ Обновляю данные...")
     try:
-        # 1. Обновляем ячейку в Google Таблице
         await update_tour_field(row_idx, col_idx, new_val)
         
-        # 2. Если пост есть в канале — обновляем его текст и там!
         tours = await get_tours(only_for_site=False)
         target_tour = next((t for t in tours if t["row_index"] == row_idx), None)
+        
         if target_tour:
+            # Подменяем обновленное значение прямо в словаре, чтобы не делать лишний запрос
+            if col_idx == 3:
+                target_tour["Детали"] = new_val
+            elif col_idx == 4:
+                target_tour["Цена"] = new_val
+                
             msg_id = str(target_tour.get("ID_поста", "")).strip()
             if msg_id.isdigit():
                 try:
