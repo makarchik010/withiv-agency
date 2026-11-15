@@ -2,8 +2,8 @@
 <html lang="ru" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Withiv | Премиальные путешествия</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Withiv | Бутик-турагентство</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,169 +28,202 @@
         }
     </script>
     <style>
-        body { background-color: #F7F4EF; color: #1B3B2B; }
-        .glass-header { background: rgba(247, 244, 239, 0.95); backdrop-filter: blur(8px); }
+        body { background-color: #F7F4EF; color: #1B3B2B; -webkit-font-smoothing: antialiased; }
+        .glass-header { background: rgba(247, 244, 239, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
         .quiz-step { display: none; }
         .quiz-step.active { display: block; animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        /* Прячем скроллбар для эстетики */
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #1B3B2B; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: #1B3B2B; border-radius: 2px; }
+        /* Фикс для iOS Safari (чтобы инпуты не зумились) */
+        input, select, textarea { font-size: 16px !important; }
     </style>
 </head>
-<body class="font-sans antialiased selection:bg-brand_dark selection:text-white">
+<body class="font-sans selection:bg-brand_dark selection:text-white flex flex-col min-h-screen">
 
-    <!-- Header -->
+    <!-- Header & Mobile Menu -->
     <header class="fixed top-0 w-full z-40 glass-header border-b border-brand_dark/10">
-        <div class="max-w-7xl mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
-            <a href="#" class="flex items-center gap-2">
-                <svg class="w-8 h-8 text-brand_dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 h-16 md:h-20 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-2 z-50">
+                <svg class="w-7 h-7 md:w-8 md:h-8 text-brand_dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" class="text-brand_accent" />
                 </svg>
                 <span class="font-serif text-2xl md:text-3xl font-bold">Withiv</span>
             </a>
+            
+            <!-- Desktop Nav -->
             <nav class="hidden md:flex space-x-8 text-sm font-medium">
                 <a href="#tours" class="hover:text-brand_accent transition-colors">Коллекция туров</a>
-                <a href="#agent" class="hover:text-brand_accent transition-colors">О нас</a>
+                <a href="#about" class="hover:text-brand_accent transition-colors">О нас</a>
                 <a href="#quiz-section" class="hover:text-brand_accent transition-colors">Собрать тур</a>
             </nav>
-            <a href="https://t.me/nast_ivn" target="_blank" class="bg-brand_dark text-brand_bg px-5 py-2.5 rounded-sm text-sm font-semibold hover:bg-brand_accent transition-colors">
+            
+            <a href="https://t.me/withivtravel13" target="_blank" class="hidden md:inline-block bg-brand_dark text-brand_bg px-5 py-2.5 rounded-sm text-sm font-semibold hover:bg-brand_accent transition-colors">
                 Связаться
             </a>
+
+            <!-- Mobile Hamburger Button -->
+            <button id="mobile-menu-btn" class="md:hidden p-2 text-brand_dark z-50">
+                <svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="fixed inset-0 bg-brand_bg pt-24 px-6 pb-8 hidden flex-col border-t border-brand_dark/10 md:hidden z-40">
+            <nav class="flex flex-col space-y-6 text-center text-lg font-medium">
+                <a href="#tours" class="mobile-link text-brand_dark hover:text-brand_accent">Коллекция туров</a>
+                <a href="#about" class="mobile-link text-brand_dark hover:text-brand_accent">О агентстве</a>
+                <a href="#quiz-section" class="mobile-link text-brand_dark hover:text-brand_accent">Индивидуальный подбор</a>
+                <hr class="border-brand_dark/10 my-4">
+                <a href="https://t.me/withivtravel13" target="_blank" class="bg-brand_dark text-brand_bg px-5 py-4 rounded-sm font-bold text-center w-full">Связаться в Telegram</a>
+            </nav>
         </div>
     </header>
 
-    <!-- Hero Section (Стабильный, классический) -->
-    <section class="relative h-screen min-h-[600px] flex items-center pt-20">
+    <!-- Hero Section -->
+    <section class="relative min-h-[100dvh] flex items-center pt-16 md:pt-20">
         <div class="absolute inset-0 z-0 bg-brand_dark">
-            <img src="https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover opacity-60 mix-blend-overlay">
+            <!-- Оптимизированное фото для фона -->
+            <img src="https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover opacity-50 mix-blend-overlay">
         </div>
-        <div class="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 text-white">
-            <p class="text-brand_accent text-sm md:text-base tracking-[0.2em] uppercase mb-4 font-semibold">Туристическое агентство</p>
-            <h1 class="font-serif text-5xl md:text-7xl font-bold leading-tight mb-8 max-w-3xl">
-                Не просто туры.<br>
-                <span class="italic font-light">Впечатления на всю жизнь.</span>
+        <div class="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 text-white mt-10 md:mt-0 text-center md:text-left">
+            <p class="text-brand_accent text-xs md:text-sm tracking-[0.2em] uppercase mb-4 font-bold">Бутик-турагентство</p>
+            <h1 class="font-serif text-4xl sm:text-5xl md:text-7xl font-bold leading-tight mb-6 md:mb-8 max-w-4xl mx-auto md:mx-0">
+                <span class="text-brand_accent">Withiv.</span> Не просто туры.<br>
+                <span class="italic font-light text-white/90">Впечатления на всю жизнь.</span>
             </h1>
-            <div class="flex gap-4">
-                <a href="#tours" class="bg-brand_bg text-brand_dark px-8 py-4 rounded-sm font-bold hover:bg-brand_accent hover:text-white transition-colors">
+            <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <a href="#tours" class="bg-brand_bg text-brand_dark px-8 py-4 rounded-sm font-bold hover:bg-brand_accent hover:text-white transition-colors w-full sm:w-auto text-center">
                     Смотреть туры
                 </a>
-                <a href="#quiz-section" class="border border-brand_bg text-brand_bg px-8 py-4 rounded-sm font-bold hover:bg-brand_bg hover:text-brand_dark transition-colors hidden sm:block">
-                    Индивидуальный подбор
+                <a href="#quiz-section" class="border border-brand_bg text-brand_bg px-8 py-4 rounded-sm font-bold hover:bg-brand_bg hover:text-brand_dark transition-colors w-full sm:w-auto text-center">
+                    Подбор тура
                 </a>
             </div>
         </div>
     </section>
 
     <!-- Interactive Tours Section -->
-    <section id="tours" class="py-24 max-w-7xl mx-auto px-4 md:px-8">
-        <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+    <section id="tours" class="py-16 md:py-24 max-w-7xl mx-auto px-4 md:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-4">
             <div>
-                <span class="text-brand_accent text-xs uppercase tracking-[0.2em] font-bold block mb-2">Актуальное</span>
-                <h2 class="font-serif text-4xl font-bold">Выбор Withiv</h2>
+                <span class="text-brand_accent text-[10px] md:text-xs uppercase tracking-[0.2em] font-bold block mb-2">Актуальное</span>
+                <h2 class="font-serif text-3xl md:text-4xl font-bold">Коллекция Withiv</h2>
             </div>
             
-            <!-- Интерактивные табы (UI функционал) -->
-            <div class="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto hide-scrollbar">
-                <button class="px-4 py-2 bg-brand_dark text-brand_bg text-sm font-semibold rounded-sm whitespace-nowrap">Все направления</button>
-                <button class="px-4 py-2 border border-brand_dark/20 text-brand_dark text-sm font-semibold rounded-sm hover:border-brand_dark transition-colors whitespace-nowrap">Пляжный отдых</button>
-                <button class="px-4 py-2 border border-brand_dark/20 text-brand_dark text-sm font-semibold rounded-sm hover:border-brand_dark transition-colors whitespace-nowrap">Экзотика</button>
+            <div class="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+                <button class="px-4 py-2 bg-brand_dark text-brand_bg text-xs md:text-sm font-semibold rounded-sm whitespace-nowrap">Все направления</button>
+                <button class="px-4 py-2 border border-brand_dark/20 text-brand_dark text-xs md:text-sm font-semibold rounded-sm hover:border-brand_dark transition-colors whitespace-nowrap">Пляжный отдых</button>
             </div>
         </div>
 
-        <div id="tours-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="col-span-full py-12 text-center text-brand_dark/60 font-medium">
-                Связываемся с базой данных...
+        <div id="tours-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <div class="col-span-full py-12 text-center text-brand_dark/60 font-medium text-sm md:text-base">
+                <div class="inline-block w-6 h-6 md:w-8 md:h-8 border-2 border-brand_accent border-t-transparent rounded-full animate-spin mb-3"></div><br>
+                Подключаемся к базе данных...
             </div>
         </div>
     </section>
 
-    <!-- Quick View Modal (Строгий функционал) -->
-    <div id="tour-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="absolute inset-0 bg-brand_dark/90" onclick="closeModal()"></div>
-        <div class="relative bg-brand_bg w-full max-w-5xl rounded-sm shadow-2xl flex flex-col md:flex-row max-h-[90vh] overflow-hidden">
-            <button onclick="closeModal()" class="absolute top-4 right-4 z-10 w-10 h-10 bg-white rounded-full flex items-center justify-center text-brand_dark hover:bg-brand_accent hover:text-white transition-colors shadow-md">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    <!-- Quick View Modal (Адаптировано для мобильных) -->
+    <div id="tour-modal" class="fixed inset-0 z-50 hidden items-end md:items-center justify-center sm:p-4 opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 bg-brand_dark/90 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="relative bg-brand_bg w-full md:max-w-5xl rounded-t-2xl md:rounded-sm shadow-2xl flex flex-col md:flex-row h-[85vh] md:h-auto md:max-h-[90vh] overflow-hidden transform transition-transform translate-y-full md:translate-y-0 duration-300" id="modal-content">
+            
+            <button onclick="closeModal()" class="absolute top-3 right-3 md:top-4 md:right-4 z-10 w-8 h-8 md:w-10 md:h-10 bg-white/80 md:bg-white backdrop-blur-md rounded-full flex items-center justify-center text-brand_dark hover:bg-brand_accent hover:text-white transition-colors shadow-md">
+                <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
             
-            <div class="w-full md:w-1/2 h-64 md:h-auto bg-gray-200">
+            <!-- Картинка (На мобилках короче, чтобы влез текст) -->
+            <div class="w-full md:w-1/2 h-48 md:h-auto bg-gray-200 shrink-0 relative">
                 <img id="modal-img" src="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent md:hidden"></div>
+                <h3 id="modal-title-mobile" class="absolute bottom-4 left-4 font-serif text-2xl font-bold text-white md:hidden line-clamp-1 drop-shadow-md">Название</h3>
             </div>
             
-            <div class="w-full md:w-1/2 p-8 flex flex-col overflow-y-auto">
-                <h3 id="modal-title" class="font-serif text-3xl font-bold mb-2">Название</h3>
-                <p id="modal-location" class="text-sm font-semibold text-brand_accent mb-6">Локация</p>
+            <div class="w-full md:w-1/2 p-5 md:p-8 flex flex-col overflow-y-auto bg-brand_bg h-full">
+                <h3 id="modal-title-desktop" class="hidden md:block font-serif text-3xl font-bold mb-2">Название</h3>
+                <p id="modal-location" class="text-xs md:text-sm font-semibold text-brand_accent mb-4 md:mb-6 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                    <span>Локация</span>
+                </p>
                 
-                <div class="text-sm text-brand_dark/80 leading-relaxed mb-8 whitespace-pre-wrap flex-1" id="modal-desc">
+                <div class="text-sm text-brand_dark/80 leading-relaxed mb-6 whitespace-pre-wrap flex-1" id="modal-desc">
                     Описание...
                 </div>
                 
-                <div class="border-t border-brand_dark/10 pt-6 mt-auto">
-                    <p class="text-xs uppercase tracking-wider font-bold text-brand_dark/50 mb-1">Стоимость</p>
-                    <p id="modal-price" class="text-2xl font-serif font-bold mb-6">Цена</p>
+                <div class="border-t border-brand_dark/10 pt-5 mt-auto shrink-0">
+                    <div class="flex justify-between items-end mb-4">
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider font-bold text-brand_dark/50 mb-1">Стоимость</p>
+                            <p id="modal-price" class="text-xl md:text-2xl font-serif font-bold">Цена</p>
+                        </div>
+                    </div>
                     
-                    <form id="modal-form" class="flex gap-3">
+                    <form id="modal-form" class="flex flex-col sm:flex-row gap-3">
                         <input type="hidden" id="modal-tour-name">
-                        <input type="text" id="modal-contact" placeholder="Телефон / Telegram" required class="flex-1 bg-white border border-brand_dark/20 rounded-sm px-4 py-3 outline-none focus:border-brand_dark text-sm">
-                        <button type="submit" class="bg-brand_dark text-brand_bg font-bold px-6 py-3 rounded-sm hover:bg-brand_accent transition-colors">Запросить</button>
+                        <input type="text" id="modal-contact" placeholder="Ваш Телефон / Telegram" required class="flex-1 bg-white border border-brand_dark/20 rounded-sm px-4 py-3 md:py-4 outline-none focus:border-brand_dark text-sm md:text-base">
+                        <button type="submit" class="bg-brand_dark text-brand_bg font-bold px-6 py-3 md:py-4 rounded-sm hover:bg-brand_accent transition-colors w-full sm:w-auto">Отправить</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Интерактивный Квиз (Главный функционал) -->
-    <section id="quiz-section" class="py-24 bg-brand_dark text-brand_bg">
+    <!-- Интерактивный Квиз -->
+    <section id="quiz-section" class="py-16 md:py-24 bg-brand_dark text-brand_bg">
         <div class="max-w-4xl mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="font-serif text-4xl font-bold mb-4">Собрать идеальный тур</h2>
-                <p class="text-brand_bg/70">Ответьте на 4 вопроса, и Анастасия подготовит для вас 3 эксклюзивных варианта.</p>
+            <div class="text-center mb-8 md:mb-12">
+                <h2 class="font-serif text-3xl md:text-4xl font-bold mb-3 md:mb-4">Собрать идеальный тур</h2>
+                <p class="text-brand_bg/70 text-sm md:text-base px-4">Ответьте на 4 вопроса, и мы подготовим для вас персональную подборку.</p>
             </div>
 
-            <div class="bg-white text-brand_dark rounded-sm p-8 md:p-12 shadow-2xl relative min-h-[400px]">
-                
-                <!-- Прогресс бар -->
-                <div class="absolute top-0 left-0 w-full h-1 bg-gray-100">
+            <div class="bg-white text-brand_dark rounded-sm p-6 md:p-12 shadow-2xl relative min-h-[380px] md:min-h-[400px] flex flex-col justify-center">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gray-100 rounded-t-sm overflow-hidden">
                     <div id="quiz-progress" class="h-full bg-brand_accent transition-all duration-300 w-1/4"></div>
                 </div>
 
                 <form id="quiz-form">
                     <!-- Шаг 1 -->
                     <div class="quiz-step active" id="step-1">
-                        <h3 class="text-2xl font-bold mb-6">1. Какое направление рассматриваете?</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg transition-all">
-                                <input type="radio" name="quiz-dest" value="Мальдивы / Сейшелы" class="mr-2 accent-brand_dark"> 🌴 Мальдивы / Сейшелы
+                        <h3 class="text-xl md:text-2xl font-bold mb-4 md:mb-6 leading-tight">1. Какое направление рассматриваете?</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-3 md:p-4 hover:border-brand_dark hover:bg-brand_bg flex items-center">
+                                <input type="radio" name="quiz-dest" value="Мальдивы / Сейшелы" class="mr-3 w-4 h-4 accent-brand_dark flex-shrink-0"> 
+                                <span class="text-sm md:text-base font-medium">🌴 Мальдивы / Сейшелы</span>
                             </label>
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg transition-all">
-                                <input type="radio" name="quiz-dest" value="ОАЭ / Ближний Восток" class="mr-2 accent-brand_dark"> 🏙 ОАЭ / Ближний Восток
+                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-3 md:p-4 hover:border-brand_dark hover:bg-brand_bg flex items-center">
+                                <input type="radio" name="quiz-dest" value="ОАЭ / Восток" class="mr-3 w-4 h-4 accent-brand_dark flex-shrink-0"> 
+                                <span class="text-sm md:text-base font-medium">🏙 ОАЭ / Ближний Восток</span>
                             </label>
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg transition-all">
-                                <input type="radio" name="quiz-dest" value="Турция / Европа" class="mr-2 accent-brand_dark"> 🏛 Турция / Европа
+                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-3 md:p-4 hover:border-brand_dark hover:bg-brand_bg flex items-center">
+                                <input type="radio" name="quiz-dest" value="Турция / Египет" class="mr-3 w-4 h-4 accent-brand_dark flex-shrink-0"> 
+                                <span class="text-sm md:text-base font-medium">☀️ Турция / Египет</span>
                             </label>
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 flex items-center">
-                                <input type="radio" name="quiz-dest" value="Другое" class="mr-2 accent-brand_dark" onclick="document.getElementById('custom-dest').focus()">
-                                <input type="text" id="custom-dest" placeholder="Свой вариант" class="w-full outline-none bg-transparent text-sm">
+                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-3 md:p-4 flex items-center bg-gray-50 focus-within:bg-white focus-within:border-brand_dark">
+                                <input type="radio" name="quiz-dest" value="Другое" class="mr-3 w-4 h-4 accent-brand_dark flex-shrink-0" onclick="document.getElementById('custom-dest').focus()">
+                                <input type="text" id="custom-dest" placeholder="Свой вариант..." class="w-full outline-none bg-transparent text-sm md:text-base font-medium">
                             </label>
                         </div>
-                        <div class="mt-8 flex justify-end">
-                            <button type="button" onclick="nextStep(2)" class="bg-brand_dark text-white px-8 py-3 font-bold rounded-sm hover:bg-brand_accent transition-colors">Далее</button>
+                        <div class="mt-6 md:mt-8 flex justify-end">
+                            <button type="button" onclick="nextStep(2)" class="bg-brand_dark text-white w-full sm:w-auto px-8 py-3.5 font-bold rounded-sm hover:bg-brand_accent transition-colors">Далее</button>
                         </div>
                     </div>
 
                     <!-- Шаг 2 -->
                     <div class="quiz-step" id="step-2">
-                        <h3 class="text-2xl font-bold mb-6">2. Когда и на сколько дней?</h3>
+                        <h3 class="text-xl md:text-2xl font-bold mb-4 md:mb-6 leading-tight">2. Когда и на сколько дней?</h3>
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-semibold mb-2">Примерные даты вылета</label>
-                                <input type="text" id="quiz-dates" placeholder="Например: начало августа" class="w-full border border-brand_dark/20 p-4 rounded-sm outline-none focus:border-brand_dark">
+                                <label class="block text-xs md:text-sm font-bold uppercase tracking-wider text-brand_dark/70 mb-2">Примерные даты вылета</label>
+                                <input type="text" id="quiz-dates" placeholder="Например: середина августа, 10 ночей" class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark text-sm md:text-base bg-white">
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold mb-2">Количество человек</label>
-                                <select id="quiz-people" class="w-full border border-brand_dark/20 p-4 rounded-sm outline-none focus:border-brand_dark bg-white">
+                                <label class="block text-xs md:text-sm font-bold uppercase tracking-wider text-brand_dark/70 mb-2">Количество гостей</label>
+                                <select id="quiz-people" class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark bg-white text-sm md:text-base cursor-pointer">
                                     <option>2 взрослых</option>
                                     <option>2 взрослых + 1 ребенок</option>
                                     <option>2 взрослых + 2 детей</option>
@@ -199,108 +232,185 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="mt-8 flex justify-between">
-                            <button type="button" onclick="nextStep(1)" class="text-brand_dark/50 hover:text-brand_dark font-bold px-4">Назад</button>
-                            <button type="button" onclick="nextStep(3)" class="bg-brand_dark text-white px-8 py-3 font-bold rounded-sm hover:bg-brand_accent transition-colors">Далее</button>
+                        <div class="mt-6 md:mt-8 flex gap-3">
+                            <button type="button" onclick="nextStep(1)" class="w-1/3 sm:w-auto bg-gray-100 text-brand_dark hover:bg-gray-200 font-bold px-4 py-3.5 rounded-sm transition-colors text-sm">Назад</button>
+                            <button type="button" onclick="nextStep(3)" class="flex-1 sm:flex-none sm:w-auto bg-brand_dark text-white px-8 py-3.5 font-bold rounded-sm hover:bg-brand_accent transition-colors">Далее</button>
                         </div>
                     </div>
 
                     <!-- Шаг 3 -->
                     <div class="quiz-step" id="step-3">
-                        <h3 class="text-2xl font-bold mb-6">3. Какой примерный бюджет?</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg">
-                                <input type="radio" name="quiz-budget" value="До 300 000 ₽" class="mr-2 accent-brand_dark" checked> До 300 000 ₽
+                        <h3 class="text-xl md:text-2xl font-bold mb-4 md:mb-6 leading-tight">3. Какой примерный бюджет?</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 mb-6">
+                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-3 md:p-4 hover:border-brand_dark hover:bg-brand_bg flex items-center">
+                                <input type="radio" name="quiz-budget" value="До 300 000 ₽" class="mr-3 w-4 h-4 accent-brand_dark" checked> 
+                                <span class="text-sm md:text-base font-medium">До 300 000 ₽</span>
                             </label>
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg">
-                                <input type="radio" name="quiz-budget" value="300 000 - 500 000 ₽" class="mr-2 accent-brand_dark"> 300 000 - 500 000 ₽
+                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-3 md:p-4 hover:border-brand_dark hover:bg-brand_bg flex items-center">
+                                <input type="radio" name="quiz-budget" value="300 000 - 500 000 ₽" class="mr-3 w-4 h-4 accent-brand_dark"> 
+                                <span class="text-sm md:text-base font-medium">300 000 - 500 000 ₽</span>
                             </label>
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg">
-                                <input type="radio" name="quiz-budget" value="500 000 - 1 000 000 ₽" class="mr-2 accent-brand_dark"> 500 000 - 1 000 000 ₽
+                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-3 md:p-4 hover:border-brand_dark hover:bg-brand_bg flex items-center">
+                                <input type="radio" name="quiz-budget" value="500 000 - 1 000 000 ₽" class="mr-3 w-4 h-4 accent-brand_dark"> 
+                                <span class="text-sm md:text-base font-medium">500 000 - 1 млн ₽</span>
                             </label>
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg">
-                                <input type="radio" name="quiz-budget" value="Премиум (от 1 млн ₽)" class="mr-2 accent-brand_dark"> Премиум (от 1 млн ₽)
+                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-3 md:p-4 hover:border-brand_dark hover:bg-brand_bg flex items-center">
+                                <input type="radio" name="quiz-budget" value="Премиум (от 1 млн ₽)" class="mr-3 w-4 h-4 accent-brand_dark"> 
+                                <span class="text-sm md:text-base font-medium">Премиум (от 1 млн ₽)</span>
                             </label>
                         </div>
-                        <div class="mt-8 flex justify-between">
-                            <button type="button" onclick="nextStep(2)" class="text-brand_dark/50 hover:text-brand_dark font-bold px-4">Назад</button>
-                            <button type="button" onclick="nextStep(4)" class="bg-brand_dark text-white px-8 py-3 font-bold rounded-sm hover:bg-brand_accent transition-colors">Далее</button>
+                        <div class="mt-6 md:mt-8 flex gap-3">
+                            <button type="button" onclick="nextStep(2)" class="w-1/3 sm:w-auto bg-gray-100 text-brand_dark hover:bg-gray-200 font-bold px-4 py-3.5 rounded-sm transition-colors text-sm">Назад</button>
+                            <button type="button" onclick="nextStep(4)" class="flex-1 sm:flex-none sm:w-auto bg-brand_dark text-white px-8 py-3.5 font-bold rounded-sm hover:bg-brand_accent transition-colors">Далее</button>
                         </div>
                     </div>
 
                     <!-- Шаг 4 -->
                     <div class="quiz-step" id="step-4">
-                        <h3 class="text-2xl font-bold mb-6">4. Куда прислать подборку?</h3>
-                        <p class="text-sm mb-6">Оставьте контакт, и Анастасия свяжется с вами с готовыми вариантами.</p>
+                        <h3 class="text-xl md:text-2xl font-bold mb-2 md:mb-4 leading-tight">4. Куда прислать подборку?</h3>
+                        <p class="text-xs md:text-sm text-brand_dark/70 mb-5 md:mb-6">Оставьте контакт, и наш менеджер свяжется с вами с готовыми вариантами.</p>
                         <div>
-                            <input type="text" id="quiz-contact" placeholder="Ваш номер телефона или @telegram" required class="w-full border border-brand_dark/20 p-4 rounded-sm outline-none focus:border-brand_dark mb-4 text-lg">
+                            <input type="text" id="quiz-contact" placeholder="Телефон или @telegram" required class="w-full border border-brand_dark/20 px-4 py-4 rounded-sm outline-none focus:border-brand_dark text-base bg-white">
                         </div>
-                        <div class="mt-8 flex justify-between items-center">
-                            <button type="button" onclick="nextStep(3)" class="text-brand_dark/50 hover:text-brand_dark font-bold px-4">Назад</button>
-                            <button type="submit" id="quiz-submit-btn" class="bg-brand_accent text-white px-10 py-4 font-bold rounded-sm hover:bg-brand_dark transition-colors shadow-lg">Отправить заявку</button>
+                        <div class="mt-6 md:mt-8 flex flex-col sm:flex-row gap-3 items-center">
+                            <button type="button" onclick="nextStep(3)" class="w-full sm:w-auto bg-gray-100 text-brand_dark hover:bg-gray-200 font-bold px-6 py-4 rounded-sm transition-colors order-2 sm:order-1">Назад</button>
+                            <button type="submit" id="quiz-submit-btn" class="w-full sm:w-auto sm:flex-1 bg-brand_accent text-white px-8 py-4 font-bold rounded-sm hover:bg-brand_dark transition-colors shadow-lg order-1 sm:order-2">Отправить заявку</button>
                         </div>
-                        <p class="text-[10px] text-center text-gray-400 mt-4">Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности.</p>
                     </div>
                     
                     <!-- Успех -->
-                    <div class="quiz-step text-center py-12" id="step-success">
-                        <svg class="w-20 h-20 text-green-600 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <h3 class="text-3xl font-serif font-bold mb-4">Заявка принята!</h3>
-                        <p class="text-brand_dark/70">Мы уже приступили к подбору идеальных вариантов для вас.</p>
+                    <div class="quiz-step text-center py-8 md:py-12" id="step-success">
+                        <svg class="w-16 h-16 md:w-20 md:h-20 text-green-600 mx-auto mb-4 md:mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <h3 class="text-2xl md:text-3xl font-serif font-bold mb-2 md:mb-4">Заявка принята!</h3>
+                        <p class="text-sm md:text-base text-brand_dark/70 px-4">Мы уже приступили к подбору идеальных вариантов для вас.</p>
                     </div>
                 </form>
             </div>
         </div>
     </section>
 
-    <!-- Agent Profile -->
-    <section id="agent" class="py-24 bg-white border-y border-brand_dark/10">
-        <div class="max-w-5xl mx-auto px-4 md:px-8">
-            <div class="flex flex-col md:flex-row items-center gap-12">
+    <!-- Agency Profile (О Нас) -->
+    <section id="about" class="py-16 md:py-24 bg-white border-t border-brand_dark/10">
+        <div class="max-w-6xl mx-auto px-4 md:px-8">
+            <div class="flex flex-col md:flex-row items-center gap-10 md:gap-16">
+                <!-- Текстовая часть об агентстве -->
                 <div class="w-full md:w-1/2 text-center md:text-left">
-                    <h2 class="font-serif text-4xl font-bold mb-2">Анастасия Иванова</h2>
-                    <p class="text-brand_accent uppercase tracking-[0.1em] text-sm font-bold mb-6">Ваш персональный турагент</p>
-                    <p class="text-brand_dark/80 leading-relaxed mb-8">
-                        Я помогаю превратить отпуск в событие, которое вы будете вспоминать годами. Мы берем на себя всю рутину: от подбора правильного отеля до регистрации на рейс.
-                    </p>
-                    <div class="flex flex-wrap justify-center md:justify-start gap-4">
-                        <a href="https://t.me/nast_ivn" target="_blank" class="bg-brand_dark text-white px-6 py-3 rounded-sm font-bold hover:bg-brand_accent transition-colors">Написать в Telegram</a>
-                        <a href="tel:+79127415413" class="border border-brand_dark text-brand_dark px-6 py-3 rounded-sm font-bold hover:bg-brand_dark hover:text-white transition-colors">+7 912 741-54-13</a>
+                    <h2 class="font-serif text-3xl md:text-4xl font-bold mb-3">О турагентстве Withiv</h2>
+                    <p class="text-brand_accent uppercase tracking-[0.1em] text-xs md:text-sm font-bold mb-6 md:mb-8">Создаем ваше идеальное путешествие</p>
+                    
+                    <div class="space-y-4 text-sm md:text-base text-brand_dark/80 leading-relaxed text-justify md:text-left px-2 md:px-0">
+                        <p>Мы — молодое и динамично развивающееся бутик-турагентство. Наша главная цель — превратить каждый ваш отпуск в событие, которое вы будете вспоминать с теплотой долгие годы.</p>
+                        <p>Withiv берет на себя абсолютно всю рутину: от тщательного подбора правильного отеля и составления сложного маршрута до регистрации на рейс и поддержки во время всей поездки.</p>
+                    </div>
+                    
+                    <div class="mt-8 flex flex-col sm:flex-row justify-center md:justify-start gap-4">
+                        <a href="https://t.me/withivtravel13" target="_blank" class="bg-brand_dark text-white px-6 py-3.5 rounded-sm font-bold hover:bg-brand_accent transition-colors shadow-md text-sm md:text-base">Перейти в Telegram</a>
+                        <a href="tel:+79127415413" class="border border-brand_dark text-brand_dark px-6 py-3.5 rounded-sm font-bold hover:bg-brand_dark hover:text-white transition-colors text-sm md:text-base">+7 912 741-54-13</a>
                     </div>
                 </div>
-                <div class="w-full md:w-1/2 flex justify-center gap-6">
-                    <div class="text-center p-4 border border-brand_dark/10 rounded-sm shadow-sm hover:shadow-md transition-shadow bg-brand_bg">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/nast_ivn&color=1B3B2B" class="w-32 h-32 mb-3 mx-auto">
-                        <p class="text-[10px] font-bold uppercase tracking-wider">Личный чат</p>
+                
+                <!-- Визитки / QR (Адаптивны на мобилках) -->
+                <div class="w-full md:w-1/2 flex flex-row justify-center md:justify-end gap-4 md:gap-6">
+                    <div class="text-center p-3 md:p-5 border border-brand_dark/10 rounded-sm shadow-sm bg-brand_bg w-36 md:w-44 shrink-0">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/nast_ivn&color=1B3B2B" class="w-24 h-24 md:w-32 md:h-32 mb-3 mx-auto">
+                        <p class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-brand_dark">Связь с менеджером</p>
                     </div>
-                    <div class="text-center p-4 border border-brand_dark/10 rounded-sm shadow-sm hover:shadow-md transition-shadow bg-brand_bg">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/withivtravel13&color=1B3B2B" class="w-32 h-32 mb-3 mx-auto">
-                        <p class="text-[10px] font-bold uppercase tracking-wider">Наш Канал</p>
+                    <div class="text-center p-3 md:p-5 border border-brand_dark/10 rounded-sm shadow-sm bg-brand_bg w-36 md:w-44 shrink-0 mt-4 md:mt-8">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/withivtravel13&color=1B3B2B" class="w-24 h-24 md:w-32 md:h-32 mb-3 mx-auto">
+                        <p class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-brand_dark">Наш Telegram-канал</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-brand_dark text-brand_bg py-12">
-        <div class="max-w-7xl mx-auto px-4 md:px-8 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-6">
-            <div>
-                <span class="font-serif text-2xl font-bold">Withiv</span>
-                <p class="text-xs text-brand_bg/50 mt-2">&copy; 2026 Бутик-турагентство.</p>
+    <!-- Footer (Переработан для эстетики и адаптивности) -->
+    <footer class="bg-brand_dark text-brand_bg mt-auto border-t border-brand_bg/5">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-16">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8">
+                
+                <!-- Бренд блок -->
+                <div class="md:col-span-4 text-center md:text-left flex flex-col items-center md:items-start">
+                    <a href="#" class="flex items-center gap-2 mb-4">
+                        <svg class="w-6 h-6 text-brand_accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                        </svg>
+                        <span class="font-serif text-2xl font-bold text-white">Withiv</span>
+                    </a>
+                    <p class="text-xs text-brand_bg/60 uppercase tracking-widest mb-4">Бутик-турагентство</p>
+                    <p class="text-sm text-brand_bg/60 leading-relaxed text-center md:text-left max-w-xs">Создаем персонализированные сценарии вашего идеального отдыха. Индивидуальные туры по всему миру.</p>
+                </div>
+                
+                <!-- Навигация -->
+                <div class="md:col-span-4 text-center md:text-left">
+                    <h4 class="text-white font-bold mb-6 text-sm uppercase tracking-wider">Навигация</h4>
+                    <ul class="space-y-4 text-sm text-brand_bg/70">
+                        <li><a href="#tours" class="hover:text-brand_accent transition-colors">Коллекция туров</a></li>
+                        <li><a href="#about" class="hover:text-brand_accent transition-colors">О агентстве</a></li>
+                        <li><a href="#quiz-section" class="hover:text-brand_accent transition-colors">Индивидуальный подбор</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Контакты -->
+                <div class="md:col-span-4 text-center md:text-left">
+                    <h4 class="text-white font-bold mb-6 text-sm uppercase tracking-wider">Контакты</h4>
+                    <ul class="space-y-4 text-sm text-brand_bg/70">
+                        <li><a href="tel:+79127415413" class="text-lg text-brand_accent hover:text-white transition-colors">+7 912 741-54-13</a></li>
+                        <li class="flex items-center justify-center md:justify-start gap-2">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                            <a href="https://t.me/withivtravel13" target="_blank" class="hover:text-white transition-colors">Telegram Канал</a>
+                        </li>
+                    </ul>
+                </div>
+                
             </div>
-            <div class="text-sm font-semibold">
-                <a href="#" class="hover:text-brand_accent">Политика конфиденциальности</a>
+            
+            <div class="border-t border-brand_bg/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-brand_bg/40">
+                <p>&copy; 2026 Withiv. Все права защищены.</p>
+                <a href="#" class="hover:text-brand_accent transition-colors">Политика конфиденциальности (ФЗ-152)</a>
             </div>
         </div>
     </footer>
 
-    <!-- Скрипты (Без библиотек, чистый JS) -->
+    <!-- JS Логика (Включает фиксы для мобилок) -->
     <script>
         const API_BASE_URL = 'https://withiv-bot.onrender.com';
         let globalTours = [];
 
-        // 1. Загрузка туров
+        // --- Мобильное меню ---
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+        const closeIcon = document.getElementById('close-icon');
+
+        function toggleMenu() {
+            const isHidden = mobileMenu.classList.contains('hidden');
+            if (isHidden) {
+                mobileMenu.classList.remove('hidden');
+                mobileMenu.classList.add('flex');
+                menuIcon.classList.add('hidden');
+                closeIcon.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // блок скролла
+            } else {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.classList.remove('flex');
+                menuIcon.classList.remove('hidden');
+                closeIcon.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        mobileBtn.addEventListener('click', toggleMenu);
+        
+        // Закрытие меню при клике на ссылку
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if(!mobileMenu.classList.contains('hidden')) toggleMenu();
+            });
+        });
+
+        // --- Загрузка туров ---
         async function loadTours() {
             const grid = document.getElementById('tours-grid');
             try {
@@ -310,50 +420,62 @@
 
                 if (globalTours.length > 0) {
                     grid.innerHTML = globalTours.map((tour, idx) => `
-                        <article onclick="openModal(${idx})" class="cursor-pointer group bg-white rounded-sm shadow-sm hover:shadow-xl transition-all border border-gray-100 overflow-hidden flex flex-col">
-                            <div class="h-64 overflow-hidden relative">
-                                <img src="${tour['Фото'] || ''}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1s]">
-                                <div class="absolute bottom-3 left-3 bg-brand_dark text-white px-2 py-1 text-xs font-bold rounded-sm">${tour['Локация'] || ''}</div>
+                        <article onclick="openModal(${idx})" class="cursor-pointer group bg-white rounded-sm shadow-sm hover:shadow-xl transition-shadow border border-brand_dark/5 overflow-hidden flex flex-col">
+                            <div class="h-48 md:h-64 overflow-hidden relative">
+                                <img src="${tour['Фото'] || ''}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                                <div class="absolute bottom-3 left-3 bg-brand_dark/90 backdrop-blur-sm text-white px-2.5 py-1 text-[10px] md:text-xs font-bold uppercase tracking-wider rounded-sm">${tour['Локация'] || ''}</div>
                             </div>
-                            <div class="p-5 flex-1 flex flex-col justify-between">
-                                <h3 class="font-serif text-xl font-bold mb-4 group-hover:text-brand_accent transition-colors">${tour['Название'] || ''}</h3>
-                                <div class="flex justify-between items-end border-t border-gray-100 pt-4 mt-auto">
-                                    <span class="font-bold text-lg">${tour['Цена'] || 'По запросу'}</span>
-                                    <span class="text-sm font-bold text-brand_accent">Смотреть &rarr;</span>
+                            <div class="p-4 md:p-5 flex-1 flex flex-col justify-between bg-white">
+                                <h3 class="font-serif text-lg md:text-xl font-bold mb-4 group-hover:text-brand_accent transition-colors line-clamp-2">${tour['Название'] || ''}</h3>
+                                <div class="flex justify-between items-end border-t border-brand_dark/5 pt-4 mt-auto">
+                                    <span class="font-bold text-base md:text-lg text-brand_dark">${tour['Цена'] || 'По запросу'}</span>
+                                    <span class="text-xs font-bold text-brand_accent">Смотреть &rarr;</span>
                                 </div>
                             </div>
                         </article>
                     `).join('');
                 } else {
-                    grid.innerHTML = '<div class="col-span-full py-10 text-center font-bold">Туры обновляются...</div>';
+                    grid.innerHTML = '<div class="col-span-full py-10 text-center font-bold text-brand_dark/60 text-sm md:text-base">В данный момент нет доступных туров.</div>';
                 }
             } catch (err) {
-                grid.innerHTML = '<div class="col-span-full py-10 text-center text-red-500">Ошибка загрузки базы.</div>';
+                grid.innerHTML = '<div class="col-span-full py-10 text-center text-red-500 font-medium text-sm md:text-base">Ошибка загрузки базы. Попробуйте обновить страницу.</div>';
             }
         }
 
-        // 2. Модальное окно
+        // --- Модальное окно (с анимацией шторки на мобилках) ---
         const modal = document.getElementById('tour-modal');
+        const modalContent = document.getElementById('modal-content');
+        
         function openModal(idx) {
             const t = globalTours[idx];
             document.getElementById('modal-img').src = t['Фото'];
-            document.getElementById('modal-title').innerText = t['Название'];
+            document.getElementById('modal-title-desktop').innerText = t['Название'];
+            document.getElementById('modal-title-mobile').innerText = t['Название'];
             document.getElementById('modal-location').innerText = t['Локация'];
             document.getElementById('modal-desc').innerHTML = (t['Описание'] || t['Детали'] || '').replace(/\n/g, '<br>');
             document.getElementById('modal-price').innerText = t['Цена'];
             document.getElementById('modal-tour-name').value = t['Название'];
             
             modal.classList.remove('hidden');
-            setTimeout(() => modal.classList.remove('opacity-0'), 10);
             document.body.style.overflow = 'hidden';
+            
+            // Запускаем анимацию после удаления hidden
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalContent.classList.remove('translate-y-full'); // для мобильной шторки
+            }, 10);
         }
+        
         function closeModal() {
             modal.classList.add('opacity-0');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-            document.body.style.overflow = '';
+            modalContent.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
         }
 
-        // 3. Отправка из карточки
+        // --- Отправка из карточки ---
         document.getElementById('modal-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button');
@@ -368,13 +490,13 @@
                         contact: document.getElementById('modal-contact').value
                     })
                 });
-                btn.innerText = 'Успешно!'; btn.classList.add('bg-green-600');
+                btn.innerText = 'Отправлено'; btn.classList.replace('bg-brand_dark', 'bg-green-600');
                 setTimeout(closeModal, 1500);
             } catch(err) { btn.innerText = 'Ошибка'; }
-            setTimeout(() => { btn.innerText = orig; btn.classList.remove('bg-green-600'); e.target.reset(); }, 2000);
+            setTimeout(() => { btn.innerText = orig; btn.classList.replace('bg-green-600', 'bg-brand_dark'); e.target.reset(); }, 2000);
         });
 
-        // 4. Логика Квиза
+        // --- Логика Квиза ---
         function nextStep(step) {
             document.querySelectorAll('.quiz-step').forEach(el => el.classList.remove('active'));
             document.getElementById(`step-${step}`).classList.add('active');
@@ -384,9 +506,9 @@
         document.getElementById('quiz-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('quiz-submit-btn');
+            const origText = btn.innerText;
             btn.innerText = 'Отправка...';
             
-            // Собираем данные
             const destRadio = document.querySelector('input[name="quiz-dest"]:checked');
             let destination = destRadio ? destRadio.value : '';
             if (destination === 'Другое' || !destination) {
@@ -410,13 +532,13 @@
                     })
                 });
                 
-                // Показываем экран успеха
                 document.querySelectorAll('.quiz-step').forEach(el => el.classList.remove('active'));
                 document.getElementById('step-success').classList.add('active');
                 document.getElementById('quiz-progress').style.width = '100%';
                 
             } catch(err) {
-                btn.innerText = 'Ошибка, попробуйте еще раз';
+                btn.innerText = 'Ошибка сети';
+                setTimeout(() => btn.innerText = origText, 2000);
             }
         });
 
