@@ -23,7 +23,7 @@
                         light: '#FAFAFA',
                         dark: '#1A1A1A',
                         dark_surface: '#242424',
-                        primary: '#B89B72', // Elegant muted gold/sand
+                        primary: '#B89B72',
                     },
                     fontFamily: {
                         sans: ['Montserrat', 'sans-serif'],
@@ -38,7 +38,6 @@
     </script>
 
     <style>
-        /* Custom Utilities */
         .glass-header {
             background: rgba(250, 250, 250, 0.85);
             backdrop-filter: blur(12px);
@@ -47,14 +46,10 @@
         .dark .glass-header {
             background: rgba(26, 26, 26, 0.85);
         }
-        
-        /* Smooth image rendering */
         img {
             -webkit-user-drag: none;
             user-select: none;
         }
-
-        /* Input styling */
         .form-input {
             width: 100%;
             background: transparent;
@@ -103,7 +98,7 @@
                 </button>
 
                 <!-- Telegram Icon -->
-                <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-primary transition-colors">
+                <a href="https://t.me/withiv" target="_blank" data-tg-link class="text-gray-600 dark:text-gray-300 hover:text-primary transition-colors">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
                     </svg>
@@ -134,7 +129,6 @@
                 <hr class="border-gray-200 dark:border-gray-700 my-2">
                 <div class="flex justify-center items-center gap-6 pt-2">
                     <button id="mobile-theme-toggle" class="text-gray-800 dark:text-gray-200 p-2">
-                        <!-- Icons handled by JS, default to text -->
                         <span class="text-sm border-b border-gray-400">Сменить тему</span>
                     </button>
                     <a href="#lead-form" class="bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-6 py-2 rounded-sm text-sm font-medium">
@@ -146,19 +140,18 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="relative h-screen min-h-[700px] flex items-center justify-center pt-20 overflow-hidden">
+    <section id="tours" class="relative h-screen min-h-[700px] flex items-center justify-center pt-20 overflow-hidden">
         <!-- Background -->
         <div class="absolute inset-0 z-0">
             <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?q=80&w=2000&auto=format&fit=crop" 
                  alt="Beautiful ocean view" 
                  class="w-full h-full object-cover select-none">
-            <!-- Overlay -->
             <div class="absolute inset-0 bg-black/40 dark:bg-black/60"></div>
         </div>
 
         <!-- Content -->
         <div class="relative z-10 w-full max-w-6xl mx-auto px-4 text-center text-white mt-12 md:mt-0">
-            <h1 class="font-serif text-4xl sm:text-5xl md:text-7xl font-medium leading-tight mb-6 max-w-4xl mx-auto animate-fade-in-up">
+            <h1 id="hero-title" class="font-serif text-4xl sm:text-5xl md:text-7xl font-medium leading-tight mb-6 max-w-4xl mx-auto">
                 Места, где реальность <br> <span class="italic text-primary/90">превосходит ожидания.</span> ✨
             </h1>
             <p class="font-sans text-lg md:text-xl font-light opacity-90 mb-12 max-w-2xl mx-auto">
@@ -167,7 +160,6 @@
 
             <!-- Tourvisor Widget Placeholder -->
             <div class="w-full max-w-5xl mx-auto bg-white/10 dark:bg-black/20 backdrop-blur-md rounded-lg p-6 border border-white/20 shadow-2xl relative">
-                <!-- Сюда позже встанет JS-виджет Tourvisor -->
                 <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
                     <div class="flex-1 w-full text-left">
                         <label class="block text-xs uppercase tracking-wider text-white/70 mb-1">Куда</label>
@@ -219,96 +211,26 @@
         </div>
     </section>
 
-    <!-- Showcase Grid -->
+    <!-- Showcase Grid (ДИНАМИЧЕСКАЯ СЕТКА ИЗ GOOGLE ТАБЛИЦ) -->
     <section id="exclusive" class="py-24 max-w-7xl mx-auto px-4 md:px-8">
         <div class="flex justify-between items-end mb-12">
             <div>
                 <span class="text-primary text-xs uppercase tracking-[0.2em] font-medium block mb-3">Коллекция</span>
                 <h2 class="font-serif text-4xl md:text-5xl text-gray-900 dark:text-white">Выбор Withiv</h2>
             </div>
-            <a href="#" class="hidden md:flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary transition-colors pb-2">
-                Смотреть все
+            <a href="https://t.me/withiv" target="_blank" data-tg-link class="hidden md:flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary transition-colors pb-2">
+                Больше в Telegram
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
             </a>
         </div>
 
-        <!-- REST API ready structure -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            
-            <!-- Card 1 -->
-            <article class="group relative flex flex-col bg-white dark:bg-dark_surface border border-gray-100 dark:border-gray-800 rounded-sm overflow-hidden hover:shadow-xl transition-shadow duration-500">
-                <div class="relative h-[400px] overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=800&auto=format&fit=crop" alt="Le Méridien Maldives" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-[1.5s] ease-out">
-                    <div class="absolute top-4 right-4 bg-white/90 dark:bg-dark/90 px-3 py-1 rounded-sm backdrop-blur-sm text-xs font-semibold text-gray-900 dark:text-white shadow-sm">
-                        Эксклюзив
-                    </div>
-                </div>
-                <div class="p-6 flex flex-col flex-1">
-                    <h3 class="font-serif text-xl mb-2 text-gray-900 dark:text-white group-hover:text-primary transition-colors">Le Méridien Maldives Resort & Spa</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 flex-1 flex flex-col gap-1">
-                        <span>📍 Мальдивы, Атолл Лавияни</span>
-                        <span>🗓️ 7 ночей</span>
-                        <span>☕ Завтраки</span>
-                    </p>
-                    <div class="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-4 mt-auto">
-                        <div>
-                            <span class="text-xs text-gray-500 dark:text-gray-400 block">Стоимость на двоих</span>
-                            <span class="font-medium text-lg text-gray-900 dark:text-white">от 800 000 ₽</span>
-                        </div>
-                        <button class="w-10 h-10 rounded-full bg-gray-50 dark:bg-dark flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors duration-300">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"></path></svg>
-                        </button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Card 2 -->
-            <article class="group relative flex flex-col bg-white dark:bg-dark_surface border border-gray-100 dark:border-gray-800 rounded-sm overflow-hidden hover:shadow-xl transition-shadow duration-500">
-                <div class="relative h-[400px] overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=800&auto=format&fit=crop" alt="The St. Regis Bali" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-[1.5s] ease-out">
-                </div>
-                <div class="p-6 flex flex-col flex-1">
-                    <h3 class="font-serif text-xl mb-2 text-gray-900 dark:text-white group-hover:text-primary transition-colors">The St. Regis Bali Resort</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 flex-1 flex flex-col gap-1">
-                        <span>📍 Индонезия, Бали (Нуса-Дуа)</span>
-                        <span>🗓️ 10 ночей</span>
-                        <span>🥂 Завтраки и Ужины</span>
-                    </p>
-                    <div class="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-4 mt-auto">
-                        <div>
-                            <span class="text-xs text-gray-500 dark:text-gray-400 block">Стоимость на двоих</span>
-                            <span class="font-medium text-lg text-gray-900 dark:text-white">от 950 000 ₽</span>
-                        </div>
-                        <button class="w-10 h-10 rounded-full bg-gray-50 dark:bg-dark flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors duration-300">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"></path></svg>
-                        </button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Card 3 -->
-            <article class="group relative flex flex-col bg-white dark:bg-dark_surface border border-gray-100 dark:border-gray-800 rounded-sm overflow-hidden hover:shadow-xl transition-shadow duration-500">
-                <div class="relative h-[400px] overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1522792065601-5e6eaf27ea4a?q=80&w=800&auto=format&fit=crop" alt="Burj Al Arab" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-[1.5s] ease-out">
-                </div>
-                <div class="p-6 flex flex-col flex-1">
-                    <h3 class="font-serif text-xl mb-2 text-gray-900 dark:text-white group-hover:text-primary transition-colors">Burj Al Arab Jumeirah</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 flex-1 flex flex-col gap-1">
-                        <span>📍 ОАЭ, Дубай</span>
-                        <span>🗓️ 5 ночей</span>
-                        <span>🛎️ Ультра Все Включено</span>
-                    </p>
-                    <div class="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-4 mt-auto">
-                        <div>
-                            <span class="text-xs text-gray-500 dark:text-gray-400 block">Стоимость на двоих</span>
-                            <span class="font-medium text-lg text-gray-900 dark:text-white">от 1 200 000 ₽</span>
-                        </div>
-                        <button class="w-10 h-10 rounded-full bg-gray-50 dark:bg-dark flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors duration-300">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"></path></svg>
-                        </button>
-                    </div>
-                </div>
-            </article>
+        <!-- Контейнер для карточек туров -->
+        <div id="tours-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Скелетон-загрузка на время ответа сервера Render -->
+            <div class="col-span-full py-12 text-center text-gray-500 dark:text-gray-400">
+                <div class="inline-block w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p class="text-sm tracking-wide">Загружаем актуальную коллекцию туров...</p>
+            </div>
         </div>
     </section>
 
@@ -319,7 +241,6 @@
                 
                 <!-- Left: Text -->
                 <div class="order-2 lg:order-1 relative">
-                    <!-- Decorative Quote Mark -->
                     <div class="absolute -top-10 -left-6 text-[120px] font-serif leading-none text-gray-100 dark:text-gray-800 select-none z-0">
                         "
                     </div>
@@ -365,7 +286,6 @@
 
     <!-- Lead Form -->
     <section id="lead-form" class="py-24 bg-gray-50 dark:bg-dark_surface relative overflow-hidden">
-        <!-- Abstract shape -->
         <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
             <div class="absolute -top-[20%] -right-[10%] w-[50%] h-[70%] bg-primary/5 dark:bg-primary/5 rounded-full blur-3xl"></div>
             <div class="absolute -bottom-[20%] -left-[10%] w-[40%] h-[60%] bg-primary/5 dark:bg-primary/5 rounded-full blur-3xl"></div>
@@ -382,7 +302,7 @@
                     <!-- Destination -->
                     <div>
                         <label class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Куда летим?</label>
-                        <input type="text" placeholder="Страна, курорт или отель" class="form-input text-gray-900 dark:text-white">
+                        <input id="lead-destination" type="text" placeholder="Страна, курорт или отель" class="form-input text-gray-900 dark:text-white">
                     </div>
                     <!-- Dates -->
                     <div>
@@ -425,7 +345,7 @@
                         Искусство путешествовать.<br>
                         Бутик-агентство премиального отдыха.
                     </p>
-                    <a href="#" class="inline-flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white hover:text-primary transition-colors">
+                    <a href="https://t.me/withiv" target="_blank" data-tg-link class="inline-flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white hover:text-primary transition-colors">
                         <svg class="w-5 h-5 text-[#229ED9]" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
                         Наш Telegram-канал
                     </a>
@@ -445,9 +365,9 @@
                 <div>
                     <h4 class="text-gray-900 dark:text-white font-medium mb-4 uppercase text-xs tracking-wider">Услуги</h4>
                     <ul class="space-y-3 text-sm text-gray-500 dark:text-gray-400">
-                        <li><a href="#" class="hover:text-primary transition-colors">Индивидуальные туры</a></li>
-                        <li><a href="#" class="hover:text-primary transition-colors">VIP-сервис и трансферы</a></li>
-                        <li><a href="#" class="hover:text-primary transition-colors">Корпоративный отдых</a></li>
+                        <li><a href="#lead-form" class="hover:text-primary transition-colors">Индивидуальные туры</a></li>
+                        <li><a href="#lead-form" class="hover:text-primary transition-colors">VIP-сервис и трансферы</a></li>
+                        <li><a href="#lead-form" class="hover:text-primary transition-colors">Корпоративный отдых</a></li>
                     </ul>
                 </div>
 
@@ -455,7 +375,7 @@
                 <div>
                     <h4 class="text-gray-900 dark:text-white font-medium mb-4 uppercase text-xs tracking-wider">Контакты</h4>
                     <ul class="space-y-3 text-sm text-gray-500 dark:text-gray-400">
-                        <li><a href="tel:+79990000000" class="hover:text-primary transition-colors">+7 (999) 000-00-00</a></li>
+                        <li><a id="footer-phone" href="tel:+79990000000" class="hover:text-primary transition-colors">+7 (999) 000-00-00</a></li>
                         <li><a href="mailto:hello@withiv.ru" class="hover:text-primary transition-colors">hello@withiv.ru</a></li>
                         <li class="pt-2">г. Москва, Пресненская наб., 12</li>
                     </ul>
@@ -465,7 +385,7 @@
 
             <!-- Legal -->
             <div class="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                <p class="text-xs text-gray-400">&copy; 2024 Withiv Travel. Все права защищены.</p>
+                <p class="text-xs text-gray-400">&copy; 2026 Withiv Travel. Все права защищены.</p>
                 <div class="flex gap-4 text-xs text-gray-400">
                     <span class="hidden md:inline">ИП Иванов И.И. ИНН 1234567890</span>
                     <a href="#" class="hover:text-primary transition-colors">Политика конфиденциальности</a>
@@ -474,17 +394,19 @@
         </div>
     </footer>
 
-    <!-- Vanilla JS for Interactivity -->
+    <!-- Vanilla JS for Interactivity & API Integration -->
     <script>
+        // ⚠️ ВСТАВЬ СЮДА СВОЮ ССЫЛКУ С RENDER (БЕЗ СЛЭША НА КОНЦЕ)
+        const API_BASE_URL = 'https://ТВОЙ-СЕРВИС.onrender.com';
+
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- Theme Toggle Logic ---
+            // --- 1. Theme Toggle Logic ---
             const themeToggleBtn = document.getElementById('theme-toggle');
             const mobileThemeToggleBtn = document.getElementById('mobile-theme-toggle');
             const darkIcon = document.getElementById('theme-toggle-dark-icon');
             const lightIcon = document.getElementById('theme-toggle-light-icon');
             
-            // Check local storage or system preference
             if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');
                 lightIcon.classList.remove('hidden');
@@ -509,8 +431,7 @@
             themeToggleBtn.addEventListener('click', toggleTheme);
             mobileThemeToggleBtn.addEventListener('click', toggleTheme);
 
-
-            // --- Mobile Menu Logic ---
+            // --- 2. Mobile Menu Logic ---
             const mobileBtn = document.getElementById('mobile-menu-btn');
             const mobileMenu = document.getElementById('mobile-menu');
             const menuIcon = document.getElementById('menu-icon');
@@ -522,7 +443,6 @@
                 closeIcon.classList.toggle('hidden');
             });
 
-            // Close menu on link click
             const mobileLinks = mobileMenu.querySelectorAll('a');
             mobileLinks.forEach(link => {
                 link.addEventListener('click', () => {
@@ -532,7 +452,105 @@
                 });
             });
 
-            // --- Form Submission Prevention (for prototype) ---
+            // --- 3. Загрузка настроек сайта из Google Таблицы (вкладка Settings) ---
+            async function loadSiteSettings() {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/settings`);
+                    if (!response.ok) return;
+                    const settings = await response.json();
+
+                    // Обновляем заголовок на главном экране
+                    if (settings['Заголовок']) {
+                        document.getElementById('hero-title').innerText = settings['Заголовок'];
+                    }
+                    // Обновляем телефон в подвале
+                    if (settings['Телефон']) {
+                        const phoneEl = document.getElementById('footer-phone');
+                        phoneEl.innerText = settings['Телефон'];
+                        phoneEl.href = `tel:${settings['Телефон'].replace(/[^+\d]/g, '')}`;
+                    }
+                    // Обновляем все ссылки на Telegram
+                    if (settings['Телеграм']) {
+                        document.querySelectorAll('[data-tg-link]').forEach(el => {
+                            el.href = settings['Телеграм'];
+                        });
+                    }
+                } catch (error) {
+                    console.error('Не удалось загрузить настройки сайта:', error);
+                }
+            }
+
+            // --- 4. Загрузка туров из Google Таблицы (вкладка Tours) ---
+            async function loadTours() {
+                const grid = document.getElementById('tours-grid');
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/tours`);
+                    if (!response.ok) throw new Error('Ошибка ответа сервера');
+                    const tours = await response.json();
+
+                    if (!tours || tours.length === 0) {
+                        grid.innerHTML = `
+                            <div class="col-span-full py-12 text-center text-gray-500 dark:text-gray-400">
+                                <p class="text-base">Актуальные предложения скоро появятся. Оставьте заявку ниже, и мы подберем тур индивидуально!</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    // Отрисовываем карточки в стиле твоего макета
+                    grid.innerHTML = tours.map(tour => {
+                        const title = tour['Название'] || 'Эксклюзивный тур';
+                        const location = tour['Локация'] || 'Локация уточняется';
+                        const details = tour['Детали'] || '';
+                        const price = tour['Цена'] || 'По запросу';
+                        const photo = tour['Фото'] || 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=800&auto=format&fit=crop';
+                        
+                        // Экранируем кавычки для передачи в функцию клика
+                        const safeTitle = title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+                        return `
+                            <article onclick="selectTour('${safeTitle}')" class="cursor-pointer group relative flex flex-col bg-white dark:bg-dark_surface border border-gray-100 dark:border-gray-800 rounded-sm overflow-hidden hover:shadow-xl transition-shadow duration-500">
+                                <div class="relative h-[400px] overflow-hidden bg-gray-100 dark:bg-gray-800">
+                                    <img src="${photo}" alt="${safeTitle}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-[1.5s] ease-out" loading="lazy">
+                                    <div class="absolute top-4 right-4 bg-white/90 dark:bg-dark/90 px-3 py-1 rounded-sm backdrop-blur-sm text-xs font-semibold text-gray-900 dark:text-white shadow-sm">
+                                        Эксклюзив
+                                    </div>
+                                </div>
+                                <div class="p-6 flex flex-col flex-1">
+                                    <h3 class="font-serif text-xl mb-3 text-gray-900 dark:text-white group-hover:text-primary transition-colors">${title}</h3>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400 mb-6 flex-1 flex flex-col gap-1.5">
+                                        <span>📍 ${location}</span>
+                                        ${details ? `<span>ℹ️ ${details}</span>` : ''}
+                                    </div>
+                                    <div class="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-4 mt-auto">
+                                        <div>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400 block">Стоимость</span>
+                                            <span class="font-medium text-lg text-gray-900 dark:text-white">${price}</span>
+                                        </div>
+                                        <button type="button" class="w-10 h-10 rounded-full bg-gray-50 dark:bg-dark flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors duration-300" aria-label="Выбрать тур">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"></path></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </article>
+                        `;
+                    }).join('');
+
+                } catch (error) {
+                    console.error('Ошибка загрузки туров:', error);
+                    grid.innerHTML = `
+                        <div class="col-span-full py-12 text-center text-gray-500 dark:text-gray-400">
+                            <p class="text-sm">Не удалось загрузить туры. Попробуйте обновить страницу через пару секунд.</p>
+                        </div>
+                    `;
+                }
+            }
+
+            // Запускаем загрузку данных при открытии страницы
+            loadSiteSettings();
+            loadTours();
+
+            // --- 5. Form Submission ---
             const form = document.querySelector('form');
             if(form) {
                 form.addEventListener('submit', (e) => {
@@ -549,6 +567,15 @@
                 });
             }
         });
+
+        // Функция при клике на карточку тура — плавно скроллит к форме и подставляет отель
+        function selectTour(tourName) {
+            const input = document.getElementById('lead-destination');
+            if (input) {
+                input.value = `Хочу забронировать: ${tourName}`;
+            }
+            document.getElementById('lead-form').scrollIntoView({ behavior: 'smooth' });
+        }
     </script>
 </body>
 </html>
