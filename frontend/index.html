@@ -5,23 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Withiv | Премиальные путешествия</title>
     
-    <!-- Шрифты -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
                         brand_bg: '#F7F4EF',
                         brand_dark: '#1B3B2B',
                         brand_accent: '#D4AF37',
-                        dark_surface: '#12251A',
                     },
                     fontFamily: {
                         sans: ['Montserrat', 'sans-serif'],
@@ -31,432 +27,322 @@
             }
         }
     </script>
-
     <style>
-        body { background-color: #F7F4EF; }
-        .dark body { background-color: #0d1a12; }
-        
-        .glass-header {
-            background: rgba(247, 244, 239, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-        }
-        .dark .glass-header {
-            background: rgba(13, 26, 18, 0.7);
-        }
-        
-        .form-input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid rgba(27, 59, 43, 0.3);
-            padding: 0.75rem 0;
-            transition: border-color 0.3s ease;
-            outline: none;
-            color: inherit;
-        }
-        .dark .form-input { border-bottom-color: rgba(247, 244, 239, 0.3); }
-        .form-input:focus { border-bottom-color: #1B3B2B; }
-        .dark .form-input:focus { border-bottom-color: #D4AF37; }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #F7F4EF; }
-        ::-webkit-scrollbar-thumb { background: #1B3B2B; border-radius: 4px; }
-        .dark ::-webkit-scrollbar-track { background: #0d1a12; }
-        .dark ::-webkit-scrollbar-thumb { background: #1B3B2B; }
-
-        /* --- Анимации появления (Reveal) --- */
-        .reveal-hidden {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .reveal-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        /* Задержки для поочередного выплывания */
-        .delay-100 { transition-delay: 100ms; }
-        .delay-200 { transition-delay: 200ms; }
-        .delay-300 { transition-delay: 300ms; }
-
-        /* --- Прелоадер --- */
-        #preloader {
-            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
-        }
-        
-        /* --- Параллакс фон --- */
-        .parallax-bg {
-            background-image: url('https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=2000&auto=format&fit=crop');
-            background-attachment: fixed;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: cover;
-        }
+        body { background-color: #F7F4EF; color: #1B3B2B; }
+        .glass-header { background: rgba(247, 244, 239, 0.95); backdrop-filter: blur(8px); }
+        .quiz-step { display: none; }
+        .quiz-step.active { display: block; animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Прячем скроллбар для эстетики */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1B3B2B; border-radius: 3px; }
     </style>
 </head>
-<body class="text-brand_dark dark:text-brand_bg transition-colors duration-500 font-sans antialiased overflow-hidden">
-
-    <!-- 1. Прелоадер (Экран загрузки) -->
-    <div id="preloader" class="fixed inset-0 z-[100] bg-brand_bg dark:bg-[#0d1a12] flex flex-col items-center justify-center">
-        <svg class="w-20 h-20 text-brand_dark dark:text-brand_bg animate-pulse mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-        </svg>
-        <span class="font-serif text-sm tracking-[0.3em] uppercase text-brand_dark/70 dark:text-brand_bg/70">Withiv Travel</span>
-    </div>
+<body class="font-sans antialiased selection:bg-brand_dark selection:text-white">
 
     <!-- Header -->
-    <header class="fixed top-0 w-full z-40 glass-header border-b border-brand_dark/10 dark:border-brand_bg/10 transition-all duration-300">
+    <header class="fixed top-0 w-full z-40 glass-header border-b border-brand_dark/10">
         <div class="max-w-7xl mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
-            <a href="#" class="group flex items-center gap-2">
-                <svg class="w-8 h-8 text-brand_dark dark:text-brand_bg group-hover:text-brand_accent transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <a href="#" class="flex items-center gap-2">
+                <svg class="w-8 h-8 text-brand_dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" class="text-brand_accent" />
                 </svg>
-                <span class="font-serif text-2xl md:text-3xl tracking-wide font-bold">Withiv</span>
+                <span class="font-serif text-2xl md:text-3xl font-bold">Withiv</span>
             </a>
-
-            <nav class="hidden lg:flex space-x-8 text-sm font-medium tracking-wide">
+            <nav class="hidden md:flex space-x-8 text-sm font-medium">
                 <a href="#tours" class="hover:text-brand_accent transition-colors">Коллекция туров</a>
-                <a href="#agent" class="hover:text-brand_accent transition-colors">Ваш турагент</a>
-                <a href="#contacts" class="hover:text-brand_accent transition-colors">Контакты</a>
+                <a href="#agent" class="hover:text-brand_accent transition-colors">О нас</a>
+                <a href="#quiz-section" class="hover:text-brand_accent transition-colors">Собрать тур</a>
             </nav>
-
-            <div class="hidden lg:flex items-center space-x-6">
-                <a href="https://t.me/withivtravel13" target="_blank" class="hover:text-brand_accent transition-colors flex items-center gap-2 text-sm font-medium">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-                </a>
-                
-                <a href="#lead-form" class="bg-brand_dark text-brand_bg dark:bg-brand_bg dark:text-brand_dark px-6 py-2.5 rounded-sm text-sm font-semibold hover:bg-brand_accent dark:hover:bg-brand_accent hover:text-white transition-all duration-300 shadow-md">
-                    Подобрать тур
-                </a>
-            </div>
+            <a href="https://t.me/nast_ivn" target="_blank" class="bg-brand_dark text-brand_bg px-5 py-2.5 rounded-sm text-sm font-semibold hover:bg-brand_accent transition-colors">
+                Связаться
+            </a>
         </div>
     </header>
 
-    <!-- 2. Кинематографичный Hero Section с Видео-фоном -->
-    <section class="relative h-screen min-h-[700px] flex items-center justify-center pt-20 overflow-hidden">
-        <div class="absolute inset-0 z-0">
-            <!-- Фоновое видео -->
-            <video autoplay loop muted playsinline class="w-full h-full object-cover select-none">
-                <source src="https://cdn.coverr.co/videos/coverr-aerial-view-of-a-tropical-beach-8012/1080p.mp4" type="video/mp4">
-            </video>
-            <!-- Затемнение под Изумрудный цвет бренда -->
-            <div class="absolute inset-0 bg-brand_dark/60 dark:bg-[#0d1a12]/70 backdrop-blur-[2px]"></div>
+    <!-- Hero Section (Стабильный, классический) -->
+    <section class="relative h-screen min-h-[600px] flex items-center pt-20">
+        <div class="absolute inset-0 z-0 bg-brand_dark">
+            <img src="https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover opacity-60 mix-blend-overlay">
         </div>
-
-        <div class="relative z-10 w-full max-w-5xl mx-auto px-4 text-center text-white mt-12 md:mt-0">
-            <p class="reveal-elem text-brand_accent text-sm md:text-base tracking-[0.3em] uppercase mb-4 font-semibold">Бутик-Турагентство</p>
-            <h1 class="reveal-elem delay-100 font-serif text-5xl md:text-7xl font-bold leading-tight mb-6 max-w-4xl mx-auto">
+        <div class="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 text-white">
+            <p class="text-brand_accent text-sm md:text-base tracking-[0.2em] uppercase mb-4 font-semibold">Туристическое агентство</p>
+            <h1 class="font-serif text-5xl md:text-7xl font-bold leading-tight mb-8 max-w-3xl">
                 Не просто туры.<br>
-                <span class="italic text-brand_bg/90 font-light">Впечатления на всю жизнь.</span>
+                <span class="italic font-light">Впечатления на всю жизнь.</span>
             </h1>
-            
-            <div class="reveal-elem delay-200 mt-12 w-full max-w-3xl mx-auto bg-brand_bg/10 backdrop-blur-md rounded-lg p-3 md:p-4 border border-brand_bg/20 shadow-2xl">
-                <div class="flex flex-col md:flex-row gap-2">
-                    <input type="text" placeholder="Куда хотите полететь?" class="flex-1 bg-brand_bg/90 text-brand_dark px-6 py-4 rounded-sm outline-none font-medium placeholder-brand_dark/60">
-                    <a href="#lead-form" class="bg-brand_accent hover:bg-brand_accent/90 text-white px-10 py-4 rounded-sm font-semibold transition-colors flex items-center justify-center whitespace-nowrap">
-                        Найти отдых
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Мышка "Листай вниз" -->
-        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10 reveal-elem delay-300">
-            <div class="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center p-1">
-                <div class="w-1 h-2 bg-brand_accent rounded-full animate-bounce"></div>
+            <div class="flex gap-4">
+                <a href="#tours" class="bg-brand_bg text-brand_dark px-8 py-4 rounded-sm font-bold hover:bg-brand_accent hover:text-white transition-colors">
+                    Смотреть туры
+                </a>
+                <a href="#quiz-section" class="border border-brand_bg text-brand_bg px-8 py-4 rounded-sm font-bold hover:bg-brand_bg hover:text-brand_dark transition-colors hidden sm:block">
+                    Индивидуальный подбор
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- Showcase Grid -->
+    <!-- Interactive Tours Section -->
     <section id="tours" class="py-24 max-w-7xl mx-auto px-4 md:px-8">
-        <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-4 reveal-elem">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div>
-                <span class="text-brand_accent text-xs uppercase tracking-[0.2em] font-bold block mb-3">Коллекция</span>
-                <h2 class="font-serif text-4xl md:text-5xl text-brand_dark dark:text-brand_bg font-bold">Выбор Withiv</h2>
+                <span class="text-brand_accent text-xs uppercase tracking-[0.2em] font-bold block mb-2">Актуальное</span>
+                <h2 class="font-serif text-4xl font-bold">Выбор Withiv</h2>
             </div>
-            <a href="https://t.me/withivtravel13" target="_blank" class="flex items-center gap-2 text-sm font-semibold hover:text-brand_accent transition-colors pb-2 border-b border-transparent hover:border-brand_accent">
-                Все горящие туры в Telegram
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-            </a>
+            
+            <!-- Интерактивные табы (UI функционал) -->
+            <div class="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto hide-scrollbar">
+                <button class="px-4 py-2 bg-brand_dark text-brand_bg text-sm font-semibold rounded-sm whitespace-nowrap">Все направления</button>
+                <button class="px-4 py-2 border border-brand_dark/20 text-brand_dark text-sm font-semibold rounded-sm hover:border-brand_dark transition-colors whitespace-nowrap">Пляжный отдых</button>
+                <button class="px-4 py-2 border border-brand_dark/20 text-brand_dark text-sm font-semibold rounded-sm hover:border-brand_dark transition-colors whitespace-nowrap">Экзотика</button>
+            </div>
         </div>
 
-        <div id="tours-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Сюда вставляются туры. JS добавляет им классы reveal-elem -->
-        </div>
-    </section>
-
-    <!-- 4. Agent Section с Параллакс-эффектом -->
-    <section id="agent" class="py-32 relative overflow-hidden">
-        <!-- Параллакс Фон -->
-        <div class="absolute inset-0 z-0 parallax-bg">
-            <div class="absolute inset-0 bg-brand_dark/95 dark:bg-[#0d1a12]/95 backdrop-blur-sm"></div>
-        </div>
-
-        <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10 reveal-elem">
-            <div class="bg-brand_bg dark:bg-dark_surface rounded-sm p-8 md:p-16 relative overflow-hidden shadow-2xl">
-                <!-- Декор -->
-                <div class="absolute -top-24 -right-24 w-64 h-64 bg-brand_accent/10 rounded-full blur-3xl"></div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center relative z-10">
-                    <div>
-                        <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">Анастасия Иванова</h2>
-                        <p class="text-brand_accent uppercase tracking-[0.15em] text-sm font-bold mb-8">Ваш персональный турагент</p>
-                        
-                        <p class="text-brand_dark/80 dark:text-brand_bg/80 leading-relaxed mb-10 max-w-md text-lg">
-                            "Ваше следующее впечатление начинается здесь. Я создаю не просто туры, а персонализированные сценарии вашего идеального отдыха."
-                        </p>
-                        
-                        <div class="flex flex-col sm:flex-row gap-4">
-                            <a href="https://t.me/nast_ivn" target="_blank" class="bg-brand_dark text-brand_bg px-8 py-4 rounded-sm text-center font-bold hover:bg-brand_accent transition-colors shadow-md flex items-center justify-center gap-2">
-                                Написать лично
-                            </a>
-                            <a href="tel:+79127415413" class="border border-brand_dark text-brand_dark dark:border-brand_bg dark:text-brand_bg px-8 py-4 rounded-sm text-center font-bold hover:bg-brand_dark hover:text-brand_bg dark:hover:bg-brand_bg dark:hover:text-brand_dark transition-colors">
-                                +7 912 741-54-13
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <!-- Имитация визитки с QR -->
-                    <div class="flex justify-center md:justify-end relative">
-                        <div class="bg-white p-6 rounded-sm shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-700 max-w-sm w-full border border-gray-100">
-                            <div class="text-center mb-6">
-                                <p class="text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase mb-2">Наведите камеру</p>
-                            </div>
-                            <div class="flex gap-4 justify-center">
-                                <div class="text-center">
-                                    <div class="bg-gray-100 p-2 rounded-sm mb-2 w-28 h-28 flex items-center justify-center mx-auto">
-                                        <svg class="w-16 h-16 text-brand_dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                                    </div>
-                                    <span class="text-[9px] font-bold uppercase text-brand_dark">Личный чат</span>
-                                </div>
-                                <div class="text-center">
-                                    <div class="bg-gray-100 p-2 rounded-sm mb-2 w-28 h-28 flex items-center justify-center mx-auto">
-                                        <svg class="w-16 h-16 text-brand_dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                                    </div>
-                                    <span class="text-[9px] font-bold uppercase text-brand_dark">Канал Withiv</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div id="tours-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="col-span-full py-12 text-center text-brand_dark/60 font-medium">
+                Связываемся с базой данных...
             </div>
         </div>
     </section>
 
-    <!-- Lead Form (Пока обычная, переделаем в квиз позже) -->
-    <section id="lead-form" class="py-24 bg-brand_bg dark:bg-[#0d1a12] relative overflow-hidden reveal-elem">
-        <div class="max-w-3xl mx-auto px-4 relative z-10">
-            <div class="text-center mb-12">
-                <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">Создать путешествие</h2>
-                <p class="text-brand_dark/70 dark:text-brand_bg/70">Оставьте детали, и Анастасия подготовит для вас эксклюзивную подборку.</p>
-            </div>
-
-            <form id="main-lead-form" class="bg-white dark:bg-dark_surface p-8 md:p-12 rounded-sm shadow-xl">
-                <div class="space-y-8 mb-10">
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-brand_accent mb-2">Куда летим?</label>
-                        <input id="form-dest" type="text" placeholder="Страна, отель или просто «На море»" class="form-input text-lg" required>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-brand_accent mb-2">Даты и длительность</label>
-                            <input id="form-dates" type="text" placeholder="Например: август, 10 ночей" class="form-input text-lg" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-brand_accent mb-2">Бюджет</label>
-                            <input id="form-budget" type="text" placeholder="Примерный бюджет" class="form-input text-lg">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-brand_accent mb-2">Ваш Telegram или Телефон</label>
-                        <input id="form-contact" type="text" placeholder="@username или +7..." class="form-input text-lg" required>
-                    </div>
-                </div>
-
-                <div class="text-center">
-                    <button type="submit" id="main-submit-btn" class="bg-brand_dark text-brand_bg dark:bg-brand_bg dark:text-brand_dark w-full md:w-auto px-16 py-5 rounded-sm font-bold text-lg hover:bg-brand_accent dark:hover:bg-brand_accent hover:text-white transition-all duration-300 shadow-xl">
-                        Получить подборку
-                    </button>
-                    <p class="text-[10px] text-brand_dark/40 dark:text-brand_bg/40 mt-6 max-w-sm mx-auto leading-relaxed">
-                        Нажимая кнопку, вы даете согласие на обработку персональных данных в соответствии с ФЗ-152.
-                    </p>
-                </div>
-            </form>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer id="contacts" class="bg-brand_dark text-brand_bg border-t border-brand_bg/10 pt-16 pb-8 reveal-elem delay-100">
-        <div class="max-w-7xl mx-auto px-4 md:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12 text-center md:text-left">
-                <div>
-                    <h3 class="font-serif text-3xl font-bold mb-2">Withiv</h3>
-                    <p class="text-brand_accent uppercase tracking-[0.2em] text-xs font-bold mb-6">Турагентство</p>
-                    <p class="text-sm font-medium text-brand_bg/60 mb-6 max-w-xs mx-auto md:mx-0">
-                        Индивидуальные туры и VIP-сервис.<br>Работаем по всему миру.
-                    </p>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-6 uppercase text-xs tracking-wider text-brand_accent">Клиентам</h4>
-                    <ul class="space-y-4 text-sm font-semibold text-brand_bg/70">
-                        <li><a href="#tours" class="hover:text-white transition-colors">Поиск туров</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Правила въезда</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-6 uppercase text-xs tracking-wider text-brand_accent">Связь</h4>
-                    <ul class="space-y-4 text-sm font-semibold text-brand_bg/70">
-                        <li><a href="tel:+79127415413" class="hover:text-white transition-colors text-lg">+7 (912) 741-54-13</a></li>
-                        <li>Анастасия Иванова</li>
-                        <li><a href="https://t.me/withivtravel13" target="_blank" class="inline-flex items-center gap-2 text-brand_accent hover:text-white transition-colors">Telegram Канал</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="border-t border-brand_bg/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-semibold text-brand_bg/40">
-                <p>&copy; 2026 Withiv Travel. Все права защищены.</p>
-                <a href="#" class="hover:text-white transition-colors">Политика конфиденциальности (ФЗ-152)</a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Modal for Tour Details -->
-    <div id="tour-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300">
-        <div class="absolute inset-0 bg-brand_dark/80 backdrop-blur-sm" onclick="closeModal()"></div>
-        <div class="relative bg-brand_bg dark:bg-dark_surface w-full max-w-4xl rounded-sm shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
-            <button onclick="closeModal()" class="absolute top-4 right-4 z-10 w-8 h-8 bg-brand_bg/50 backdrop-blur-md rounded-full flex items-center justify-center text-brand_dark hover:bg-brand_dark hover:text-brand_bg transition-colors">
+    <!-- Quick View Modal (Строгий функционал) -->
+    <div id="tour-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 bg-brand_dark/90" onclick="closeModal()"></div>
+        <div class="relative bg-brand_bg w-full max-w-5xl rounded-sm shadow-2xl flex flex-col md:flex-row max-h-[90vh] overflow-hidden">
+            <button onclick="closeModal()" class="absolute top-4 right-4 z-10 w-10 h-10 bg-white rounded-full flex items-center justify-center text-brand_dark hover:bg-brand_accent hover:text-white transition-colors shadow-md">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <div class="w-full md:w-1/2 h-64 md:h-auto relative">
-                <img id="modal-img" src="" alt="Tour" class="w-full h-full object-cover">
-                <div class="absolute top-4 left-4 bg-brand_accent text-white px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-sm shadow-md">Эксклюзив</div>
+            
+            <div class="w-full md:w-1/2 h-64 md:h-auto bg-gray-200">
+                <img id="modal-img" src="" class="w-full h-full object-cover">
             </div>
-            <div class="w-full md:w-1/2 p-6 md:p-10 flex flex-col overflow-y-auto">
-                <h3 id="modal-title" class="font-serif text-2xl md:text-3xl font-bold mb-4">Название</h3>
-                <div class="flex items-center gap-2 text-sm font-semibold text-brand_accent mb-6">
-                    <span id="modal-location">Локация</span>
+            
+            <div class="w-full md:w-1/2 p-8 flex flex-col overflow-y-auto">
+                <h3 id="modal-title" class="font-serif text-3xl font-bold mb-2">Название</h3>
+                <p id="modal-location" class="text-sm font-semibold text-brand_accent mb-6">Локация</p>
+                
+                <div class="text-sm text-brand_dark/80 leading-relaxed mb-8 whitespace-pre-wrap flex-1" id="modal-desc">
+                    Описание...
                 </div>
-                <div class="prose prose-sm dark:prose-invert max-w-none mb-8 flex-1">
-                    <p id="modal-desc" class="text-brand_dark/80 dark:text-brand_bg/80 leading-relaxed whitespace-pre-wrap"></p>
-                </div>
-                <div class="border-t border-brand_dark/10 dark:border-brand_bg/10 pt-6 mt-auto">
-                    <div class="flex items-end justify-between mb-6">
-                        <div>
-                            <span class="block text-xs uppercase tracking-wider font-bold text-brand_dark/50 mb-1">Стоимость</span>
-                            <span id="modal-price" class="text-2xl font-serif font-bold">Цена</span>
-                        </div>
-                    </div>
-                    <form id="modal-form" class="flex flex-col gap-3">
+                
+                <div class="border-t border-brand_dark/10 pt-6 mt-auto">
+                    <p class="text-xs uppercase tracking-wider font-bold text-brand_dark/50 mb-1">Стоимость</p>
+                    <p id="modal-price" class="text-2xl font-serif font-bold mb-6">Цена</p>
+                    
+                    <form id="modal-form" class="flex gap-3">
                         <input type="hidden" id="modal-tour-name">
-                        <input type="text" id="modal-contact" placeholder="Ваш телефон или Telegram" required class="bg-brand_dark/5 border border-brand_dark/20 rounded-sm px-4 py-3 text-sm outline-none w-full">
-                        <button type="submit" class="w-full bg-brand_dark text-brand_bg font-bold py-4 rounded-sm hover:bg-brand_accent transition-colors shadow-lg">Хочу сюда</button>
+                        <input type="text" id="modal-contact" placeholder="Телефон / Telegram" required class="flex-1 bg-white border border-brand_dark/20 rounded-sm px-4 py-3 outline-none focus:border-brand_dark text-sm">
+                        <button type="submit" class="bg-brand_dark text-brand_bg font-bold px-6 py-3 rounded-sm hover:bg-brand_accent transition-colors">Запросить</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Скрипты -->
+    <!-- Интерактивный Квиз (Главный функционал) -->
+    <section id="quiz-section" class="py-24 bg-brand_dark text-brand_bg">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="font-serif text-4xl font-bold mb-4">Собрать идеальный тур</h2>
+                <p class="text-brand_bg/70">Ответьте на 4 вопроса, и Анастасия подготовит для вас 3 эксклюзивных варианта.</p>
+            </div>
+
+            <div class="bg-white text-brand_dark rounded-sm p-8 md:p-12 shadow-2xl relative min-h-[400px]">
+                
+                <!-- Прогресс бар -->
+                <div class="absolute top-0 left-0 w-full h-1 bg-gray-100">
+                    <div id="quiz-progress" class="h-full bg-brand_accent transition-all duration-300 w-1/4"></div>
+                </div>
+
+                <form id="quiz-form">
+                    <!-- Шаг 1 -->
+                    <div class="quiz-step active" id="step-1">
+                        <h3 class="text-2xl font-bold mb-6">1. Какое направление рассматриваете?</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg transition-all">
+                                <input type="radio" name="quiz-dest" value="Мальдивы / Сейшелы" class="mr-2 accent-brand_dark"> 🌴 Мальдивы / Сейшелы
+                            </label>
+                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg transition-all">
+                                <input type="radio" name="quiz-dest" value="ОАЭ / Ближний Восток" class="mr-2 accent-brand_dark"> 🏙 ОАЭ / Ближний Восток
+                            </label>
+                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg transition-all">
+                                <input type="radio" name="quiz-dest" value="Турция / Европа" class="mr-2 accent-brand_dark"> 🏛 Турция / Европа
+                            </label>
+                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 flex items-center">
+                                <input type="radio" name="quiz-dest" value="Другое" class="mr-2 accent-brand_dark" onclick="document.getElementById('custom-dest').focus()">
+                                <input type="text" id="custom-dest" placeholder="Свой вариант" class="w-full outline-none bg-transparent text-sm">
+                            </label>
+                        </div>
+                        <div class="mt-8 flex justify-end">
+                            <button type="button" onclick="nextStep(2)" class="bg-brand_dark text-white px-8 py-3 font-bold rounded-sm hover:bg-brand_accent transition-colors">Далее</button>
+                        </div>
+                    </div>
+
+                    <!-- Шаг 2 -->
+                    <div class="quiz-step" id="step-2">
+                        <h3 class="text-2xl font-bold mb-6">2. Когда и на сколько дней?</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">Примерные даты вылета</label>
+                                <input type="text" id="quiz-dates" placeholder="Например: начало августа" class="w-full border border-brand_dark/20 p-4 rounded-sm outline-none focus:border-brand_dark">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">Количество человек</label>
+                                <select id="quiz-people" class="w-full border border-brand_dark/20 p-4 rounded-sm outline-none focus:border-brand_dark bg-white">
+                                    <option>2 взрослых</option>
+                                    <option>2 взрослых + 1 ребенок</option>
+                                    <option>2 взрослых + 2 детей</option>
+                                    <option>Один человек</option>
+                                    <option>Большая компания</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-8 flex justify-between">
+                            <button type="button" onclick="nextStep(1)" class="text-brand_dark/50 hover:text-brand_dark font-bold px-4">Назад</button>
+                            <button type="button" onclick="nextStep(3)" class="bg-brand_dark text-white px-8 py-3 font-bold rounded-sm hover:bg-brand_accent transition-colors">Далее</button>
+                        </div>
+                    </div>
+
+                    <!-- Шаг 3 -->
+                    <div class="quiz-step" id="step-3">
+                        <h3 class="text-2xl font-bold mb-6">3. Какой примерный бюджет?</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg">
+                                <input type="radio" name="quiz-budget" value="До 300 000 ₽" class="mr-2 accent-brand_dark" checked> До 300 000 ₽
+                            </label>
+                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg">
+                                <input type="radio" name="quiz-budget" value="300 000 - 500 000 ₽" class="mr-2 accent-brand_dark"> 300 000 - 500 000 ₽
+                            </label>
+                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg">
+                                <input type="radio" name="quiz-budget" value="500 000 - 1 000 000 ₽" class="mr-2 accent-brand_dark"> 500 000 - 1 000 000 ₽
+                            </label>
+                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg">
+                                <input type="radio" name="quiz-budget" value="Премиум (от 1 млн ₽)" class="mr-2 accent-brand_dark"> Премиум (от 1 млн ₽)
+                            </label>
+                        </div>
+                        <div class="mt-8 flex justify-between">
+                            <button type="button" onclick="nextStep(2)" class="text-brand_dark/50 hover:text-brand_dark font-bold px-4">Назад</button>
+                            <button type="button" onclick="nextStep(4)" class="bg-brand_dark text-white px-8 py-3 font-bold rounded-sm hover:bg-brand_accent transition-colors">Далее</button>
+                        </div>
+                    </div>
+
+                    <!-- Шаг 4 -->
+                    <div class="quiz-step" id="step-4">
+                        <h3 class="text-2xl font-bold mb-6">4. Куда прислать подборку?</h3>
+                        <p class="text-sm mb-6">Оставьте контакт, и Анастасия свяжется с вами с готовыми вариантами.</p>
+                        <div>
+                            <input type="text" id="quiz-contact" placeholder="Ваш номер телефона или @telegram" required class="w-full border border-brand_dark/20 p-4 rounded-sm outline-none focus:border-brand_dark mb-4 text-lg">
+                        </div>
+                        <div class="mt-8 flex justify-between items-center">
+                            <button type="button" onclick="nextStep(3)" class="text-brand_dark/50 hover:text-brand_dark font-bold px-4">Назад</button>
+                            <button type="submit" id="quiz-submit-btn" class="bg-brand_accent text-white px-10 py-4 font-bold rounded-sm hover:bg-brand_dark transition-colors shadow-lg">Отправить заявку</button>
+                        </div>
+                        <p class="text-[10px] text-center text-gray-400 mt-4">Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности.</p>
+                    </div>
+                    
+                    <!-- Успех -->
+                    <div class="quiz-step text-center py-12" id="step-success">
+                        <svg class="w-20 h-20 text-green-600 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <h3 class="text-3xl font-serif font-bold mb-4">Заявка принята!</h3>
+                        <p class="text-brand_dark/70">Мы уже приступили к подбору идеальных вариантов для вас.</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Agent Profile -->
+    <section id="agent" class="py-24 bg-white border-y border-brand_dark/10">
+        <div class="max-w-5xl mx-auto px-4 md:px-8">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="w-full md:w-1/2 text-center md:text-left">
+                    <h2 class="font-serif text-4xl font-bold mb-2">Анастасия Иванова</h2>
+                    <p class="text-brand_accent uppercase tracking-[0.1em] text-sm font-bold mb-6">Ваш персональный турагент</p>
+                    <p class="text-brand_dark/80 leading-relaxed mb-8">
+                        Я помогаю превратить отпуск в событие, которое вы будете вспоминать годами. Мы берем на себя всю рутину: от подбора правильного отеля до регистрации на рейс.
+                    </p>
+                    <div class="flex flex-wrap justify-center md:justify-start gap-4">
+                        <a href="https://t.me/nast_ivn" target="_blank" class="bg-brand_dark text-white px-6 py-3 rounded-sm font-bold hover:bg-brand_accent transition-colors">Написать в Telegram</a>
+                        <a href="tel:+79127415413" class="border border-brand_dark text-brand_dark px-6 py-3 rounded-sm font-bold hover:bg-brand_dark hover:text-white transition-colors">+7 912 741-54-13</a>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 flex justify-center gap-6">
+                    <div class="text-center p-4 border border-brand_dark/10 rounded-sm shadow-sm hover:shadow-md transition-shadow bg-brand_bg">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/nast_ivn&color=1B3B2B" class="w-32 h-32 mb-3 mx-auto">
+                        <p class="text-[10px] font-bold uppercase tracking-wider">Личный чат</p>
+                    </div>
+                    <div class="text-center p-4 border border-brand_dark/10 rounded-sm shadow-sm hover:shadow-md transition-shadow bg-brand_bg">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/withivtravel13&color=1B3B2B" class="w-32 h-32 mb-3 mx-auto">
+                        <p class="text-[10px] font-bold uppercase tracking-wider">Наш Канал</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-brand_dark text-brand_bg py-12">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <span class="font-serif text-2xl font-bold">Withiv</span>
+                <p class="text-xs text-brand_bg/50 mt-2">&copy; 2026 Бутик-турагентство.</p>
+            </div>
+            <div class="text-sm font-semibold">
+                <a href="#" class="hover:text-brand_accent">Политика конфиденциальности</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Скрипты (Без библиотек, чистый JS) -->
     <script>
         const API_BASE_URL = 'https://withiv-bot.onrender.com';
         let globalTours = [];
 
-        // Управление Прелоадером и логикой загрузки
-        document.addEventListener('DOMContentLoaded', () => {
-            // Убираем скролл, пока идет загрузка
-            document.body.classList.remove('overflow-hidden');
-            
-            // Настройка наблюдателя для Reveal-анимаций
-            const observerOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('reveal-visible');
-                        entry.target.classList.remove('reveal-hidden');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, observerOptions);
+        // 1. Загрузка туров
+        async function loadTours() {
+            const grid = document.getElementById('tours-grid');
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/tours`);
+                if (!res.ok) throw new Error();
+                globalTours = await res.json();
 
-            // Функция для активации observer на элементах
-            const initReveal = () => {
-                document.querySelectorAll('.reveal-elem').forEach(el => {
-                    el.classList.add('reveal-hidden');
-                    observer.observe(el);
-                });
-            };
-
-            // Загрузка туров
-            async function loadTours() {
-                const grid = document.getElementById('tours-grid');
-                try {
-                    const response = await fetch(`${API_BASE_URL}/api/tours`);
-                    if (!response.ok) throw new Error('Ошибка сервера');
-                    globalTours = await response.json();
-
-                    if (globalTours.length > 0) {
-                        grid.innerHTML = globalTours.map((tour, index) => {
-                            const title = tour['Название'] || 'Эксклюзивный тур';
-                            const location = tour['Локация'] || '';
-                            const price = tour['Цена'] || 'По запросу';
-                            const photo = tour['Фото'] || 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=800&auto=format&fit=crop';
-                            // Добавляем класс reveal-elem каждой карточке для анимации при скролле
-                            return `
-                                <article onclick="openModal(${index})" class="reveal-elem cursor-pointer group relative flex flex-col bg-white dark:bg-dark_surface rounded-sm overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
-                                    <div class="relative h-72 overflow-hidden bg-gray-100">
-                                        <img src="${photo}" alt="${title}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-[2s] ease-out" loading="lazy">
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
-                                        <div class="absolute bottom-4 left-4 right-4 text-white">
-                                            <h3 class="font-serif text-2xl font-bold mb-1 line-clamp-1">${title}</h3>
-                                            <p class="text-sm font-medium text-white/80">${location}</p>
-                                        </div>
-                                    </div>
-                                    <div class="p-6 flex items-center justify-between border-t-4 border-brand_accent">
-                                        <div>
-                                            <span class="text-[10px] uppercase tracking-widest font-bold text-brand_dark/50 dark:text-brand_bg/50 block mb-1">Стоимость</span>
-                                            <span class="font-bold text-lg">${price}</span>
-                                        </div>
-                                        <button class="text-sm font-bold text-brand_accent transition-colors flex items-center gap-1">Смотреть</button>
-                                    </div>
-                                </article>
-                            `;
-                        }).join('');
-                    }
-                } catch (error) {
-                    console.error(error);
+                if (globalTours.length > 0) {
+                    grid.innerHTML = globalTours.map((tour, idx) => `
+                        <article onclick="openModal(${idx})" class="cursor-pointer group bg-white rounded-sm shadow-sm hover:shadow-xl transition-all border border-gray-100 overflow-hidden flex flex-col">
+                            <div class="h-64 overflow-hidden relative">
+                                <img src="${tour['Фото'] || ''}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1s]">
+                                <div class="absolute bottom-3 left-3 bg-brand_dark text-white px-2 py-1 text-xs font-bold rounded-sm">${tour['Локация'] || ''}</div>
+                            </div>
+                            <div class="p-5 flex-1 flex flex-col justify-between">
+                                <h3 class="font-serif text-xl font-bold mb-4 group-hover:text-brand_accent transition-colors">${tour['Название'] || ''}</h3>
+                                <div class="flex justify-between items-end border-t border-gray-100 pt-4 mt-auto">
+                                    <span class="font-bold text-lg">${tour['Цена'] || 'По запросу'}</span>
+                                    <span class="text-sm font-bold text-brand_accent">Смотреть &rarr;</span>
+                                </div>
+                            </div>
+                        </article>
+                    `).join('');
+                } else {
+                    grid.innerHTML = '<div class="col-span-full py-10 text-center font-bold">Туры обновляются...</div>';
                 }
-
-                // После загрузки данных запускаем анимации
-                initReveal();
-                
-                // Прячем прелоадер (искусственная задержка для плавности)
-                setTimeout(() => {
-                    const preloader = document.getElementById('preloader');
-                    preloader.style.opacity = '0';
-                    preloader.style.visibility = 'hidden';
-                    setTimeout(() => preloader.remove(), 800);
-                }, 1000);
+            } catch (err) {
+                grid.innerHTML = '<div class="col-span-full py-10 text-center text-red-500">Ошибка загрузки базы.</div>';
             }
+        }
 
-            loadTours();
-            setupLeadForms();
-        });
-
-        // Модальное окно (из предыдущего шага, без изменений)
+        // 2. Модальное окно
         const modal = document.getElementById('tour-modal');
-        function openModal(index) {
-            const tour = globalTours[index];
-            if(!tour) return;
-            document.getElementById('modal-img').src = tour['Фото'] || '';
-            document.getElementById('modal-title').innerText = tour['Название'] || 'Без названия';
-            document.getElementById('modal-location').innerText = tour['Локация'] || 'Уточняется';
-            document.getElementById('modal-desc').innerHTML = (tour['Описание'] || tour['Детали'] || '').replace(/\n/g, '<br>');
-            document.getElementById('modal-price').innerText = tour['Цена'] || 'По запросу';
-            document.getElementById('modal-tour-name').value = tour['Название'];
+        function openModal(idx) {
+            const t = globalTours[idx];
+            document.getElementById('modal-img').src = t['Фото'];
+            document.getElementById('modal-title').innerText = t['Название'];
+            document.getElementById('modal-location').innerText = t['Локация'];
+            document.getElementById('modal-desc').innerHTML = (t['Описание'] || t['Детали'] || '').replace(/\n/g, '<br>');
+            document.getElementById('modal-price').innerText = t['Цена'];
+            document.getElementById('modal-tour-name').value = t['Название'];
+            
             modal.classList.remove('hidden');
             setTimeout(() => modal.classList.remove('opacity-0'), 10);
             document.body.style.overflow = 'hidden';
@@ -467,32 +353,74 @@
             document.body.style.overflow = '';
         }
 
-        // Отправка заявок (из предыдущего шага, работает с API)
-        function setupLeadForms() {
-            const mainForm = document.getElementById('main-lead-form');
-            if(mainForm) {
-                mainForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const btn = document.getElementById('main-submit-btn');
-                    const originalText = btn.innerText;
-                    btn.innerText = "Отправка...";
-                    const data = {
-                        destination: document.getElementById('form-dest').value,
-                        dates: document.getElementById('form-dates').value,
-                        budget: document.getElementById('form-budget').value || "Не указан",
-                        contact: document.getElementById('form-contact').value
-                    };
-                    try {
-                        const res = await fetch(`${API_BASE_URL}/api/lead`, {
-                            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
-                        });
-                        if(res.ok) { btn.innerText = "Заявка отправлена! ✨"; btn.classList.replace('bg-brand_dark', 'bg-green-600'); mainForm.reset(); }
-                        else throw new Error('Ошибка');
-                    } catch(err) { btn.innerText = "Ошибка отправки"; btn.classList.replace('bg-brand_dark', 'bg-red-600'); }
-                    setTimeout(() => { btn.innerText = originalText; btn.className = "bg-brand_dark text-brand_bg dark:bg-brand_bg dark:text-brand_dark w-full md:w-auto px-16 py-5 rounded-sm font-bold text-lg hover:bg-brand_accent dark:hover:bg-brand_accent hover:text-white transition-all duration-300 shadow-xl"; }, 4000);
+        // 3. Отправка из карточки
+        document.getElementById('modal-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const orig = btn.innerText;
+            btn.innerText = '...';
+            try {
+                await fetch(`${API_BASE_URL}/api/lead`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        destination: 'Тур: ' + document.getElementById('modal-tour-name').value,
+                        dates: '-', budget: document.getElementById('modal-price').innerText,
+                        contact: document.getElementById('modal-contact').value
+                    })
                 });
-            }
+                btn.innerText = 'Успешно!'; btn.classList.add('bg-green-600');
+                setTimeout(closeModal, 1500);
+            } catch(err) { btn.innerText = 'Ошибка'; }
+            setTimeout(() => { btn.innerText = orig; btn.classList.remove('bg-green-600'); e.target.reset(); }, 2000);
+        });
+
+        // 4. Логика Квиза
+        function nextStep(step) {
+            document.querySelectorAll('.quiz-step').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step-${step}`).classList.add('active');
+            document.getElementById('quiz-progress').style.width = `${(step / 4) * 100}%`;
         }
+
+        document.getElementById('quiz-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('quiz-submit-btn');
+            btn.innerText = 'Отправка...';
+            
+            // Собираем данные
+            const destRadio = document.querySelector('input[name="quiz-dest"]:checked');
+            let destination = destRadio ? destRadio.value : '';
+            if (destination === 'Другое' || !destination) {
+                destination = document.getElementById('custom-dest').value || 'Не указано';
+            }
+            
+            const budgetRadio = document.querySelector('input[name="quiz-budget"]:checked');
+            const budget = budgetRadio ? budgetRadio.value : 'Не указан';
+            
+            const dates = document.getElementById('quiz-dates').value || 'Не указано';
+            const people = document.getElementById('quiz-people').value;
+
+            try {
+                await fetch(`${API_BASE_URL}/api/lead`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        destination: `КВИЗ: ${destination} (${people})`,
+                        dates: dates,
+                        budget: budget,
+                        contact: document.getElementById('quiz-contact').value
+                    })
+                });
+                
+                // Показываем экран успеха
+                document.querySelectorAll('.quiz-step').forEach(el => el.classList.remove('active'));
+                document.getElementById('step-success').classList.add('active');
+                document.getElementById('quiz-progress').style.width = '100%';
+                
+            } catch(err) {
+                btn.innerText = 'Ошибка, попробуйте еще раз';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', loadTours);
     </script>
 </body>
 </html>
