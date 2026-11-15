@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ЖЕСТКИЙ ТЕСТ API</title>
+</head>
+<body style="font-family: monospace; background: #111; color: #0f0; padding: 20px;">
+    <h2>Проверка связи с бэкендом...</h2>
+    <div id="log"></div>
+
+    <script>
+        const log = (msg) => document.getElementById('log').innerHTML += `<p>${msg}</p>`;
+        const url = 'https://withiv-bot.onrender.com/api/tours';
+        
+        log(`[1] Отправляю запрос на: ${url}`);
+        
+        fetch(url)
+            .then(res => {
+                log(`[2] Ответ от сервера получен! Статус: ${res.status}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                log(`[3] ✅ ДАННЫЕ УСПЕШНО ПРОЧИТАНЫ. Туров в базе: ${data.length}`);
+                log(`<pre style="color: #ff0; background: #222; padding: 10px;">${JSON.stringify(data, null, 2)}</pre>`);
+            })
+            .catch(err => {
+                log(`<span style="color: #f00;">[X] ЖЕСТКАЯ ОШИБКА: ${err.message} (Скорее всего CORS или блокировка в браузере)</span>`);
+            });
+    </script>
+</body>
+</html>
