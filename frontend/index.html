@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Withiv — Турагентство индивидуальных путешествий</title>
     
-    <!-- Open Graph SEO / Шеринг в Telegram -->
     <meta property="og:title" content="Withiv — Бутик-турагентство">
     <meta property="og:description" content="Индивидуальный подбор туров, бронирование отелей и полное сопровождение в поездке по всему миру.">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=1200&auto=format&fit=crop">
-    <meta property="og:url" content="https://makarchik010.github.io/withiv-agency/">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,8 +35,8 @@
         body { background-color: #F7F4EF; color: #1B3B2B; -webkit-font-smoothing: antialiased; }
         .glass-header { background: rgba(247, 244, 239, 0.94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
         .quiz-step { display: none; }
-        .quiz-step.active { display: block; animation: fadeIn 0.35s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .quiz-step.active { display: flex; flex-direction: column; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1B3B2B; border-radius: 3px; }
@@ -50,23 +48,20 @@
         }
         .reviews-scroll::-webkit-scrollbar { display: none; }
 
-        /* Премиальная физика анимации модального окна */
-        #tour-modal {
-            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        #tour-modal { transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        #modal-backdrop { transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.4s ease; }
+        #modal-content { transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-closed #modal-content { transform: translateY(60px) scale(0.96); opacity: 0; }
+        .modal-open #modal-content { transform: translateY(0) scale(1); opacity: 1; }
+        
+        /* Стили для кастомных радиокнопок в квизе */
+        .quiz-radio:checked + div {
+            border-color: #1B3B2B;
+            background-color: rgba(27, 59, 43, 0.05);
         }
-        #modal-backdrop {
-            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.4s ease;
-        }
-        #modal-content {
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .modal-closed #modal-content {
-            transform: translateY(60px) scale(0.96);
-            opacity: 0;
-        }
-        .modal-open #modal-content {
-            transform: translateY(0) scale(1);
-            opacity: 1;
+        .quiz-radio:checked + div .radio-inner {
+            background-color: #1B3B2B;
+            border-color: #1B3B2B;
         }
     </style>
 </head>
@@ -91,9 +86,6 @@
             </nav>
             
             <div class="hidden md:flex items-center gap-3">
-                <a href="https://wa.me/79127415413" target="_blank" class="text-brand_dark/60 hover:text-[#25D366] transition-colors" title="Написать в WhatsApp">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                </a>
                 <a href="https://t.me/withivtravel13" target="_blank" class="bg-brand_dark text-brand_bg px-5 py-2.5 rounded-sm text-sm font-semibold hover:bg-brand_accent transition-colors">
                     Telegram-канал
                 </a>
@@ -114,14 +106,10 @@
             <a href="#reviews" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Отзывы клиентов</a>
             <a href="#about" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Об агентстве</a>
             <hr class="border-brand_dark/10 my-2">
-            <div class="flex gap-4 w-full pt-2">
-                <a href="https://wa.me/79127415413" target="_blank" class="flex-1 bg-[#25D366] text-white px-5 py-4 rounded-sm font-bold text-center flex justify-center items-center gap-2">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                    WhatsApp
-                </a>
-                <a href="https://t.me/withivtravel13" target="_blank" class="flex-1 bg-brand_dark text-brand_bg px-5 py-4 rounded-sm font-bold text-center flex justify-center items-center gap-2">
+            <div class="flex flex-col gap-4 w-full pt-2">
+                <a href="https://t.me/withivtravel13" target="_blank" class="w-full bg-brand_dark text-brand_bg px-5 py-4 rounded-sm font-bold text-center flex justify-center items-center gap-2">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-                    Telegram
+                    Telegram-канал
                 </a>
             </div>
         </nav>
@@ -145,7 +133,7 @@
             </h1>
             
             <p class="text-base md:text-lg text-white/80 max-w-xl mb-10 font-normal leading-relaxed">
-                Организуем отдых по всему миру: от проверенных семейных курортов до уединенных вилл и индивидуальных туров без лишней суеты
+                Организуем отдых по всему миру: от проверенных семейных курортов до уединенных вилл и индивидуальных маршрутов без лишней суеты
             </p>
             
             <div class="flex flex-col sm:flex-row gap-4">
@@ -168,13 +156,14 @@
             </div>
             
             <div id="filter-tabs" class="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto hide-scrollbar">
+                <!-- Заполняется через JS -->
             </div>
         </div>
 
         <div id="tours-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             <div class="col-span-full py-12 text-center text-brand_dark/60 font-medium text-sm md:text-base">
-                <div class="inline-block w-6 h-6 md:w-8 md:h-8 border-2 border-brand_accent border-t-transparent rounded-full animate-spin mb-3"></div><br>
-                Загружаем актуальные туры...
+                <div class="inline-block w-6 h-6 border-2 border-brand_accent border-t-transparent rounded-full animate-spin mb-3"></div><br>
+                <span id="loading-text">Соединяемся с базой туров...</span>
             </div>
         </div>
     </section>
@@ -191,22 +180,16 @@
         </div>
     </section>
 
-    <!-- Quick View Modal (Премиальные плавные переходы + фиксированный крестик) -->
+    <!-- Quick View Modal -->
     <div id="tour-modal" class="fixed inset-0 z-[1050] hidden items-end md:items-center justify-center sm:p-6 modal-closed">
-        <!-- Затемняющий фон с размытием -->
         <div id="modal-backdrop" class="absolute inset-0 bg-brand_dark/80 backdrop-blur-md opacity-0" onclick="closeModal()"></div>
         
-        <!-- Карточка -->
         <div id="modal-content" class="relative bg-brand_bg w-full md:max-w-4xl rounded-t-2xl md:rounded-md shadow-2xl flex flex-col md:flex-row max-h-[90vh] overflow-hidden z-10">
             
-            <!-- Крупный удобный крестик сверху -->
-            <button onclick="closeModal()" type="button" aria-label="Закрыть" class="absolute top-4 right-4 z-30 w-10 h-10 bg-black/40 hover:bg-brand_dark text-white backdrop-blur-md rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90 shadow-lg border border-white/20">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
+            <button onclick="closeModal()" type="button" aria-label="Закрыть" class="absolute top-4 right-4 z-30 w-10 h-10 bg-black/40 hover:bg-brand_dark text-white backdrop-blur-md rounded-full flex items-center justify-center transition-all duration-300 shadow-lg border border-white/20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
             
-            <!-- Фото -->
             <div class="w-full md:w-1/2 h-56 sm:h-64 md:h-auto bg-brand_dark shrink-0 relative overflow-hidden">
                 <img id="modal-img" src="" alt="Тур" class="w-full h-full object-cover">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent md:hidden"></div>
@@ -216,7 +199,6 @@
                 </div>
             </div>
             
-            <!-- Текст и форма -->
             <div class="w-full md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto bg-brand_bg">
                 <div class="hidden md:block mb-5 pr-8">
                     <p id="modal-location" class="text-xs font-bold uppercase tracking-widest text-brand_accent mb-2 flex items-center gap-1.5">
@@ -226,15 +208,12 @@
                     <h3 id="modal-title-desktop" class="text-2xl lg:text-3xl font-bold leading-tight text-brand_dark">Название</h3>
                 </div>
                 
-                <!-- Детали (короткая плашка, если есть и описание, и детали) -->
                 <div id="modal-details-badge" class="hidden mb-4 p-3 bg-white border border-brand_dark/10 rounded-sm text-xs font-medium text-brand_dark/80"></div>
 
-                <!-- Основное описание -->
-                <div class="text-sm text-brand_dark/85 leading-relaxed mb-6 whitespace-pre-wrap" id="modal-desc">
+                <div class="text-sm text-brand_dark/85 leading-relaxed mb-6 whitespace-pre-wrap flex-1" id="modal-desc">
                     Описание...
                 </div>
                 
-                <!-- Низ: Цена и форма заявки -->
                 <div class="border-t border-brand_dark/10 pt-5 mt-auto">
                     <div class="flex items-baseline justify-between mb-4">
                         <span class="text-[11px] uppercase tracking-wider font-bold text-brand_dark/50">Стоимость</span>
@@ -243,7 +222,7 @@
                     
                     <form id="modal-form" class="flex flex-col gap-3">
                         <input type="hidden" id="modal-tour-name">
-                        <input type="text" id="modal-contact" placeholder="Телефон или @telegram" required pattern="^[\+@a-zA-Z0-9\s\-\(\)]+$" minlength="5" title="Введите корректный номер или ник" class="w-full bg-white border border-brand_dark/20 rounded-sm px-4 py-3.5 outline-none focus:border-brand_dark text-sm transition-colors">
+                        <input type="text" id="modal-contact" placeholder="Телефон или @telegram" required class="w-full bg-white border border-brand_dark/20 rounded-sm px-4 py-3.5 outline-none focus:border-brand_dark text-sm transition-colors">
                         <button type="submit" class="w-full bg-brand_dark text-brand_bg font-bold py-4 rounded-sm hover:bg-brand_accent transition-colors shadow-md text-sm">
                             Хочу сюда
                         </button>
@@ -253,138 +232,288 @@
         </div>
     </div>
 
-    <!-- Интерактивный Квиз -->
+    <!-- Продвинутый Интерактивный Квиз -->
     <section id="quiz-section" class="py-16 md:py-24 bg-brand_dark text-brand_bg">
         <div class="max-w-4xl mx-auto px-4">
             <div class="text-center mb-8 md:mb-12">
-                <span class="text-brand_accent text-xs uppercase tracking-[0.2em] font-bold block mb-2">Персональный расчет</span>
-                <h2 class="text-3xl md:text-4xl font-bold mb-3 tracking-tight">Собрать идеальный тур</h2>
-                <p class="text-brand_bg/75 text-sm md:text-base max-w-xl mx-auto">Ответьте на несколько вопросов — мы подготовим подборку проверенных отелей под ваши пожелания</p>
+                <span class="text-brand_accent text-xs uppercase tracking-[0.2em] font-bold block mb-2">Глубокий подбор</span>
+                <h2 class="text-3xl md:text-4xl font-bold mb-3 tracking-tight">Конструктор путешествия</h2>
+                <p class="text-brand_bg/75 text-sm md:text-base max-w-xl mx-auto">Расскажите подробно о своих предпочтениях, чтобы менеджер подготовил максимально точные варианты</p>
             </div>
 
-            <div class="bg-white text-brand_dark rounded-sm p-6 md:p-12 shadow-2xl relative min-h-[380px] flex flex-col justify-center">
-                <div class="absolute top-0 left-0 w-full h-1.5 bg-gray-100 rounded-t-sm overflow-hidden">
-                    <div id="quiz-progress" class="h-full bg-brand_accent transition-all duration-300 w-1/4"></div>
+            <div class="bg-white text-brand_dark rounded-md p-6 md:p-10 shadow-2xl relative min-h-[450px] flex flex-col">
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-gray-100 rounded-t-md overflow-hidden">
+                    <div id="quiz-progress" class="h-full bg-brand_accent transition-all duration-300 w-[16%]"></div>
                 </div>
 
-                <form id="quiz-form">
-                    <!-- Шаг 1 -->
-                    <div class="quiz-step active" id="step-1">
-                        <h3 class="text-xl md:text-2xl font-bold mb-2">Куда планируете отправиться?</h3>
-                        <p class="text-xs md:text-sm text-brand_dark/60 mb-6">Выберите одно из популярных направлений или укажите своё</p>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-3.5 hover:border-brand_dark hover:bg-brand_bg transition-colors flex items-center">
-                                <input type="radio" name="quiz-dest" value="Турция" class="mr-3 w-4 h-4 accent-brand_dark shrink-0"> 
-                                <span class="text-sm font-semibold">Турция</span>
-                            </label>
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-3.5 hover:border-brand_dark hover:bg-brand_bg transition-colors flex items-center">
-                                <input type="radio" name="quiz-dest" value="ОАЭ" class="mr-3 w-4 h-4 accent-brand_dark shrink-0"> 
-                                <span class="text-sm font-semibold">ОАЭ</span>
-                            </label>
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-3.5 hover:border-brand_dark hover:bg-brand_bg transition-colors flex items-center">
-                                <input type="radio" name="quiz-dest" value="Египет" class="mr-3 w-4 h-4 accent-brand_dark shrink-0"> 
-                                <span class="text-sm font-semibold">Египет</span>
-                            </label>
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-3.5 hover:border-brand_dark hover:bg-brand_bg transition-colors flex items-center">
-                                <input type="radio" name="quiz-dest" value="Мальдивы" class="mr-3 w-4 h-4 accent-brand_dark shrink-0"> 
-                                <span class="text-sm font-semibold">Мальдивы</span>
-                            </label>
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-3.5 hover:border-brand_dark hover:bg-brand_bg transition-colors flex items-center">
-                                <input type="radio" name="quiz-dest" value="Таиланд" class="mr-3 w-4 h-4 accent-brand_dark shrink-0"> 
-                                <span class="text-sm font-semibold">Таиланд</span>
-                            </label>
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-3.5 hover:border-brand_dark hover:bg-brand_bg transition-colors flex items-center">
-                                <input type="radio" name="quiz-dest" value="Сейшелы" class="mr-3 w-4 h-4 accent-brand_dark shrink-0"> 
-                                <span class="text-sm font-semibold">Сейшелы</span>
-                            </label>
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-3.5 flex items-center bg-gray-50 focus-within:bg-white focus-within:border-brand_dark sm:col-span-3">
-                                <input type="radio" name="quiz-dest" value="Другое" id="radio-other" class="mr-3 w-4 h-4 accent-brand_dark shrink-0">
-                                <input type="text" id="custom-dest" placeholder="Другая страна или курорт..." oninput="document.getElementById('radio-other').checked = true;" class="w-full outline-none bg-transparent text-sm font-medium">
-                            </label>
+                <form id="quiz-form" class="flex-1 flex flex-col">
+                    
+                    <!-- Шаг 1: Формат отдыха -->
+                    <div class="quiz-step active flex-1" id="step-1">
+                        <div class="mb-auto">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Шаг 1 из 6</span>
+                            <h3 class="text-2xl font-bold mb-6">Какой формат отдыха вам ближе?</h3>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="quiz-format" value="Пляж и релакс" class="quiz-radio sr-only" checked>
+                                    <div class="border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark transition-colors flex items-start gap-3">
+                                        <div class="w-5 h-5 rounded-full border-2 border-brand_dark/30 mt-0.5 flex items-center justify-center shrink-0 radio-inner">
+                                            <div class="w-2.5 h-2.5 rounded-full bg-transparent"></div>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-sm">Пляж и полный релакс</p>
+                                            <p class="text-xs text-brand_dark/60 mt-1">Отель хорошего уровня, море, солнце, минимум передвижений.</p>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="quiz-format" value="Активный / Экскурсии" class="quiz-radio sr-only">
+                                    <div class="border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark transition-colors flex items-start gap-3">
+                                        <div class="w-5 h-5 rounded-full border-2 border-brand_dark/30 mt-0.5 flex items-center justify-center shrink-0 radio-inner">
+                                            <div class="w-2.5 h-2.5 rounded-full bg-transparent"></div>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-sm">Активный и экскурсионный</p>
+                                            <p class="text-xs text-brand_dark/60 mt-1">Изучение новых мест, поездки, насыщенная программа.</p>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="quiz-format" value="Баланс (Пляж + Город)" class="quiz-radio sr-only">
+                                    <div class="border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark transition-colors flex items-start gap-3">
+                                        <div class="w-5 h-5 rounded-full border-2 border-brand_dark/30 mt-0.5 flex items-center justify-center shrink-0 radio-inner">
+                                            <div class="w-2.5 h-2.5 rounded-full bg-transparent"></div>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-sm">Баланс (Пляж + Город)</p>
+                                            <p class="text-xs text-brand_dark/60 mt-1">Пару дней экскурсий или шоппинга, остальное время на пляже.</p>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="quiz-format" value="Романтика / Уединение" class="quiz-radio sr-only">
+                                    <div class="border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark transition-colors flex items-start gap-3">
+                                        <div class="w-5 h-5 rounded-full border-2 border-brand_dark/30 mt-0.5 flex items-center justify-center shrink-0 radio-inner">
+                                            <div class="w-2.5 h-2.5 rounded-full bg-transparent"></div>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-sm">Романтика и уединение</p>
+                                            <p class="text-xs text-brand_dark/60 mt-1">Медовый месяц или спокойный отдых вдали от шума.</p>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
                         <div class="mt-8 flex justify-end">
-                            <button type="button" onclick="nextStep(2)" class="bg-brand_dark text-white w-full sm:w-auto px-8 py-3.5 font-bold rounded-sm hover:bg-brand_accent transition-colors text-sm">Продолжить</button>
+                            <button type="button" onclick="nextStep(2)" class="bg-brand_dark text-white w-full sm:w-auto px-8 py-3.5 font-bold rounded-sm hover:bg-brand_accent transition-colors text-sm">Следующий шаг</button>
                         </div>
                     </div>
 
-                    <!-- Шаг 2 -->
-                    <div class="quiz-step" id="step-2">
-                        <h3 class="text-xl md:text-2xl font-bold mb-6">Когда планируете вылет и каким составом?</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-brand_dark/60 mb-2">Примерные даты и длительность</label>
-                                <input type="text" id="quiz-dates" placeholder="Например: конец ноября, на 10 ночей" class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark text-sm bg-white">
+                    <!-- Шаг 2: Направления -->
+                    <div class="quiz-step flex-1" id="step-2">
+                        <div class="mb-auto">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Шаг 2 из 6</span>
+                            <h3 class="text-2xl font-bold mb-6">Куда бы вы хотели отправиться?</h3>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="quiz-dest" value="Турция" class="quiz-radio sr-only">
+                                    <div class="border border-brand_dark/20 rounded-sm p-3 text-center hover:border-brand_dark transition-colors">
+                                        <span class="font-semibold text-sm">Турция</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="quiz-dest" value="ОАЭ" class="quiz-radio sr-only">
+                                    <div class="border border-brand_dark/20 rounded-sm p-3 text-center hover:border-brand_dark transition-colors">
+                                        <span class="font-semibold text-sm">ОАЭ</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="quiz-dest" value="Египет" class="quiz-radio sr-only">
+                                    <div class="border border-brand_dark/20 rounded-sm p-3 text-center hover:border-brand_dark transition-colors">
+                                        <span class="font-semibold text-sm">Египет</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="quiz-dest" value="Таиланд" class="quiz-radio sr-only">
+                                    <div class="border border-brand_dark/20 rounded-sm p-3 text-center hover:border-brand_dark transition-colors">
+                                        <span class="font-semibold text-sm">Таиланд</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="quiz-dest" value="Мальдивы / Сейшелы" class="quiz-radio sr-only">
+                                    <div class="border border-brand_dark/20 rounded-sm p-3 text-center hover:border-brand_dark transition-colors">
+                                        <span class="font-semibold text-sm">Мальдивы / Сейшелы</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="quiz-dest" value="Пока не знаю" class="quiz-radio sr-only" checked>
+                                    <div class="border border-brand_dark/20 rounded-sm p-3 text-center hover:border-brand_dark transition-colors">
+                                        <span class="font-semibold text-sm">Нужен совет</span>
+                                    </div>
+                                </label>
                             </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-brand_dark/60 mb-2">Количество путешественников</label>
-                                <select id="quiz-people" class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark bg-white text-sm cursor-pointer">
-                                    <option>2 взрослых</option>
-                                    <option>2 взрослых + 1 ребенок</option>
-                                    <option>2 взрослых + 2 детей</option>
-                                    <option>1 взрослый</option>
-                                    <option>Компания друзей</option>
-                                </select>
-                            </div>
+                            <input type="text" id="custom-dest" placeholder="Или напишите свой вариант (страна, город, отель)..." class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark text-sm bg-white">
                         </div>
                         <div class="mt-8 flex gap-3">
                             <button type="button" onclick="nextStep(1)" class="w-1/3 sm:w-auto bg-gray-100 text-brand_dark hover:bg-gray-200 font-bold px-5 py-3.5 rounded-sm transition-colors text-sm">Назад</button>
-                            <button type="button" onclick="nextStep(3)" class="flex-1 sm:flex-none bg-brand_dark text-white px-8 py-3.5 font-bold rounded-sm hover:bg-brand_accent transition-colors text-sm">Продолжить</button>
+                            <button type="button" onclick="nextStep(3)" class="flex-1 sm:flex-none bg-brand_dark text-white px-8 py-3.5 font-bold rounded-sm hover:bg-brand_accent transition-colors text-sm">Далее</button>
                         </div>
                     </div>
 
-                    <!-- Шаг 3 -->
-                    <div class="quiz-step" id="step-3">
-                        <h3 class="text-xl md:text-2xl font-bold mb-6">На какой бюджет ориентируетесь?</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg flex items-center">
-                                <input type="radio" name="quiz-budget" value="До 250 000 ₽" class="mr-3 w-4 h-4 accent-brand_dark" checked> 
-                                <span class="text-sm font-semibold">До 250 000 ₽</span>
-                            </label>
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg flex items-center">
-                                <input type="radio" name="quiz-budget" value="250 000 – 450 000 ₽" class="mr-3 w-4 h-4 accent-brand_dark"> 
-                                <span class="text-sm font-semibold">250 000 – 450 000 ₽</span>
-                            </label>
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg flex items-center">
-                                <input type="radio" name="quiz-budget" value="450 000 – 800 000 ₽" class="mr-3 w-4 h-4 accent-brand_dark"> 
-                                <span class="text-sm font-semibold">450 000 – 800 000 ₽</span>
-                            </label>
-                            <label class="cursor-pointer border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark hover:bg-brand_bg flex items-center">
-                                <input type="radio" name="quiz-budget" value="От 800 000 ₽ и выше" class="mr-3 w-4 h-4 accent-brand_dark"> 
-                                <span class="text-sm font-semibold">От 800 000 ₽ и выше</span>
-                            </label>
+                    <!-- Шаг 3: Состав и даты -->
+                    <div class="quiz-step flex-1" id="step-3">
+                        <div class="mb-auto">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Шаг 3 из 6</span>
+                            <h3 class="text-2xl font-bold mb-6">Даты поездки и состав отдыхающих</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-brand_dark/60 mb-1.5">Взрослых</label>
+                                    <select id="quiz-adults" class="w-full border border-brand_dark/20 px-4 py-3 rounded-sm outline-none focus:border-brand_dark bg-white text-sm">
+                                        <option value="1 взрослый">1 взрослый</option>
+                                        <option value="2 взрослых" selected>2 взрослых</option>
+                                        <option value="3 взрослых">3 взрослых</option>
+                                        <option value="4 взрослых">4 взрослых</option>
+                                        <option value="5+ взрослых">5+ взрослых</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-brand_dark/60 mb-1.5">Детей</label>
+                                    <select id="quiz-children" class="w-full border border-brand_dark/20 px-4 py-3 rounded-sm outline-none focus:border-brand_dark bg-white text-sm" onchange="toggleAges()">
+                                        <option value="Без детей" selected>Без детей</option>
+                                        <option value="1 ребенок">1 ребенок</option>
+                                        <option value="2 ребенка">2 ребенка</option>
+                                        <option value="3+ детей">3+ детей</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div id="children-ages-div" class="hidden mb-4">
+                                <label class="block text-xs font-bold text-brand_dark/60 mb-1.5">Возраст детей (важно для расчета авиабилетов)</label>
+                                <input type="text" id="quiz-children-ages" placeholder="Например: 4 года и 10 лет" class="w-full border border-brand_dark/20 px-4 py-3 rounded-sm outline-none focus:border-brand_dark text-sm bg-white">
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-brand_dark/60 mb-1.5">Примерные даты вылета</label>
+                                    <input type="text" id="quiz-dates" placeholder="Напр: с 15 по 20 августа" class="w-full border border-brand_dark/20 px-4 py-3 rounded-sm outline-none focus:border-brand_dark text-sm bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-brand_dark/60 mb-1.5">На сколько ночей?</label>
+                                    <input type="text" id="quiz-nights" placeholder="Напр: 7-10 ночей" class="w-full border border-brand_dark/20 px-4 py-3 rounded-sm outline-none focus:border-brand_dark text-sm bg-white">
+                                </div>
+                            </div>
                         </div>
                         <div class="mt-8 flex gap-3">
                             <button type="button" onclick="nextStep(2)" class="w-1/3 sm:w-auto bg-gray-100 text-brand_dark hover:bg-gray-200 font-bold px-5 py-3.5 rounded-sm transition-colors text-sm">Назад</button>
-                            <button type="button" onclick="nextStep(4)" class="flex-1 sm:flex-none bg-brand_dark text-white px-8 py-3.5 font-bold rounded-sm hover:bg-brand_accent transition-colors text-sm">Продолжить</button>
+                            <button type="button" onclick="nextStep(4)" class="flex-1 sm:flex-none bg-brand_dark text-white px-8 py-3.5 font-bold rounded-sm hover:bg-brand_accent transition-colors text-sm">Далее</button>
                         </div>
                     </div>
 
-                    <!-- Шаг 4 -->
-                    <div class="quiz-step" id="step-4">
-                        <h3 class="text-xl md:text-2xl font-bold mb-2">Куда отправить готовую подборку?</h3>
-                        <p class="text-xs md:text-sm text-brand_dark/70 mb-6">Укажите номер телефона (WhatsApp/Telegram) или ник в Telegram</p>
-                        <div>
-                            <input type="text" id="quiz-contact" placeholder="+7 (999) 000-00-00 или @username" required pattern="^[\+@a-zA-Z0-9\s\-\(\)]+$" minlength="5" class="w-full border border-brand_dark/25 px-4 py-4 rounded-sm outline-none focus:border-brand_dark text-base bg-white">
+                    <!-- Шаг 4: Отель и питание -->
+                    <div class="quiz-step flex-1" id="step-4">
+                        <div class="mb-auto">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Шаг 4 из 6</span>
+                            <h3 class="text-2xl font-bold mb-6">Уровень отеля и питание</h3>
+                            
+                            <label class="block text-xs font-bold text-brand_dark/60 mb-2">Категория отеля</label>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="quiz-hotel" value="Любые варианты" class="quiz-radio sr-only" checked>
+                                    <div class="border border-brand_dark/20 rounded-sm p-3 text-center hover:border-brand_dark transition-colors">
+                                        <span class="font-semibold text-sm">Неважно</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="quiz-hotel" value="Хорошие 4*" class="quiz-radio sr-only">
+                                    <div class="border border-brand_dark/20 rounded-sm p-3 text-center hover:border-brand_dark transition-colors">
+                                        <span class="font-semibold text-sm">Хорошие 4*</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="quiz-hotel" value="Стандартные 5*" class="quiz-radio sr-only">
+                                    <div class="border border-brand_dark/20 rounded-sm p-3 text-center hover:border-brand_dark transition-colors">
+                                        <span class="font-semibold text-sm">Бюджетные 5*</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="quiz-hotel" value="Премиум 5* / Люкс" class="quiz-radio sr-only">
+                                    <div class="border border-brand_dark/20 rounded-sm p-3 text-center hover:border-brand_dark transition-colors">
+                                        <span class="font-semibold text-sm text-brand_accent">Премиум 5*</span>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <label class="block text-xs font-bold text-brand_dark/60 mb-2">Предпочтения по питанию</label>
+                            <select id="quiz-food" class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark bg-white text-sm">
+                                <option value="Всё включено (AI/UAI)">Всё включено / Ультра всё включено</option>
+                                <option value="Завтрак + Ужин (HB)">Завтрак + Ужин</option>
+                                <option value="Только завтраки (BB)">Только завтраки</option>
+                                <option value="Без питания (RO)">Без питания (апартаменты)</option>
+                                <option value="Зависит от страны" selected>Зависит от страны (посоветуйте)</option>
+                            </select>
+                        </div>
+                        <div class="mt-8 flex gap-3">
+                            <button type="button" onclick="nextStep(3)" class="w-1/3 sm:w-auto bg-gray-100 text-brand_dark hover:bg-gray-200 font-bold px-5 py-3.5 rounded-sm transition-colors text-sm">Назад</button>
+                            <button type="button" onclick="nextStep(5)" class="flex-1 sm:flex-none bg-brand_dark text-white px-8 py-3.5 font-bold rounded-sm hover:bg-brand_accent transition-colors text-sm">Далее</button>
+                        </div>
+                    </div>
+
+                    <!-- Шаг 5: Бюджет и пожелания -->
+                    <div class="quiz-step flex-1" id="step-5">
+                        <div class="mb-auto">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Шаг 5 из 6</span>
+                            <h3 class="text-2xl font-bold mb-6">Бюджет и особые пожелания</h3>
+                            
+                            <label class="block text-xs font-bold text-brand_dark/60 mb-2">Ориентировочный бюджет (на всех)</label>
+                            <input type="text" id="quiz-budget" placeholder="Например: до 400 000 руб." class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark text-sm bg-white mb-5">
+                            
+                            <label class="block text-xs font-bold text-brand_dark/60 mb-2">Важные детали (по желанию)</label>
+                            <textarea id="quiz-notes" rows="3" placeholder="Первая линия, пологий вход в море, тихое место, нужен дайвинг..." class="w-full border border-brand_dark/20 px-4 py-3 rounded-sm outline-none focus:border-brand_dark text-sm bg-white resize-none"></textarea>
+                        </div>
+                        <div class="mt-8 flex gap-3">
+                            <button type="button" onclick="nextStep(4)" class="w-1/3 sm:w-auto bg-gray-100 text-brand_dark hover:bg-gray-200 font-bold px-5 py-3.5 rounded-sm transition-colors text-sm">Назад</button>
+                            <button type="button" onclick="nextStep(6)" class="flex-1 sm:flex-none bg-brand_dark text-white px-8 py-3.5 font-bold rounded-sm hover:bg-brand_accent transition-colors text-sm">Финальный шаг</button>
+                        </div>
+                    </div>
+
+                    <!-- Шаг 6: Контакты -->
+                    <div class="quiz-step flex-1" id="step-6">
+                        <div class="mb-auto">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Финал</span>
+                            <h3 class="text-2xl font-bold mb-2">Куда отправить подборку туров?</h3>
+                            <p class="text-sm text-brand_dark/70 mb-6">Менеджер изучит заявку и пришлет 3-5 проверенных вариантов с расчетом цены.</p>
+                            
+                            <div>
+                                <label class="block text-xs font-bold text-brand_dark/60 mb-1.5">Как к вам обращаться?</label>
+                                <input type="text" id="quiz-name" placeholder="Ваше имя" required class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark text-base bg-white mb-4">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-bold text-brand_dark/60 mb-1.5">Номер телефона или Telegram</label>
+                                <input type="text" id="quiz-contact" placeholder="+7 (999) 000-00-00 или @username" required class="w-full border border-brand_dark/25 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark text-base bg-white">
+                            </div>
                         </div>
                         <div class="mt-8 flex flex-col sm:flex-row gap-3 items-center">
-                            <button type="button" onclick="nextStep(3)" class="w-full sm:w-auto bg-gray-100 text-brand_dark hover:bg-gray-200 font-bold px-6 py-4 rounded-sm transition-colors order-2 sm:order-1 text-sm">Назад</button>
-                            <button type="submit" id="quiz-submit-btn" class="w-full sm:flex-1 bg-brand_accent text-white px-8 py-4 font-bold rounded-sm hover:bg-brand_dark transition-colors shadow-lg order-1 sm:order-2 text-sm">Получить подборку</button>
+                            <button type="button" onclick="nextStep(5)" class="w-full sm:w-auto bg-gray-100 text-brand_dark hover:bg-gray-200 font-bold px-6 py-4 rounded-sm transition-colors order-2 sm:order-1 text-sm">Назад</button>
+                            <button type="submit" id="quiz-submit-btn" class="w-full sm:flex-1 bg-brand_accent text-white px-8 py-4 font-bold rounded-sm hover:bg-brand_dark transition-colors shadow-lg order-1 sm:order-2 text-sm">Получить расчет стоимости</button>
                         </div>
                     </div>
                     
                     <!-- Успех -->
-                    <div class="quiz-step text-center py-8 md:py-12" id="step-success">
+                    <div class="quiz-step text-center py-8 md:py-12 flex-1 flex-col justify-center" id="step-success">
                         <svg class="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <h3 class="text-2xl md:text-3xl font-bold mb-2">Заявка успешно отправлена</h3>
-                        <p class="text-sm md:text-base text-brand_dark/70 max-w-md mx-auto">Менеджер Withiv уже получил ваши параметры и скоро свяжется с вами с готовыми вариантами</p>
+                        <h3 class="text-2xl md:text-3xl font-bold mb-2">Заявка принята в работу</h3>
+                        <p class="text-sm md:text-base text-brand_dark/70 max-w-md mx-auto">Спасибо за подробные ответы! Менеджер агентства свяжется с вами в ближайшее время.</p>
                     </div>
                 </form>
             </div>
         </div>
     </section>
 
-    <!-- Agency Profile (Об агентстве) -->
+    <!-- Agency Profile -->
     <section id="about" class="py-16 md:py-24 bg-brand_bg border-t border-brand_dark/10">
         <div class="max-w-6xl mx-auto px-4 md:px-8">
             <div class="flex flex-col md:flex-row items-center gap-10 md:gap-16">
@@ -403,7 +532,6 @@
                     </div>
                 </div>
                 
-                <!-- QR-коды -->
                 <div class="w-full md:w-2/5 flex flex-row justify-center md:justify-end gap-4">
                     <div class="text-center p-4 border border-brand_dark/10 rounded-sm bg-white w-40 shrink-0 shadow-sm">
                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/nast_ivn&color=1B3B2B" alt="QR Менеджер" class="w-28 h-28 mb-3 mx-auto" loading="lazy">
@@ -466,7 +594,6 @@
         const API_BASE_URL = 'https://withiv-bot.onrender.com';
         let globalTours = [];
 
-        // Парсинг UTM-меток
         const urlParams = new URLSearchParams(window.location.search);
         const utmData = {
             source: urlParams.get('utm_source') || 'Органика',
@@ -474,7 +601,6 @@
             campaign: urlParams.get('utm_campaign') || ''
         };
 
-        // Мобильное меню
         const mobileBtn = document.getElementById('mobile-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
         const menuIcon = document.getElementById('menu-icon');
@@ -496,7 +622,18 @@
             });
         });
 
-        // Динамическая генерация фильтров
+        // Умная логика опроса (Показ возраста детей)
+        function toggleAges() {
+            const childrenSelect = document.getElementById('quiz-children');
+            const agesDiv = document.getElementById('children-ages-div');
+            if (childrenSelect.value !== 'Без детей') {
+                agesDiv.classList.remove('hidden');
+            } else {
+                agesDiv.classList.add('hidden');
+            }
+        }
+
+        // Фильтры без дублирования
         function renderFilters(tours) {
             const tabsContainer = document.getElementById('filter-tabs');
             if(!tours || tours.length === 0) return;
@@ -530,11 +667,10 @@
             });
         }
 
-        // Рендер карточек
         function renderTours(list) {
             const grid = document.getElementById('tours-grid');
             if (!list || list.length === 0) {
-                grid.innerHTML = '<div class="col-span-full py-12 text-center font-medium text-brand_dark/60">По выбранному направлению туров пока нет</div>';
+                grid.innerHTML = '<div class="col-span-full py-12 text-center font-medium text-brand_dark/60">В данный момент по этому направлению нет предложений</div>';
                 return;
             }
             grid.innerHTML = list.map((tour) => {
@@ -560,55 +696,53 @@
             }).join('');
         }
 
-        // Загрузка туров
-        async function loadTours(attempt = 1) {
-            const grid = document.getElementById('tours-grid');
-            try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 25000);
-                const res = await fetch(`${API_BASE_URL}/api/tours`, { signal: controller.signal });
-                clearTimeout(timeout);
-                
-                if (!res.ok) throw new Error('Server error');
-                globalTours = await res.json();
-                renderFilters(globalTours);
-                renderTours(globalTours);
-            } catch (err) {
-                if (attempt < 3) {
-                    grid.innerHTML = `
-                        <div class="col-span-full py-12 text-center text-brand_dark/70 text-sm">
-                            <div class="inline-block w-6 h-6 border-2 border-brand_accent border-t-transparent rounded-full animate-spin mb-3"></div><br>
-                            Сервер просыпается, загружаем туры (попытка ${attempt + 1} из 3)...
-                        </div>`;
-                    setTimeout(() => loadTours(attempt + 1), 3000);
-                } else {
-                    grid.innerHTML = '<div class="col-span-full py-12 text-center text-red-600 font-medium text-sm">Не удалось загрузить туры. Нажмите F5 для обновления страницы</div>';
+        // Загрузка туров (Мягкий пулинг вместо таймаута)
+        async function fetchWithRetry(url, maxRetries = 4, delay = 5000) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 8000);
+                    const response = await fetch(url, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    
+                    if (response.ok) return await response.json();
+                } catch (e) {
+                    if (i === maxRetries - 1) throw e;
+                    document.getElementById('loading-text').innerText = `Сервер пробуждается. Загрузка данных (${i + 1}/${maxRetries})...`;
+                    await new Promise(resolve => setTimeout(resolve, delay));
                 }
             }
         }
 
-        // Загрузка отзывов
+        async function loadTours() {
+            const grid = document.getElementById('tours-grid');
+            try {
+                globalTours = await fetchWithRetry(`${API_BASE_URL}/api/tours`);
+                renderFilters(globalTours);
+                renderTours(globalTours);
+            } catch (err) {
+                grid.innerHTML = '<div class="col-span-full py-12 text-center text-red-600 font-medium text-sm">Не удалось соединиться с сервером базы данных. Обновите страницу.</div>';
+            }
+        }
+
         async function loadReviews() {
             const container = document.getElementById('reviews-container');
             try {
-                const res = await fetch(`${API_BASE_URL}/api/reviews`);
-                if (!res.ok) throw new Error();
-                const reviews = await res.json();
+                const reviews = await fetchWithRetry(`${API_BASE_URL}/api/reviews`, 3);
                 renderReviews(reviews);
             } catch (err) {
-                const dummyReviews = [
-                    { name: "Елена", location: "Тур в ОАЭ", text: "Огромное спасибо Анастасии за безупречную организацию отдыха в Дубае! Отель Rixos превзошел все ожидания. Трансфер встретил вовремя, номер был готов заранее. Теперь только к вам!" },
-                    { name: "Михаил", location: "Мальдивы", text: "Долго сомневались с выбором атолла на Мальдивах. Менеджер очень грамотно разложил все плюсы и минусы, подобрал виллу с идеальным рифом. Отдых прошел на 10/10." },
-                    { name: "Анна и Сергей", location: "Турция", text: "Спонтанно решили полететь в Турцию. Withiv за пару часов собрали отличную подборку премиум-отелей, помогли с оплатой и регистрацией. Сервис на высшем уровне, спасибо!" }
-                ];
-                renderReviews(dummyReviews);
+                container.innerHTML = '<div class="w-full text-center py-10 text-brand_dark/50 text-sm">Не удалось загрузить отзывы</div>';
             }
         }
 
         function renderReviews(reviews) {
             const container = document.getElementById('reviews-container');
+            if (!reviews || reviews.length === 0) {
+                container.innerHTML = '<div class="w-full text-center py-10 text-brand_dark/50 text-sm">Отзывы скоро появятся</div>';
+                return;
+            }
             container.innerHTML = reviews.map(r => `
-                <div class="w-80 md:w-96 shrink-0 bg-white border border-brand_dark/10 p-6 md:p-8 rounded-sm snap-center">
+                <div class="w-80 md:w-96 shrink-0 bg-white border border-brand_dark/10 p-6 md:p-8 rounded-sm snap-center shadow-sm">
                     <div class="flex items-center gap-1 mb-4 text-brand_accent">
                         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
@@ -625,7 +759,6 @@
             `).join('');
         }
 
-        // Плавное модальное окно
         const modal = document.getElementById('tour-modal');
         const modalBackdrop = document.getElementById('modal-backdrop');
         
@@ -658,7 +791,6 @@
             modal.classList.add('flex');
             document.body.style.overflow = 'hidden';
             
-            // Триггер плавного появления на следующий кадр отрисовки
             requestAnimationFrame(() => {
                 modalBackdrop.classList.remove('opacity-0');
                 modal.classList.remove('modal-closed');
@@ -682,7 +814,6 @@
             if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
         });
 
-        // Отправка заявки из карточки
         document.getElementById('modal-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button');
@@ -692,8 +823,8 @@
                 await fetch(`${API_BASE_URL}/api/lead`, {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
-                        destination: 'Тур из коллекции: ' + document.getElementById('modal-tour-name').value,
-                        dates: 'По выбранному туру', budget: document.getElementById('modal-price').innerText,
+                        destination: 'Запрос из каталога: ' + document.getElementById('modal-tour-name').value,
+                        dates: '-', budget: document.getElementById('modal-price').innerText,
                         contact: document.getElementById('modal-contact').value,
                         utm: `${utmData.source} | ${utmData.medium} | ${utmData.campaign}`
                     })
@@ -704,11 +835,11 @@
             setTimeout(() => { btn.innerText = orig; btn.classList.replace('bg-green-600', 'bg-brand_dark'); e.target.reset(); }, 2000);
         });
 
-        // Квиз
+        // Продвинутый Квиз
         function nextStep(step) {
             document.querySelectorAll('.quiz-step').forEach(el => el.classList.remove('active'));
             document.getElementById(`step-${step}`).classList.add('active');
-            document.getElementById('quiz-progress').style.width = `${(step / 4) * 100}%`;
+            document.getElementById('quiz-progress').style.width = `${(step / 6) * 100}%`;
         }
 
         document.getElementById('quiz-form').addEventListener('submit', async (e) => {
@@ -717,25 +848,43 @@
             const origText = btn.innerText;
             btn.innerText = 'Отправка...';
             
+            const format = document.querySelector('input[name="quiz-format"]:checked').value;
+            
             const destRadio = document.querySelector('input[name="quiz-dest"]:checked');
             let destination = destRadio ? destRadio.value : '';
             if (destination === 'Другое' || !destination) {
                 destination = document.getElementById('custom-dest').value || 'Не указано';
             }
             
-            const budgetRadio = document.querySelector('input[name="quiz-budget"]:checked');
-            const budget = budgetRadio ? budgetRadio.value : 'Не указан';
-            const dates = document.getElementById('quiz-dates').value || 'Не указано';
-            const people = document.getElementById('quiz-people').value;
+            const adults = document.getElementById('quiz-adults').value;
+            const children = document.getElementById('quiz-children').value;
+            let kidsAgeText = "";
+            if (children !== 'Без детей') {
+                kidsAgeText = `(Возраст: ${document.getElementById('quiz-children-ages').value || 'не указан'})`;
+            }
+            const comp = `${adults}, ${children} ${kidsAgeText}`;
+            
+            const dates = `${document.getElementById('quiz-dates').value || '-'} на ${document.getElementById('quiz-nights').value || '-'}`;
+            
+            const hotel = document.querySelector('input[name="quiz-hotel"]:checked').value;
+            const food = document.getElementById('quiz-food').value;
+            const budget = document.getElementById('quiz-budget').value || 'Не указан';
+            const notes = document.getElementById('quiz-notes').value || 'Нет';
+            
+            const name = document.getElementById('quiz-name').value;
+            const contact = document.getElementById('quiz-contact').value;
+
+            // Формируем красивый и подробный запрос для Telegram
+            const fullDescription = `[КВИЗ] ${name}\nФормат: ${format}\nСтрана: ${destination}\nСостав: ${comp}\nДаты: ${dates}\nОтель: ${hotel} (${food})\nПожелания: ${notes}`;
 
             try {
                 await fetch(`${API_BASE_URL}/api/lead`, {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
-                        destination: `${destination} (${people})`,
-                        dates: dates,
+                        destination: fullDescription,
+                        dates: "Смотри выше",
                         budget: budget,
-                        contact: document.getElementById('quiz-contact').value,
+                        contact: contact,
                         utm: `${utmData.source} | ${utmData.medium} | ${utmData.campaign}`
                     })
                 });
