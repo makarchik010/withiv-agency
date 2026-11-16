@@ -30,11 +30,7 @@ async def upload_photo_to_telegraph(file_bytes: bytes) -> str:
 def _append_tour_sync(row: list):
     sh = _get_spreadsheet()
     worksheet = sh.worksheet("Tours")
-    
-    # Очищаем данные от None и принудительно переводим все в текст, чтобы код не зависал
     clean_row = [str(item) if item is not None else "" for item in row]
-    
-    # Железобетонный метод вставки (сам найдет конец таблицы)
     worksheet.append_row(clean_row, value_input_option='USER_ENTERED')
 
 async def append_tour_to_sheet(row: list):
@@ -47,10 +43,8 @@ def _get_tours_sync(only_for_site: bool = False):
     
     result = []
     for idx, r in enumerate(records, start=2):
-        # Игнорируем случайные пустые строки
         if not str(r.get("Название", "")).strip():
             continue
-            
         dest = str(r.get("Место публикации", "")).strip()
         if only_for_site and dest not in ["both", "site"]:
             continue
@@ -76,6 +70,43 @@ def _update_tour_field_sync(row_index: int, col_index: int, new_value: str):
 
 async def update_tour_field(row_index: int, col_index: int, new_value: str):
     await asyncio.to_thread(_update_tour_field_sync, row_index, col_index, new_value)
+
+
+# --- РАБОТА С ОТЗЫВАМИ ---
+
+def _append_review_sync(row: list):
+    sh = _get_spreadsheet()
+    worksheet = sh.worksheet("Reviews")
+    clean_row = [str(item) if item is not None else "" for item in row]
+    worksheet.append_row(clean_row, value_input_option='USER_ENTERED')
+
+async def append_review(row: list):
+    await asyncio.to_thread(_append_review_sync, row)
+
+def _get_reviews_sync():
+    sh = _get_spreadsheet()
+    worksheet = sh.worksheet("Reviews")
+    records = worksheet.get_all_records()
+    
+    result = []
+    for idx, r in enumerate(records, start=2):
+        if not str(r.get("Имя", "")).strip():
+            continue
+        r["row_index"] = idx
+        result.append(r)
+    return result
+
+async def get_reviews():
+    return await asyncio.to_thread(_get_reviews_sync)
+
+def _delete_review_sync(row_index: int):
+    sh = _get_spreadsheet()
+    worksheet = sh.worksheet("Reviews")
+    worksheet.delete_rows(row_index)
+
+async def delete_review(row_index: int):
+    await asyncio.to_thread(_delete_review_sync, row_index)
+
 
 # --- РАБОТА С НАСТРОЙКАМИ САЙТА ---
 
