@@ -10,7 +10,10 @@ from services import (
     append_tour_to_sheet,
     get_tours,
     delete_tour_from_sheet,
-    update_tour_field
+    update_tour_field,
+    append_review,
+    get_reviews,
+    delete_review
 )
 
 router = Router()
@@ -18,11 +21,12 @@ router = Router()
 def is_admin(user_id: int) -> bool:
     return str(user_id) == str(ADMIN_ID)
 
+# --- КЛАВИАТУРЫ ---
 def get_main_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="➕ Добавить тур")],
-            [KeyboardButton(text="🗂 Управление турами")]
+            [KeyboardButton(text="➕ Добавить тур"), KeyboardButton(text="🗂 Управление турами")],
+            [KeyboardButton(text="⭐ Управление отзывами")]
         ],
         resize_keyboard=True
     )
@@ -39,6 +43,15 @@ def get_publish_keyboard() -> InlineKeyboardMarkup:
         ]
     )
 
+def get_reviews_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="➕ Добавить новый отзыв", callback_data="add_review")],
+            [InlineKeyboardButton(text="📋 Список всех отзывов", callback_data="list_reviews")]
+        ]
+    )
+
+# --- СОСТОЯНИЯ FSM ---
 class AddTourStates(StatesGroup):
     name = State()
     location = State()
@@ -49,6 +62,11 @@ class AddTourStates(StatesGroup):
 
 class EditTourStates(StatesGroup):
     waiting_for_value = State()
+
+class AddReviewStates(StatesGroup):
+    author = State()
+    location = State()
+    text = State()
 
 def format_post_text(data: dict) -> str:
     desc = data.get('description') or data.get('Описание') or ""
@@ -65,6 +83,7 @@ def format_post_text(data: dict) -> str:
     )
     return post
 
+# --- СТАРТ И ДОБАВЛЕНИЕ ТУРА ---
 @router.message(Command("start"))
 async def cmd_start(message: Message):
     if not is_admin(message.from_user.id):
@@ -119,11 +138,7 @@ async def process_price(message: Message, state: FSMContext):
 async def process_description(message: Message, state: FSMContext):
     text = message.html_text or ""
     raw_text = message.text or ""
-    
-    if raw_text.strip() == '-':
-        desc = ""
-    else:
-        desc = text
+    desc = "" if raw_text.strip() == '-' else text
         
     await state.update_data(description=desc)
     await state.set_state(AddTourStates.photo)
@@ -145,7 +160,7 @@ async def process_photo(message: Message, state: FSMContext, bot: Bot):
         await wait_msg.delete()
         await message.answer_photo(
             photo=photo_url,
-            caption=preview_text[:1020],
+            caption=preview_text,
             reply_markup=get_publish_keyboard(),
             parse_mode="HTML"
         )
@@ -161,8 +176,7 @@ async def process_cancel(callback: CallbackQuery, state: FSMContext):
 async def process_publish(callback: CallbackQuery, state: FSMContext, bot: Bot):
     data = await state.get_data()
     if not data:
-        await callback.message.answer("❌ Данные устарели. Начните заново.")
-        await callback.answer()
+        await callback.message.edit_caption(caption="❌ Данные устарели. Начните заново.")
         return
 
     destination = callback.data.split("_")[1]
@@ -176,7 +190,7 @@ async def process_publish(callback: CallbackQuery, state: FSMContext, bot: Bot):
             sent_msg = await bot.send_photo(
                 chat_id=CHANNEL_ID,
                 photo=data.get('photo_url'),
-                caption=post_text[:1024],
+                caption=post_text,
                 parse_mode="HTML"
             )
             msg_id = str(sent_msg.message_id)
@@ -202,12 +216,9 @@ async def process_publish(callback: CallbackQuery, state: FSMContext, bot: Bot):
         await state.clear()
 
     except Exception as e:
-        # Отправляем ошибку отдельным сообщением, чтобы не упереться в лимит длины подписи
-        await callback.message.edit_caption(caption="❌ Произошла ошибка при сохранении.")
-        await callback.message.answer(f"<b>Детали ошибки:</b>\n<code>{repr(e)}</code>", parse_mode="HTML")
+        await callback.message.edit_caption(caption=f"❌ Ошибка при публикации: {str(e)}")
 
-# --- УПРАВЛЕНИЕ СУЩЕСТВУЮЩИМИ ТУРАМИ (/manage) ---
-
+# --- УПРАВЛЕНИЕ СУЩЕСТВУЮЩИМИ ТУРАМИ ---
 @router.message(Command("manage"))
 @router.message(F.text == "🗂 Управление турами")
 async def cmd_manage(message: Message):
@@ -241,7 +252,7 @@ async def cmd_manage(message: Message):
             ])
             await message.answer(text, reply_markup=kb, parse_mode="HTML")
     except Exception as e:
-        await wait_msg.edit_text(f"❌ Ошибка чтения таблицы:\n<code>{repr(e)}</code>", parse_mode="HTML")
+        await wait_msg.edit_text(f"❌ Ошибка чтения таблицы: {str(e)}")
 
 @router.callback_query(F.data.startswith("del_"))
 async def process_delete_tour(callback: CallbackQuery, bot: Bot):
@@ -264,7 +275,7 @@ async def process_delete_tour(callback: CallbackQuery, bot: Bot):
         else:
             await callback.message.edit_text("⚠️ Тур не найден (возможно, уже удален).")
     except Exception as e:
-        await callback.message.edit_text(f"❌ Ошибка удаления:\n<code>{repr(e)}</code>", parse_mode="HTML")
+        await callback.message.edit_text(f"❌ Ошибка удаления: {str(e)}")
 
 @router.callback_query(F.data.startswith("edit_"))
 async def start_edit_tour(callback: CallbackQuery, state: FSMContext):
@@ -303,7 +314,7 @@ async def finish_edit_tour(message: Message, state: FSMContext, bot: Bot):
                     await bot.edit_message_caption(
                         chat_id=CHANNEL_ID,
                         message_id=int(msg_id),
-                        caption=new_caption[:1024],
+                        caption=new_caption,
                         parse_mode="HTML"
                     )
                 except Exception:
@@ -312,4 +323,84 @@ async def finish_edit_tour(message: Message, state: FSMContext, bot: Bot):
         await wait_msg.edit_text("✅ Данные успешно обновлены на сайте и в канале!")
         await state.clear()
     except Exception as e:
-        await wait_msg.edit_text(f"❌ Ошибка обновления:\n<code>{repr(e)}</code>", parse_mode="HTML")
+        await wait_msg.edit_text(f"❌ Ошибка обновления: {str(e)}")
+
+
+# --- УПРАВЛЕНИЕ ОТЗЫВАМИ ---
+
+@router.message(F.text == "⭐ Управление отзывами")
+async def cmd_reviews(message: Message):
+    if not is_admin(message.from_user.id):
+        return
+    await message.answer(
+        "⭐ <b>Меню отзывов</b>\nЗдесь вы можете добавить новый отзыв клиента на сайт или удалить старые.",
+        reply_markup=get_reviews_keyboard(),
+        parse_mode="HTML"
+    )
+
+@router.callback_query(F.data == "add_review")
+async def add_review_start(callback: CallbackQuery, state: FSMContext):
+    await state.clear()
+    await state.set_state(AddReviewStates.author)
+    await callback.message.edit_text("✍️ Введите <b>Имя клиента</b> (например: Елена, или Анна и Сергей):", parse_mode="HTML")
+
+@router.message(AddReviewStates.author)
+async def process_review_author(message: Message, state: FSMContext):
+    await state.update_data(author=message.text)
+    await state.set_state(AddReviewStates.location)
+    await message.answer("Введите <b>Направление или название отеля</b> (например: Тур в ОАЭ, или Мальдивы, Rixos):", parse_mode="HTML")
+
+@router.message(AddReviewStates.location)
+async def process_review_location(message: Message, state: FSMContext):
+    await state.update_data(location=message.text)
+    await state.set_state(AddReviewStates.text)
+    await message.answer("📝 Отправьте <b>Текст отзыва</b> клиента (без кавычек, просто сам текст):", parse_mode="HTML")
+
+@router.message(AddReviewStates.text)
+async def process_review_text(message: Message, state: FSMContext):
+    data = await state.get_data()
+    author = data.get("author")
+    location = data.get("location")
+    review_text = message.text
+
+    wait_msg = await message.answer("⏳ Сохраняю отзыв...")
+    try:
+        row = [author, location, review_text]
+        await append_review(row)
+        await wait_msg.edit_text(f"✅ <b>Отзыв успешно добавлен на сайт!</b>\n\n👤 {author}\n📍 {location}\n💬 <i>{review_text}</i>", parse_mode="HTML")
+        await state.clear()
+    except Exception as e:
+        await wait_msg.edit_text(f"❌ Ошибка сохранения отзыва: {str(e)}")
+
+@router.callback_query(F.data == "list_reviews")
+async def list_all_reviews(callback: CallbackQuery):
+    await callback.message.edit_text("⏳ Загружаю отзывы с сайта...")
+    try:
+        reviews = await get_reviews()
+        if not reviews:
+            await callback.message.edit_text("📭 На сайте пока нет ни одного отзыва.", reply_markup=get_reviews_keyboard())
+            return
+            
+        await callback.message.delete()
+        for r in reviews:
+            row_idx = r["row_index"]
+            text = (
+                f"👤 <b>{r.get('Имя')}</b> ({r.get('Направление')})\n\n"
+                f"💬 <i>{r.get('Текст')}</i>"
+            )
+            kb = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="🗑 Удалить с сайта", callback_data=f"delrev_{row_idx}")]
+            ])
+            await callback.message.answer(text, reply_markup=kb, parse_mode="HTML")
+    except Exception as e:
+        await callback.message.answer(f"❌ Ошибка чтения отзывов: {str(e)}")
+
+@router.callback_query(F.data.startswith("delrev_"))
+async def process_delete_review(callback: CallbackQuery):
+    row_idx = int(callback.data.split("_")[1])
+    await callback.message.edit_text("⏳ Удаляю отзыв...")
+    try:
+        await delete_review(row_idx)
+        await callback.message.edit_text("🗑 Отзыв успешно удален с сайта!")
+    except Exception as e:
+        await callback.message.edit_text(f"❌ Ошибка удаления: {str(e)}")
