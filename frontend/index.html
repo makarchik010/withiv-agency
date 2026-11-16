@@ -49,6 +49,25 @@
             -ms-overflow-style: none;
         }
         .reviews-scroll::-webkit-scrollbar { display: none; }
+
+        /* Премиальная физика анимации модального окна */
+        #tour-modal {
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #modal-backdrop {
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.4s ease;
+        }
+        #modal-content {
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-closed #modal-content {
+            transform: translateY(60px) scale(0.96);
+            opacity: 0;
+        }
+        .modal-open #modal-content {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="font-sans selection:bg-brand_dark selection:text-white flex flex-col min-h-screen">
@@ -87,7 +106,7 @@
         </div>
     </header>
 
-    <!-- Mobile Menu (Вынесено из header, жесткий фон и z-index) -->
+    <!-- Mobile Menu -->
     <div id="mobile-menu" style="background-color: #F7F4EF; z-index: 999;" class="fixed inset-0 pt-24 px-6 pb-8 hidden flex-col md:hidden overflow-y-auto">
         <nav class="flex flex-col space-y-6 text-center text-lg font-semibold">
             <a href="#tours" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Коллекция туров</a>
@@ -148,7 +167,6 @@
                 <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Коллекция Withiv</h2>
             </div>
             
-            <!-- Фильтры генерируются динамически через JS -->
             <div id="filter-tabs" class="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto hide-scrollbar">
             </div>
         </div>
@@ -173,42 +191,62 @@
         </div>
     </section>
 
-    <!-- Quick View Modal -->
-    <div id="tour-modal" class="fixed inset-0 z-[1050] hidden items-end md:items-center justify-center sm:p-4 opacity-0 transition-opacity duration-300">
-        <div class="absolute inset-0 bg-brand_dark/85 backdrop-blur-sm" onclick="closeModal()"></div>
-        <div class="relative bg-brand_bg w-full md:max-w-5xl rounded-t-2xl md:rounded-sm shadow-2xl flex flex-col md:flex-row h-[88vh] md:h-auto md:max-h-[90vh] overflow-hidden transform transition-transform translate-y-full md:translate-y-0 duration-300" id="modal-content">
+    <!-- Quick View Modal (Премиальные плавные переходы + фиксированный крестик) -->
+    <div id="tour-modal" class="fixed inset-0 z-[1050] hidden items-end md:items-center justify-center sm:p-6 modal-closed">
+        <!-- Затемняющий фон с размытием -->
+        <div id="modal-backdrop" class="absolute inset-0 bg-brand_dark/80 backdrop-blur-md opacity-0" onclick="closeModal()"></div>
+        
+        <!-- Карточка -->
+        <div id="modal-content" class="relative bg-brand_bg w-full md:max-w-4xl rounded-t-2xl md:rounded-md shadow-2xl flex flex-col md:flex-row max-h-[90vh] overflow-hidden z-10">
             
-            <button onclick="closeModal()" class="absolute top-3 right-3 md:top-4 md:right-4 z-10 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center text-brand_dark hover:bg-brand_accent hover:text-white transition-colors shadow-md">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            <!-- Крупный удобный крестик сверху -->
+            <button onclick="closeModal()" type="button" aria-label="Закрыть" class="absolute top-4 right-4 z-30 w-10 h-10 bg-black/40 hover:bg-brand_dark text-white backdrop-blur-md rounded-full flex items-center justify-center transition-all duration-300 hover:rotate-90 shadow-lg border border-white/20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
             </button>
             
-            <div class="w-full md:w-1/2 h-52 md:h-auto bg-gray-200 shrink-0 relative">
+            <!-- Фото -->
+            <div class="w-full md:w-1/2 h-56 sm:h-64 md:h-auto bg-brand_dark shrink-0 relative overflow-hidden">
                 <img id="modal-img" src="" alt="Тур" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent md:hidden"></div>
-                <h3 id="modal-title-mobile" class="absolute bottom-4 left-4 right-4 text-xl font-bold text-white md:hidden line-clamp-2">Название</h3>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent md:hidden"></div>
+                <div class="absolute bottom-4 left-5 right-5 md:hidden">
+                    <span id="modal-location-mobile" class="inline-block text-[11px] font-bold uppercase tracking-wider text-brand_accent mb-1">Локация</span>
+                    <h3 id="modal-title-mobile" class="text-xl font-bold text-white leading-snug">Название</h3>
+                </div>
             </div>
             
-            <div class="w-full md:w-1/2 p-5 md:p-8 flex flex-col overflow-y-auto bg-brand_bg h-full">
-                <h3 id="modal-title-desktop" class="hidden md:block text-2xl lg:text-3xl font-bold mb-2 leading-snug">Название</h3>
-                <p id="modal-location" class="text-xs md:text-sm font-semibold text-brand_accent mb-4 md:mb-6 flex items-center gap-1.5">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
-                    <span>Локация</span>
-                </p>
+            <!-- Текст и форма -->
+            <div class="w-full md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto bg-brand_bg">
+                <div class="hidden md:block mb-5 pr-8">
+                    <p id="modal-location" class="text-xs font-bold uppercase tracking-widest text-brand_accent mb-2 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                        <span>Локация</span>
+                    </p>
+                    <h3 id="modal-title-desktop" class="text-2xl lg:text-3xl font-bold leading-tight text-brand_dark">Название</h3>
+                </div>
                 
-                <div class="text-sm text-brand_dark/85 leading-relaxed mb-6 whitespace-pre-wrap flex-1" id="modal-desc">
+                <!-- Детали (короткая плашка, если есть и описание, и детали) -->
+                <div id="modal-details-badge" class="hidden mb-4 p-3 bg-white border border-brand_dark/10 rounded-sm text-xs font-medium text-brand_dark/80"></div>
+
+                <!-- Основное описание -->
+                <div class="text-sm text-brand_dark/85 leading-relaxed mb-6 whitespace-pre-wrap" id="modal-desc">
                     Описание...
                 </div>
                 
-                <div class="border-t border-brand_dark/10 pt-5 mt-auto shrink-0">
-                    <div class="mb-4">
-                        <p class="text-[11px] uppercase tracking-wider font-bold text-brand_dark/50 mb-0.5">Стоимость предложения</p>
-                        <p id="modal-price" class="text-xl md:text-2xl font-bold">Цена</p>
+                <!-- Низ: Цена и форма заявки -->
+                <div class="border-t border-brand_dark/10 pt-5 mt-auto">
+                    <div class="flex items-baseline justify-between mb-4">
+                        <span class="text-[11px] uppercase tracking-wider font-bold text-brand_dark/50">Стоимость</span>
+                        <span id="modal-price" class="text-xl md:text-2xl font-bold text-brand_dark">Цена</span>
                     </div>
                     
-                    <form id="modal-form" class="flex flex-col sm:flex-row gap-3">
+                    <form id="modal-form" class="flex flex-col gap-3">
                         <input type="hidden" id="modal-tour-name">
-                        <input type="text" id="modal-contact" placeholder="Телефон или @telegram" required pattern="^[\+@a-zA-Z0-9\s\-\(\)]+$" minlength="5" title="Введите корректный номер или ник" class="flex-1 bg-white border border-brand_dark/20 rounded-sm px-4 py-3.5 outline-none focus:border-brand_dark text-sm">
-                        <button type="submit" class="bg-brand_dark text-brand_bg font-bold px-6 py-3.5 rounded-sm hover:bg-brand_accent transition-colors w-full sm:w-auto whitespace-nowrap">Хочу сюда</button>
+                        <input type="text" id="modal-contact" placeholder="Телефон или @telegram" required pattern="^[\+@a-zA-Z0-9\s\-\(\)]+$" minlength="5" title="Введите корректный номер или ник" class="w-full bg-white border border-brand_dark/20 rounded-sm px-4 py-3.5 outline-none focus:border-brand_dark text-sm transition-colors">
+                        <button type="submit" class="w-full bg-brand_dark text-brand_bg font-bold py-4 rounded-sm hover:bg-brand_accent transition-colors shadow-md text-sm">
+                            Хочу сюда
+                        </button>
                     </form>
                 </div>
             </div>
@@ -502,7 +540,7 @@
             grid.innerHTML = list.map((tour) => {
                 const realIdx = globalTours.indexOf(tour);
                 return `
-                    <article onclick="openModal(${realIdx})" class="cursor-pointer group bg-white rounded-sm shadow-sm hover:shadow-xl transition-all border border-brand_dark/10 overflow-hidden flex flex-col">
+                    <article onclick="openModal(${realIdx})" class="cursor-pointer group bg-white rounded-sm shadow-sm hover:shadow-xl transition-all duration-300 border border-brand_dark/10 overflow-hidden flex flex-col">
                         <div class="h-52 md:h-64 overflow-hidden relative bg-gray-100">
                             <img src="${tour['Фото'] || ''}" alt="${tour['Название'] || ''}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                             <div class="absolute bottom-3 left-3 bg-brand_dark/90 backdrop-blur-sm text-white px-2.5 py-1 text-[11px] font-semibold tracking-wide rounded-sm">${tour['Локация'] || ''}</div>
@@ -587,38 +625,57 @@
             `).join('');
         }
 
-        // Модальное окно
+        // Плавное модальное окно
         const modal = document.getElementById('tour-modal');
-        const modalContent = document.getElementById('modal-content');
+        const modalBackdrop = document.getElementById('modal-backdrop');
         
         function openModal(idx) {
             const t = globalTours[idx];
             if (!t) return;
+            
             document.getElementById('modal-img').src = t['Фото'] || '';
             document.getElementById('modal-title-desktop').innerText = t['Название'] || '';
             document.getElementById('modal-title-mobile').innerText = t['Название'] || '';
             document.getElementById('modal-location').querySelector('span').innerText = t['Локация'] || '';
-            document.getElementById('modal-desc').innerHTML = (t['Описание'] || t['Детали'] || '').replace(/\n/g, '<br>');
+            document.getElementById('modal-location-mobile').innerText = t['Локация'] || '';
+            
+            const detailsBadge = document.getElementById('modal-details-badge');
+            const descEl = document.getElementById('modal-desc');
+            
+            if (t['Описание'] && t['Детали']) {
+                detailsBadge.innerText = t['Детали'];
+                detailsBadge.classList.remove('hidden');
+                descEl.innerHTML = t['Описание'].replace(/\n/g, '<br>');
+            } else {
+                detailsBadge.classList.add('hidden');
+                descEl.innerHTML = (t['Описание'] || t['Детали'] || 'Подробную программу тура и актуальные вылеты уточняйте у менеджера').replace(/\n/g, '<br>');
+            }
+            
             document.getElementById('modal-price').innerText = t['Цена'] || 'По запросу';
             document.getElementById('modal-tour-name').value = t['Название'] || '';
             
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             document.body.style.overflow = 'hidden';
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modalContent.classList.remove('translate-y-full');
-            }, 10);
+            
+            // Триггер плавного появления на следующий кадр отрисовки
+            requestAnimationFrame(() => {
+                modalBackdrop.classList.remove('opacity-0');
+                modal.classList.remove('modal-closed');
+                modal.classList.add('modal-open');
+            });
         }
         
         function closeModal() {
-            modal.classList.add('opacity-0');
-            modalContent.classList.add('translate-y-full');
+            modalBackdrop.classList.add('opacity-0');
+            modal.classList.remove('modal-open');
+            modal.classList.add('modal-closed');
+            
             setTimeout(() => {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
                 document.body.style.overflow = '';
-            }, 300);
+            }, 420);
         }
 
         document.addEventListener('keydown', (e) => {
@@ -642,7 +699,7 @@
                     })
                 });
                 btn.innerText = 'Отправлено'; btn.classList.replace('bg-brand_dark', 'bg-green-600');
-                setTimeout(closeModal, 1400);
+                setTimeout(closeModal, 1200);
             } catch(err) { btn.innerText = 'Ошибка'; }
             setTimeout(() => { btn.innerText = orig; btn.classList.replace('bg-green-600', 'bg-brand_dark'); e.target.reset(); }, 2000);
         });
