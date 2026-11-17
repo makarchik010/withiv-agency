@@ -145,6 +145,25 @@
                 </a>
             </div>
         </div>
+    </section><!-- Онлайн Поиск Tourvisor -->
+    <section id="tourvisor-search" class="py-12 md:py-16 bg-white relative z-20 -mt-6 md:-mt-10 mx-4 md:mx-8 rounded-xl shadow-[0_10px_40px_rgba(27,59,43,0.08)] border border-brand_dark/5">
+        <div class="max-w-7xl mx-auto px-4 md:px-8">
+            <div class="text-center mb-8">
+                <span class="text-brand_accent text-xs uppercase tracking-[0.2em] font-bold block mb-2">Поиск по всем туроператорам</span>
+                <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-brand_dark">Найти тур самостоятельно</h2>
+            </div>
+            
+            <!-- КОНТЕЙНЕР ДЛЯ ВИДЖЕТА TOURVISOR -->
+            <div id="tourvisor-widget-container" class="w-full min-h-[350px] bg-brand_bg/30 rounded-md flex items-center justify-center border border-brand_dark/10">
+                <div class="text-center">
+                    <div class="animate-spin inline-block w-8 h-8 border-4 border-brand_accent border-t-transparent rounded-full mb-4"></div>
+                    <p class="text-sm font-medium text-brand_dark/60">Загрузка поискового модуля...</p>
+                    <p class="text-xs text-brand_dark/40 mt-1">Ожидаем подключение к базе туроператоров</p>
+                </div>
+            </div>
+            <!-- КОНЕЦ КОНТЕЙНЕРА -->
+
+        </div>
     </section>
 
     <!-- Tours Collection -->
@@ -591,214 +610,291 @@
     </footer>
 
     <script>
-        const API_BASE_URL = 'https://withiv-bot.onrender.com';
+        // --- 1. БАЗОВЫЕ НАСТРОЙКИ И ЗАГЛУШКИ ---
+        const API_BASE_URL = 'https://withiv-bot.onrender.com'; // Позже заменишь на Amvera
+        const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=800&auto=format&fit=crop';
         let globalTours = [];
 
+        // Безопасное чтение UTM-меток
         const urlParams = new URLSearchParams(window.location.search);
         const utmData = {
             source: urlParams.get('utm_source') || 'Органика',
-            medium: urlParams.get('utm_medium') || '',
-            campaign: urlParams.get('utm_campaign') || ''
+            medium: urlParams.get('utm_medium') || 'Неизвестно',
+            campaign: urlParams.get('utm_campaign') || 'Без кампании'
         };
 
-        const mobileBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const menuIcon = document.getElementById('menu-icon');
-        const closeIcon = document.getElementById('close-icon');
+        // --- 2. МОБИЛЬНОЕ МЕНЮ (Изолировано от ошибок загрузки данных) ---
+        try {
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIcon = document.getElementById('menu-icon');
+            const closeIcon = document.getElementById('close-icon');
 
-        function toggleMenu() {
-            const isHidden = mobileMenu.classList.contains('hidden');
-            mobileMenu.classList.toggle('hidden', !isHidden);
-            mobileMenu.classList.toggle('flex', isHidden);
-            menuIcon.classList.toggle('hidden', isHidden);
-            closeIcon.classList.toggle('hidden', !isHidden);
-            document.body.style.overflow = isHidden ? 'hidden' : '';
-        }
-
-        mobileBtn.addEventListener('click', toggleMenu);
-        document.querySelectorAll('.mobile-link').forEach(link => {
-            link.addEventListener('click', () => {
-                if (!mobileMenu.classList.contains('hidden')) toggleMenu();
-            });
-        });
-
-        // Умная логика опроса (Показ возраста детей)
-        function toggleAges() {
-            const childrenSelect = document.getElementById('quiz-children');
-            const agesDiv = document.getElementById('children-ages-div');
-            if (childrenSelect.value !== 'Без детей') {
-                agesDiv.classList.remove('hidden');
-            } else {
-                agesDiv.classList.add('hidden');
+            function toggleMenu() {
+                const isHidden = mobileMenu.classList.contains('hidden');
+                mobileMenu.classList.toggle('hidden', !isHidden);
+                mobileMenu.classList.toggle('flex', isHidden);
+                menuIcon.classList.toggle('hidden', isHidden);
+                closeIcon.classList.toggle('hidden', !isHidden);
+                document.body.style.overflow = isHidden ? 'hidden' : '';
             }
-        }
 
-        // Фильтры без дублирования
-        function renderFilters(tours) {
-            const tabsContainer = document.getElementById('filter-tabs');
-            if(!tours || tours.length === 0) return;
-            
-            const locationsRaw = tours.map(t => (t['Локация'] || '').split(',')[0].trim()).filter(Boolean);
-            const uniqueLocations = [...new Set(locationsRaw)];
-            
-            let html = `<button data-filter="all" class="filter-btn px-4 py-2 bg-brand_dark text-brand_bg text-xs md:text-sm font-semibold rounded-sm whitespace-nowrap transition-colors">Все направления</button>`;
-            uniqueLocations.forEach(loc => {
-                html += `<button data-filter="${loc}" class="filter-btn px-4 py-2 border border-brand_dark/20 text-brand_dark text-xs md:text-sm font-semibold rounded-sm hover:border-brand_dark transition-colors whitespace-nowrap">${loc}</button>`;
-            });
-            tabsContainer.innerHTML = html;
-
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.filter-btn').forEach(b => {
-                        b.classList.remove('bg-brand_dark', 'text-brand_bg');
-                        b.classList.add('border', 'border-brand_dark/20', 'text-brand_dark');
+            if (mobileBtn) {
+                mobileBtn.addEventListener('click', toggleMenu);
+                document.querySelectorAll('.mobile-link').forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (!mobileMenu.classList.contains('hidden')) toggleMenu();
                     });
-                    btn.classList.add('bg-brand_dark', 'text-brand_bg');
-                    btn.classList.remove('border', 'border-brand_dark/20', 'text-brand_dark');
-
-                    const filter = btn.dataset.filter;
-                    if (filter === 'all') {
-                        renderTours(globalTours);
-                    } else {
-                        const filtered = globalTours.filter(t => (t['Локация'] || '').includes(filter));
-                        renderTours(filtered);
-                    }
                 });
-            });
-        }
-
-        function renderTours(list) {
-            const grid = document.getElementById('tours-grid');
-            if (!list || list.length === 0) {
-                grid.innerHTML = '<div class="col-span-full py-12 text-center font-medium text-brand_dark/60">В данный момент по этому направлению нет предложений</div>';
-                return;
             }
-            grid.innerHTML = list.map((tour) => {
-                const realIdx = globalTours.indexOf(tour);
-                return `
-                    <article onclick="openModal(${realIdx})" class="cursor-pointer group bg-white rounded-sm shadow-sm hover:shadow-xl transition-all duration-300 border border-brand_dark/10 overflow-hidden flex flex-col">
-                        <div class="h-52 md:h-64 overflow-hidden relative bg-gray-100">
-                            <img src="${tour['Фото'] || ''}" alt="${tour['Название'] || ''}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                            <div class="absolute bottom-3 left-3 bg-brand_dark/90 backdrop-blur-sm text-white px-2.5 py-1 text-[11px] font-semibold tracking-wide rounded-sm">${tour['Локация'] || ''}</div>
-                        </div>
-                        <div class="p-5 flex-1 flex flex-col justify-between bg-white">
-                            <div>
-                                <h3 class="text-lg md:text-xl font-bold mb-2 group-hover:text-brand_accent transition-colors line-clamp-2 leading-snug">${tour['Название'] || ''}</h3>
-                                ${tour['Детали'] ? `<p class="text-xs text-brand_dark/60 mb-4 line-clamp-1">${tour['Детали']}</p>` : ''}
-                            </div>
-                            <div class="flex justify-between items-center border-t border-brand_dark/10 pt-4 mt-auto">
-                                <span class="font-bold text-base md:text-lg text-brand_dark">${tour['Цена'] || 'По запросу'}</span>
-                                <span class="text-xs font-bold text-brand_accent">Подробнее &rarr;</span>
-                            </div>
-                        </div>
-                    </article>
-                `;
-            }).join('');
+        } catch (e) {
+            console.error("Ошибка инициализации меню:", e);
         }
 
-        // Загрузка туров (Мягкий пулинг вместо таймаута)
-        async function fetchWithRetry(url, maxRetries = 4, delay = 5000) {
+        // --- 3. ЛОГИКА КВИЗА (Возраст детей) ---
+        window.toggleAges = function() {
+            try {
+                const childrenSelect = document.getElementById('quiz-children');
+                const agesDiv = document.getElementById('children-ages-div');
+                if (childrenSelect && agesDiv) {
+                    if (childrenSelect.value !== 'Без детей') {
+                        agesDiv.classList.remove('hidden');
+                    } else {
+                        agesDiv.classList.add('hidden');
+                    }
+                }
+            } catch (e) {
+                console.error("Ошибка отображения возраста:", e);
+            }
+        };
+
+        // --- 4. БЕЗОПАСНАЯ СЕТЕВАЯ ФУНКЦИЯ (С защитой от зависаний) ---
+        async function fetchWithRetry(url, maxRetries = 3, delay = 5000) {
             for (let i = 0; i < maxRetries; i++) {
                 try {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 8000);
-                    const response = await fetch(url, { signal: controller.signal });
+                    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 секунд на попытку
+                    
+                    // Добавляем timestamp для обхода жесткого кэширования на телефонах
+                    const cacheBusterUrl = new URL(url);
+                    cacheBusterUrl.searchParams.append('_t', new Date().getTime());
+
+                    const response = await fetch(cacheBusterUrl.toString(), { 
+                        signal: controller.signal,
+                        headers: { 'Accept': 'application/json' }
+                    });
                     clearTimeout(timeoutId);
                     
-                    if (response.ok) return await response.json();
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    
+                    const data = await response.json();
+                    return data;
                 } catch (e) {
                     if (i === maxRetries - 1) throw e;
-                    document.getElementById('loading-text').innerText = `Сервер пробуждается. Загрузка данных (${i + 1}/${maxRetries})...`;
+                    
+                    const loadingText = document.getElementById('loading-text');
+                    if (loadingText) {
+                        loadingText.innerText = `Подключение к серверу базы данных (${i + 1}/${maxRetries})...`;
+                    }
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
             }
         }
 
+        // --- 5. РЕНДЕР ТУРОВ И ФИЛЬТРОВ (С защитой от битых данных) ---
+        function renderFilters(tours) {
+            try {
+                const tabsContainer = document.getElementById('filter-tabs');
+                if (!tabsContainer) return;
+                
+                if (!Array.isArray(tours) || tours.length === 0) {
+                    tabsContainer.innerHTML = '';
+                    return;
+                }
+                
+                // Извлекаем только валидные локации
+                const locationsRaw = tours
+                    .filter(t => t && typeof t === 'object' && t['Локация'])
+                    .map(t => String(t['Локация']).split(',')[0].trim())
+                    .filter(Boolean);
+                
+                const uniqueLocations = [...new Set(locationsRaw)];
+                
+                let html = `<button data-filter="all" class="filter-btn px-4 py-2 bg-brand_dark text-brand_bg text-xs md:text-sm font-semibold rounded-sm whitespace-nowrap transition-colors">Все направления</button>`;
+                uniqueLocations.forEach(loc => {
+                    html += `<button data-filter="${loc}" class="filter-btn px-4 py-2 border border-brand_dark/20 text-brand_dark text-xs md:text-sm font-semibold rounded-sm hover:border-brand_dark transition-colors whitespace-nowrap">${loc}</button>`;
+                });
+                tabsContainer.innerHTML = html;
+
+                // Навешиваем события на фильтры
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.filter-btn').forEach(b => {
+                            b.classList.remove('bg-brand_dark', 'text-brand_bg');
+                            b.classList.add('border', 'border-brand_dark/20', 'text-brand_dark');
+                        });
+                        e.target.classList.add('bg-brand_dark', 'text-brand_bg');
+                        e.target.classList.remove('border', 'border-brand_dark/20', 'text-brand_dark');
+
+                        const filter = e.target.dataset.filter;
+                        if (filter === 'all') {
+                            renderTours(globalTours);
+                        } else {
+                            const filtered = globalTours.filter(t => t && String(t['Локация'] || '').includes(filter));
+                            renderTours(filtered);
+                        }
+                    });
+                });
+            } catch (e) {
+                console.error("Ошибка рендера фильтров:", e);
+            }
+        }
+
+        function renderTours(list) {
+            const grid = document.getElementById('tours-grid');
+            if (!grid) return;
+
+            if (!Array.isArray(list) || list.length === 0) {
+                grid.innerHTML = '<div class="col-span-full py-12 text-center font-medium text-brand_dark/60">В данный момент по этому направлению нет предложений в ручной коллекции. Воспользуйтесь глобальным поиском выше.</div>';
+                return;
+            }
+
+            try {
+                grid.innerHTML = list.map((tour) => {
+                    if (!tour || typeof tour !== 'object') return '';
+                    
+                    const realIdx = globalTours.indexOf(tour);
+                    // Защита от undefined и битых картинок
+                    const title = tour['Название'] ? String(tour['Название']).replace(/</g, "&lt;") : 'Тур под запрос';
+                    const location = tour['Локация'] ? String(tour['Локация']).replace(/</g, "&lt;") : 'Секретное место';
+                    const price = tour['Цена'] ? String(tour['Цена']).replace(/</g, "&lt;") : 'По запросу';
+                    const details = tour['Детали'] ? String(tour['Детали']).replace(/</g, "&lt;") : '';
+                    
+                    // Бронебойная вставка картинки с onerror
+                    const imgUrl = tour['Фото'] && tour['Фото'].startsWith('http') ? tour['Фото'] : FALLBACK_IMAGE;
+
+                    return `
+                        <article onclick="openModal(${realIdx})" class="cursor-pointer group bg-white rounded-sm shadow-sm hover:shadow-xl transition-all duration-300 border border-brand_dark/10 overflow-hidden flex flex-col">
+                            <div class="h-52 md:h-64 overflow-hidden relative bg-brand_dark">
+                                <img src="${imgUrl}" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}';" alt="${title}" loading="lazy" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700">
+                                <div class="absolute bottom-3 left-3 bg-brand_dark/90 backdrop-blur-sm text-white px-2.5 py-1 text-[11px] font-semibold tracking-wide rounded-sm shadow-md">${location}</div>
+                            </div>
+                            <div class="p-5 flex-1 flex flex-col justify-between bg-white">
+                                <div>
+                                    <h3 class="text-lg md:text-xl font-bold mb-2 group-hover:text-brand_accent transition-colors line-clamp-2 leading-snug">${title}</h3>
+                                    ${details ? `<p class="text-xs text-brand_dark/60 mb-4 line-clamp-1">${details}</p>` : ''}
+                                </div>
+                                <div class="flex justify-between items-center border-t border-brand_dark/10 pt-4 mt-auto">
+                                    <span class="font-bold text-base md:text-lg text-brand_dark">${price}</span>
+                                    <span class="text-xs font-bold text-brand_accent flex items-center gap-1">Подробнее <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                                </div>
+                            </div>
+                        </article>
+                    `;
+                }).join('');
+            } catch (e) {
+                console.error("Ошибка рендера карточек туров:", e);
+                grid.innerHTML = '<div class="col-span-full py-12 text-center text-red-600">Произошла ошибка при отображении коллекции туров.</div>';
+            }
+        }
+
+        // --- 6. ЗАГРУЗКА ДАННЫХ (Независимая) ---
         async function loadTours() {
             const grid = document.getElementById('tours-grid');
+            if (!grid) return;
             try {
-                globalTours = await fetchWithRetry(`${API_BASE_URL}/api/tours`);
+                const data = await fetchWithRetry(`${API_BASE_URL}/api/tours`);
+                globalTours = Array.isArray(data) ? data : [];
                 renderFilters(globalTours);
                 renderTours(globalTours);
             } catch (err) {
-                grid.innerHTML = '<div class="col-span-full py-12 text-center text-red-600 font-medium text-sm">Не удалось соединиться с сервером базы данных. Обновите страницу.</div>';
+                console.error("Tours Fetch Error:", err);
+                grid.innerHTML = '<div class="col-span-full py-12 text-center font-medium text-brand_dark/60 bg-white border border-brand_dark/10 rounded-sm p-6">Временно не удалось загрузить авторскую коллекцию туров. Воспользуйтесь глобальным поиском.</div>';
             }
         }
 
         async function loadReviews() {
             const container = document.getElementById('reviews-container');
+            if (!container) return;
             try {
-                const reviews = await fetchWithRetry(`${API_BASE_URL}/api/reviews`, 3);
-                renderReviews(reviews);
+                const reviews = await fetchWithRetry(`${API_BASE_URL}/api/reviews`, 2, 2000); // Быстрый ретрай для отзывов
+                
+                if (!Array.isArray(reviews) || reviews.length === 0) {
+                    container.innerHTML = '<div class="w-full text-center py-12 text-brand_dark/50 text-sm">Отзывы загружаются или скоро появятся...</div>';
+                    return;
+                }
+                
+                container.innerHTML = reviews.map(r => {
+                    const text = r.text ? String(r.text).replace(/</g, "&lt;") : '';
+                    const name = r.name ? String(r.name).replace(/</g, "&lt;") : 'Гость';
+                    const loc = r.location ? String(r.location).replace(/</g, "&lt;") : '';
+                    return `
+                    <div class="w-80 md:w-96 shrink-0 bg-white border border-brand_dark/10 p-6 md:p-8 rounded-sm snap-center shadow-sm flex flex-col">
+                        <div class="flex items-center gap-1 mb-4 text-brand_accent">
+                            ${'<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'.repeat(5)}
+                        </div>
+                        <p class="text-brand_dark/80 text-sm md:text-base leading-relaxed mb-6 italic flex-1">«${text}»</p>
+                        <div class="mt-auto border-t border-brand_dark/10 pt-4">
+                            <p class="font-bold text-sm text-brand_dark">${name}</p>
+                            ${loc ? `<p class="text-[11px] text-brand_dark/50 uppercase tracking-wider font-semibold mt-0.5">${loc}</p>` : ''}
+                        </div>
+                    </div>
+                `}).join('');
             } catch (err) {
-                container.innerHTML = '<div class="w-full text-center py-10 text-brand_dark/50 text-sm">Не удалось загрузить отзывы</div>';
+                console.error("Reviews Fetch Error:", err);
+                container.innerHTML = '<div class="w-full text-center py-10 text-brand_dark/50 text-sm">Временно не удалось загрузить отзывы</div>';
             }
         }
 
-        function renderReviews(reviews) {
-            const container = document.getElementById('reviews-container');
-            if (!reviews || reviews.length === 0) {
-                container.innerHTML = '<div class="w-full text-center py-10 text-brand_dark/50 text-sm">Отзывы скоро появятся</div>';
-                return;
-            }
-            container.innerHTML = reviews.map(r => `
-                <div class="w-80 md:w-96 shrink-0 bg-white border border-brand_dark/10 p-6 md:p-8 rounded-sm snap-center shadow-sm">
-                    <div class="flex items-center gap-1 mb-4 text-brand_accent">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    </div>
-                    <p class="text-brand_dark/80 text-sm md:text-base leading-relaxed mb-6 italic">«${r.text}»</p>
-                    <div class="mt-auto border-t border-brand_dark/10 pt-4">
-                        <p class="font-bold text-sm text-brand_dark">${r.name}</p>
-                        <p class="text-[11px] text-brand_dark/50 uppercase tracking-wider font-semibold">${r.location}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
-
+        // --- 7. МОДАЛЬНОЕ ОКНО ---
         const modal = document.getElementById('tour-modal');
         const modalBackdrop = document.getElementById('modal-backdrop');
         
-        function openModal(idx) {
-            const t = globalTours[idx];
-            if (!t) return;
-            
-            document.getElementById('modal-img').src = t['Фото'] || '';
-            document.getElementById('modal-title-desktop').innerText = t['Название'] || '';
-            document.getElementById('modal-title-mobile').innerText = t['Название'] || '';
-            document.getElementById('modal-location').querySelector('span').innerText = t['Локация'] || '';
-            document.getElementById('modal-location-mobile').innerText = t['Локация'] || '';
-            
-            const detailsBadge = document.getElementById('modal-details-badge');
-            const descEl = document.getElementById('modal-desc');
-            
-            if (t['Описание'] && t['Детали']) {
-                detailsBadge.innerText = t['Детали'];
-                detailsBadge.classList.remove('hidden');
-                descEl.innerHTML = t['Описание'].replace(/\n/g, '<br>');
-            } else {
-                detailsBadge.classList.add('hidden');
-                descEl.innerHTML = (t['Описание'] || t['Детали'] || 'Подробную программу тура и актуальные вылеты уточняйте у менеджера').replace(/\n/g, '<br>');
+        window.openModal = function(idx) {
+            try {
+                const t = globalTours[idx];
+                if (!t || !modal || !modalBackdrop) return;
+                
+                const imgEl = document.getElementById('modal-img');
+                imgEl.src = t['Фото'] && t['Фото'].startsWith('http') ? t['Фото'] : FALLBACK_IMAGE;
+                imgEl.onerror = function() { this.onerror=null; this.src=FALLBACK_IMAGE; };
+
+                document.getElementById('modal-title-desktop').innerText = t['Название'] || 'Тур';
+                document.getElementById('modal-title-mobile').innerText = t['Название'] || 'Тур';
+                document.getElementById('modal-location').querySelector('span').innerText = t['Локация'] || '';
+                document.getElementById('modal-location-mobile').innerText = t['Локация'] || '';
+                
+                const detailsBadge = document.getElementById('modal-details-badge');
+                const descEl = document.getElementById('modal-desc');
+                
+                if (t['Описание'] && t['Детали']) {
+                    detailsBadge.innerText = t['Детали'];
+                    detailsBadge.classList.remove('hidden');
+                    descEl.innerHTML = String(t['Описание']).replace(/\n/g, '<br>');
+                } else {
+                    detailsBadge.classList.add('hidden');
+                    descEl.innerHTML = String(t['Описание'] || t['Детали'] || 'Подробную программу тура уточняйте у менеджера').replace(/\n/g, '<br>');
+                }
+                
+                document.getElementById('modal-price').innerText = t['Цена'] || 'По запросу';
+                document.getElementById('modal-tour-name').value = t['Название'] || 'Без названия';
+                
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+                
+                requestAnimationFrame(() => {
+                    modalBackdrop.classList.remove('opacity-0');
+                    modal.classList.remove('modal-closed');
+                    modal.classList.add('modal-open');
+                });
+            } catch (e) {
+                console.error("Ошибка открытия модального окна:", e);
             }
-            
-            document.getElementById('modal-price').innerText = t['Цена'] || 'По запросу';
-            document.getElementById('modal-tour-name').value = t['Название'] || '';
-            
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.style.overflow = 'hidden';
-            
-            requestAnimationFrame(() => {
-                modalBackdrop.classList.remove('opacity-0');
-                modal.classList.remove('modal-closed');
-                modal.classList.add('modal-open');
-            });
-        }
+        };
         
-        function closeModal() {
+        window.closeModal = function() {
+            if (!modal || !modalBackdrop) return;
             modalBackdrop.classList.add('opacity-0');
             modal.classList.remove('modal-open');
             modal.classList.add('modal-closed');
@@ -807,100 +903,167 @@
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
                 document.body.style.overflow = '';
-            }, 420);
-        }
+            }, 400);
+        };
 
+        // Закрытие по Escape
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+            if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) window.closeModal();
         });
 
-        document.getElementById('modal-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button');
-            const orig = btn.innerText;
-            btn.innerText = 'Отправка...';
-            try {
-                await fetch(`${API_BASE_URL}/api/lead`, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        destination: 'Запрос из каталога: ' + document.getElementById('modal-tour-name').value,
-                        dates: '-', budget: document.getElementById('modal-price').innerText,
-                        contact: document.getElementById('modal-contact').value,
-                        utm: `${utmData.source} | ${utmData.medium} | ${utmData.campaign}`
-                    })
-                });
-                btn.innerText = 'Отправлено'; btn.classList.replace('bg-brand_dark', 'bg-green-600');
-                setTimeout(closeModal, 1200);
-            } catch(err) { btn.innerText = 'Ошибка'; }
-            setTimeout(() => { btn.innerText = orig; btn.classList.replace('bg-green-600', 'bg-brand_dark'); e.target.reset(); }, 2000);
-        });
+        // Отправка формы из модалки
+        const modalForm = document.getElementById('modal-form');
+        if (modalForm) {
+            modalForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button');
+                if (!btn || btn.disabled) return;
 
-        // Продвинутый Квиз
-        function nextStep(step) {
-            document.querySelectorAll('.quiz-step').forEach(el => el.classList.remove('active'));
-            document.getElementById(`step-${step}`).classList.add('active');
-            document.getElementById('quiz-progress').style.width = `${(step / 6) * 100}%`;
+                const origText = btn.innerText;
+                btn.innerText = 'Отправка...';
+                btn.disabled = true;
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/lead`, {
+                        method: 'POST', 
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            destination: 'Запрос из каталога: ' + document.getElementById('modal-tour-name').value,
+                            dates: '-', 
+                            budget: document.getElementById('modal-price').innerText,
+                            contact: document.getElementById('modal-contact').value,
+                            utm: `${utmData.source} | ${utmData.medium} | ${utmData.campaign}`
+                        })
+                    });
+                    
+                    if (!response.ok) throw new Error("Server rejected lead");
+                    
+                    btn.innerText = 'Успешно отправлено!'; 
+                    btn.classList.replace('bg-brand_dark', 'bg-green-600');
+                    setTimeout(window.closeModal, 1500);
+                } catch(err) { 
+                    console.error("Submit Error:", err);
+                    btn.innerText = 'Ошибка. Попробуйте позже'; 
+                    btn.classList.replace('bg-brand_dark', 'bg-red-600');
+                } finally {
+                    setTimeout(() => { 
+                        btn.innerText = origText; 
+                        btn.classList.remove('bg-green-600', 'bg-red-600');
+                        btn.classList.add('bg-brand_dark');
+                        btn.disabled = false;
+                        e.target.reset(); 
+                    }, 3000);
+                }
+            });
         }
 
-        document.getElementById('quiz-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('quiz-submit-btn');
-            const origText = btn.innerText;
-            btn.innerText = 'Отправка...';
-            
-            const format = document.querySelector('input[name="quiz-format"]:checked').value;
-            
-            const destRadio = document.querySelector('input[name="quiz-dest"]:checked');
-            let destination = destRadio ? destRadio.value : '';
-            if (destination === 'Другое' || !destination) {
-                destination = document.getElementById('custom-dest').value || 'Не указано';
-            }
-            
-            const adults = document.getElementById('quiz-adults').value;
-            const children = document.getElementById('quiz-children').value;
-            let kidsAgeText = "";
-            if (children !== 'Без детей') {
-                kidsAgeText = `(Возраст: ${document.getElementById('quiz-children-ages').value || 'не указан'})`;
-            }
-            const comp = `${adults}, ${children} ${kidsAgeText}`;
-            
-            const dates = `${document.getElementById('quiz-dates').value || '-'} на ${document.getElementById('quiz-nights').value || '-'}`;
-            
-            const hotel = document.querySelector('input[name="quiz-hotel"]:checked').value;
-            const food = document.getElementById('quiz-food').value;
-            const budget = document.getElementById('quiz-budget').value || 'Не указан';
-            const notes = document.getElementById('quiz-notes').value || 'Нет';
-            
-            const name = document.getElementById('quiz-name').value;
-            const contact = document.getElementById('quiz-contact').value;
-
-            // Формируем красивый и подробный запрос для Telegram
-            const fullDescription = `[КВИЗ] ${name}\nФормат: ${format}\nСтрана: ${destination}\nСостав: ${comp}\nДаты: ${dates}\nОтель: ${hotel} (${food})\nПожелания: ${notes}`;
-
+        // --- 8. ЛОГИКА МНОГОШАГОВОГО КВИЗА ---
+        window.nextStep = function(step) {
             try {
-                await fetch(`${API_BASE_URL}/api/lead`, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        destination: fullDescription,
-                        dates: "Смотри выше",
-                        budget: budget,
-                        contact: contact,
-                        utm: `${utmData.source} | ${utmData.medium} | ${utmData.campaign}`
-                    })
-                });
-                
                 document.querySelectorAll('.quiz-step').forEach(el => el.classList.remove('active'));
-                document.getElementById('step-success').classList.add('active');
-                document.getElementById('quiz-progress').style.width = '100%';
-            } catch(err) {
-                btn.innerText = 'Ошибка сети';
-                setTimeout(() => btn.innerText = origText, 2000);
+                const nextStepEl = document.getElementById(`step-${step}`);
+                if (nextStepEl) {
+                    nextStepEl.classList.add('active');
+                    const progressEl = document.getElementById('quiz-progress');
+                    if (progressEl) progressEl.style.width = `${(step / 6) * 100}%`;
+                }
+            } catch (e) {
+                console.error("Ошибка переключения шагов квиза:", e);
             }
-        });
+        };
 
+        const quizForm = document.getElementById('quiz-form');
+        if (quizForm) {
+            quizForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('quiz-submit-btn');
+                if (!btn || btn.disabled) return;
+
+                const origText = btn.innerText;
+                btn.innerText = 'Отправка заявки...';
+                btn.disabled = true;
+                
+                try {
+                    const formatInput = document.querySelector('input[name="quiz-format"]:checked');
+                    const destRadio = document.querySelector('input[name="quiz-dest"]:checked');
+                    const customDest = document.getElementById('custom-dest');
+                    
+                    const format = formatInput ? formatInput.value : 'Не указан';
+                    let destination = destRadio ? destRadio.value : '';
+                    if (destination === 'Другое' || !destination) {
+                        destination = customDest && customDest.value ? customDest.value : 'Не указано';
+                    }
+                    
+                    const adults = document.getElementById('quiz-adults') ? document.getElementById('quiz-adults').value : '';
+                    const children = document.getElementById('quiz-children') ? document.getElementById('quiz-children').value : '';
+                    let kidsAgeText = "";
+                    if (children !== 'Без детей') {
+                        const agesInput = document.getElementById('quiz-children-ages');
+                        kidsAgeText = `(Возраст: ${agesInput && agesInput.value ? agesInput.value : 'не указан'})`;
+                    }
+                    const comp = `${adults}, ${children} ${kidsAgeText}`.trim();
+                    
+                    const datesInput = document.getElementById('quiz-dates');
+                    const nightsInput = document.getElementById('quiz-nights');
+                    const dates = `${datesInput && datesInput.value ? datesInput.value : '-'} на ${nightsInput && nightsInput.value ? nightsInput.value : '-'}`;
+                    
+                    const hotelInput = document.querySelector('input[name="quiz-hotel"]:checked');
+                    const foodInput = document.getElementById('quiz-food');
+                    const budgetInput = document.getElementById('quiz-budget');
+                    const notesInput = document.getElementById('quiz-notes');
+                    
+                    const hotel = hotelInput ? hotelInput.value : 'Любой';
+                    const food = foodInput ? foodInput.value : 'Любое';
+                    const budget = budgetInput && budgetInput.value ? budgetInput.value : 'Не указан';
+                    const notes = notesInput && notesInput.value ? notesInput.value : 'Нет';
+                    
+                    const name = document.getElementById('quiz-name') ? document.getElementById('quiz-name').value : 'Без имени';
+                    const contact = document.getElementById('quiz-contact') ? document.getElementById('quiz-contact').value : 'Без контакта';
+
+                    const fullDescription = `[КВИЗ] ${name}\nФормат: ${format}\nСтрана: ${destination}\nСостав: ${comp}\nДаты: ${dates}\nОтель: ${hotel} (${food})\nПожелания: ${notes}`;
+
+                    const response = await fetch(`${API_BASE_URL}/api/lead`, {
+                        method: 'POST', 
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            destination: fullDescription,
+                            dates: "Смотри выше",
+                            budget: budget,
+                            contact: contact,
+                            utm: `${utmData.source} | ${utmData.medium} | ${utmData.campaign}`
+                        })
+                    });
+                    
+                    if (!response.ok) throw new Error("Server rejected quiz lead");
+                    
+                    document.querySelectorAll('.quiz-step').forEach(el => el.classList.remove('active'));
+                    const successStep = document.getElementById('step-success');
+                    if (successStep) successStep.classList.add('active');
+                    const progressEl = document.getElementById('quiz-progress');
+                    if (progressEl) progressEl.style.width = '100%';
+                    
+                } catch(err) {
+                    console.error("Quiz Submit Error:", err);
+                    btn.innerText = 'Ошибка сети. Попробуйте еще раз';
+                    btn.classList.add('bg-red-600');
+                    setTimeout(() => { 
+                        btn.innerText = origText; 
+                        btn.classList.remove('bg-red-600');
+                        btn.disabled = false;
+                    }, 3000);
+                }
+            });
+        }
+
+        // --- 9. ИНИЦИАЛИЗАЦИЯ (Изолированный запуск) ---
         document.addEventListener('DOMContentLoaded', () => {
-            loadTours();
-            loadReviews();
+            // Запускаем независимые процессы: если один падает, другой продолжает работу
+            Promise.allSettled([
+                loadTours(),
+                loadReviews()
+            ]).then(() => {
+                console.log("Инициализация компонентов завершена.");
+            });
         });
     </script>
 </body>
