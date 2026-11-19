@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Withiv — Панель управления (GAS)</title>
-    <meta name="robots" content="noindex, nofollow"> 
+    <title>Withiv — Панель управления</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -20,7 +21,6 @@
         }
     </script>
 </head>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
 <body class="bg-brand_bg text-brand_dark min-h-screen font-sans antialiased">
 
     <!-- ЭКРАН АВТОРИЗАЦИИ -->
@@ -129,7 +129,6 @@
     </div>
 
     <script>
-        // --- НАСТРОЙКИ ---
         const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyfm98Wbr_Mwar3n8924oXOSQ1ZwVMg2jB_Ik1d_kULMANbzj332Odu2D9R6w0b4ts/exec';
         const CLOUDINARY_CLOUD_NAME = 'g9u4par5';
         const CLOUDINARY_UPLOAD_PRESET = 'withiv_preset';
@@ -140,11 +139,26 @@
             showPanel();
         }
 
-        document.getElementById('login-form').addEventListener('submit', (e) => {
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            adminPassword = document.getElementById('admin-pass-input').value.trim();
-            localStorage.setItem('withiv_admin_pass', adminPassword);
-            showPanel();
+            const btn = e.target.querySelector('button');
+            const passInput = document.getElementById('admin-pass-input').value.trim();
+            const origText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Проверка...';
+
+            try {
+                adminPassword = passInput;
+                await postToGAS({ action: 'auth' });
+                localStorage.setItem('withiv_admin_pass', adminPassword);
+                showPanel();
+            } catch (err) {
+                adminPassword = '';
+                if (err.message !== 'Unauthorized') alert('Ошибка сети: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = origText;
+            }
         });
 
         function logout() {
@@ -162,16 +176,15 @@
             const isTours = tab === 'tours';
             document.getElementById('section-tours').classList.toggle('hidden', !isTours);
             document.getElementById('section-reviews').classList.toggle('hidden', isTours);
-            
-            document.getElementById('tab-btn-tours').className = isTours 
+
+            document.getElementById('tab-btn-tours').className = isTours
                 ? 'px-5 py-2.5 bg-brand_dark text-white text-sm font-semibold rounded transition'
                 : 'px-5 py-2.5 bg-white text-brand_dark border border-brand_dark/20 text-sm font-semibold rounded transition';
-            document.getElementById('tab-btn-reviews').className = !isTours 
+            document.getElementById('tab-btn-reviews').className = !isTours
                 ? 'px-5 py-2.5 bg-brand_dark text-white text-sm font-semibold rounded transition'
                 : 'px-5 py-2.5 bg-white text-brand_dark border border-brand_dark/20 text-sm font-semibold rounded transition';
         }
 
-        // Универсальная отправка POST в Google Apps Script (без CORS-проблем)
         async function postToGAS(payload) {
             const res = await fetch(GAS_API_URL, {
                 method: 'POST',
@@ -180,8 +193,8 @@
             });
             const data = await res.json();
             if (data.status === 401) {
-                alert('Неверный пароль! Войдите заново.');
-                logout();
+                alert('Неверный пароль!');
+                if (localStorage.getItem('withiv_admin_pass')) logout();
                 throw new Error('Unauthorized');
             }
             if (!data.ok) {
@@ -190,7 +203,6 @@
             return data;
         }
 
-        // Безопасное сжатие фото (с защитой от зависания на HEIC)
         function compressImage(file, maxWidth = 1200, quality = 0.8) {
             return new Promise((resolve) => {
                 if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
@@ -234,7 +246,6 @@
             });
         }
 
-        // Загрузка в Cloudinary
         async function uploadToCloudinary(file) {
             const fileToUpload = await compressImage(file);
             const formData = new FormData();
@@ -252,7 +263,6 @@
             return data.secure_url;
         }
 
-        // Добавление тура
         document.getElementById('add-tour-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('tour-submit-btn');
@@ -265,8 +275,6 @@
                 const photoUrl = await uploadToCloudinary(file);
 
                 btn.innerText = 'Сохраняем в таблицу...';
-                // Порядок колонок в листе Tours:
-                // [Название, Локация, Цена, Детали, Описание, Фото, Место публикации]
                 const row = [
                     document.getElementById('tour-title').value.trim(),
                     document.getElementById('tour-location').value.trim(),
@@ -290,7 +298,6 @@
             }
         });
 
-        // Добавление отзыва
         document.getElementById('add-review-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('rev-submit-btn');
@@ -298,7 +305,6 @@
             btn.innerText = 'Публикация...';
 
             try {
-                // Порядок колонок в листе Reviews: [Имя, Локация, Текст]
                 const row = [
                     document.getElementById('rev-name').value.trim(),
                     document.getElementById('rev-location').value.trim(),
@@ -318,7 +324,6 @@
             }
         });
 
-        // Загрузка списков из Google Apps Script
         async function loadAdminData() {
             try {
                 const [toursRes, revRes] = await Promise.all([
@@ -328,7 +333,7 @@
                 const tours = await toursRes.json();
                 const reviews = await revRes.json();
 
-                document.getElementById('admin-tours-list').innerHTML = tours.length 
+                document.getElementById('admin-tours-list').innerHTML = tours.length
                     ? tours.map((t) => `
                         <div class="flex justify-between items-center p-3 bg-brand_bg rounded border border-brand_dark/10">
                             <div>
