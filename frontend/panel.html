@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Withiv — Панель управления</title>
+    <title>Withiv — Панель управления (GAS)</title>
     <meta name="robots" content="noindex, nofollow"> 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -128,14 +128,13 @@
     </div>
 
     <script>
-        // --- НАСТРОЙКИ (ЗАМЕНИ НА СВОИ) ---
-        const API_BASE_URL = 'https://withiv-backend-makarchik010.waw0.amvera.tech'; 
+        // --- НАСТРОЙКИ ---
+        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyfm98Wbr_Mwar3n8924oXOSQ1ZwVMg2jB_Ik1d_kULMANbzj332Odu2D9R6w0b4ts/exec';
         const CLOUDINARY_CLOUD_NAME = 'g9u4par5';
         const CLOUDINARY_UPLOAD_PRESET = 'withiv_preset';
 
         let adminPassword = localStorage.getItem('withiv_admin_pass') || '';
 
-        // Проверка входа при загрузке
         if (adminPassword) {
             showPanel();
         }
@@ -171,18 +170,34 @@
                 : 'px-5 py-2.5 bg-white text-brand_dark border border-brand_dark/20 text-sm font-semibold rounded transition';
         }
 
-                // Безопасное сжатие фото (с защитой от зависания на HEIC/ошибках)
+        // Универсальная отправка POST в Google Apps Script (без CORS-проблем)
+        async function postToGAS(payload) {
+            const res = await fetch(GAS_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ ...payload, password: adminPassword })
+            });
+            const data = await res.json();
+            if (data.status === 401) {
+                alert('Неверный пароль! Войдите заново.');
+                logout();
+                throw new Error('Unauthorized');
+            }
+            if (!data.ok) {
+                throw new Error(data.error || 'Ошибка скрипта Google');
+            }
+            return data;
+        }
+
+        // Безопасное сжатие фото (с защитой от зависания на HEIC)
         function compressImage(file, maxWidth = 1200, quality = 0.8) {
             return new Promise((resolve) => {
-                // Если это не стандартный JPEG/PNG/WebP (например, HEIC с айфона), отдаем оригинал
                 if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
                     resolve(file);
                     return;
                 }
 
-                // Таймер-страховка: если за 3 секунды не сжалось — шлем оригинал
                 const timeout = setTimeout(() => resolve(file), 3000);
-
                 const reader = new FileReader();
                 reader.onerror = () => { clearTimeout(timeout); resolve(file); };
                 reader.readAsDataURL(file);
@@ -236,22 +251,6 @@
             return data.secure_url;
         }
 
-        // Загрузка в Cloudinary
-        async function uploadToCloudinary(file) {
-            const compressedBlob = await compressImage(file);
-            const formData = new FormData();
-            formData.append('file', compressedBlob, 'tour.jpg');
-            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-
-            const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-                method: 'POST',
-                body: formData
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error?.message || 'Ошибка загрузки фото');
-            return data.secure_url;
-        }
-
         // Добавление тура
         document.getElementById('add-tour-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -264,35 +263,26 @@
                 const file = document.getElementById('tour-photo-file').files[0];
                 const photoUrl = await uploadToCloudinary(file);
 
-                btn.innerText = 'Сохраняем в базу...';
-                const res = await fetch(`${API_BASE_URL}/api/admin/tour/add`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Admin-Password': adminPassword
-                    },
-                    body: JSON.stringify({
-                        title: document.getElementById('tour-title').value,
-                        location: document.getElementById('tour-location').value,
-                        price: document.getElementById('tour-price').value,
-                        details: document.getElementById('tour-details').value,
-                        description: document.getElementById('tour-desc').value,
-                        photo: photoUrl
-                    })
-                });
+                btn.innerText = 'Сохраняем в таблицу...';
+                // Порядок колонок в листе Tours:
+                // [Название, Локация, Цена, Детали, Описание, Фото, Место публикации]
+                const row = [
+                    document.getElementById('tour-title').value.trim(),
+                    document.getElementById('tour-location').value.trim(),
+                    document.getElementById('tour-price').value.trim(),
+                    document.getElementById('tour-details').value.trim(),
+                    document.getElementById('tour-desc').value.trim(),
+                    photoUrl,
+                    'both'
+                ];
 
-                if (res.status === 401) {
-                    alert('Неверный пароль! Войдите заново.');
-                    logout();
-                    return;
-                }
-                if (!res.ok) throw new Error('Ошибка сервера');
+                await postToGAS({ action: 'tour_add', row });
 
                 alert('Тур успешно опубликован!');
                 e.target.reset();
                 loadAdminData();
             } catch (err) {
-                alert('Ошибка: ' + err.message);
+                if (err.message !== 'Unauthorized') alert('Ошибка: ' + err.message);
             } finally {
                 btn.innerText = origText;
                 btn.disabled = false;
@@ -307,67 +297,56 @@
             btn.innerText = 'Публикация...';
 
             try {
-                const res = await fetch(`${API_BASE_URL}/api/admin/review/add`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Admin-Password': adminPassword
-                    },
-                    body: JSON.stringify({
-                        name: document.getElementById('rev-name').value,
-                        location: document.getElementById('rev-location').value,
-                        text: document.getElementById('rev-text').value
-                    })
-                });
+                // Порядок колонок в листе Reviews: [Имя, Локация, Текст]
+                const row = [
+                    document.getElementById('rev-name').value.trim(),
+                    document.getElementById('rev-location').value.trim(),
+                    document.getElementById('rev-text').value.trim()
+                ];
 
-                if (res.status === 401) {
-                    alert('Неверный пароль!');
-                    logout();
-                    return;
-                }
-                if (!res.ok) throw new Error('Ошибка сервера');
+                await postToGAS({ action: 'review_add', row });
 
                 alert('Отзыв опубликован!');
                 e.target.reset();
                 loadAdminData();
             } catch (err) {
-                alert('Ошибка: ' + err.message);
+                if (err.message !== 'Unauthorized') alert('Ошибка: ' + err.message);
             } finally {
                 btn.innerText = 'Опубликовать отзыв';
                 btn.disabled = false;
             }
         });
 
-        // Загрузка списков для удаления
+        // Загрузка списков из Google Apps Script
         async function loadAdminData() {
             try {
                 const [toursRes, revRes] = await Promise.all([
-                    fetch(`${API_BASE_URL}/api/tours?_t=${Date.now()}`),
-                    fetch(`${API_BASE_URL}/api/reviews?_t=${Date.now()}`)
+                    fetch(`${GAS_API_URL}?action=tours&_t=${Date.now()}`),
+                    fetch(`${GAS_API_URL}?action=reviews&_t=${Date.now()}`)
                 ]);
                 const tours = await toursRes.json();
                 const reviews = await revRes.json();
 
                 document.getElementById('admin-tours-list').innerHTML = tours.length 
-                    ? tours.map((t, idx) => `
+                    ? tours.map((t) => `
                         <div class="flex justify-between items-center p-3 bg-brand_bg rounded border border-brand_dark/10">
                             <div>
-                                <p class="font-bold text-brand_dark">${t['Название']}</p>
-                                <p class="text-xs">${t['Локация']} — ${t['Цена']}</p>
+                                <p class="font-bold text-brand_dark">${t['Название'] || ''}</p>
+                                <p class="text-xs">${t['Локация'] || ''} — ${t['Цена'] || ''}</p>
                             </div>
-                            <button onclick="deleteItem('tour', ${idx})" class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded hover:bg-red-200">Удалить</button>
+                            <button onclick="deleteItem('tour', ${t.row_index})" class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded hover:bg-red-200">Удалить</button>
                         </div>
                     `).join('')
                     : 'Туров пока нет';
 
                 document.getElementById('admin-reviews-list').innerHTML = reviews.length
-                    ? reviews.map((r, idx) => `
+                    ? reviews.map((r) => `
                         <div class="flex justify-between items-center p-3 bg-brand_bg rounded border border-brand_dark/10">
                             <div class="pr-4">
-                                <p class="font-bold text-brand_dark">${r.name} <span class="font-normal text-xs">(${r.location || ''})</span></p>
-                                <p class="text-xs line-clamp-1">${r.text}</p>
+                                <p class="font-bold text-brand_dark">${r['Имя'] || r.name || ''} <span class="font-normal text-xs">(${r['Локация'] || r['Куда летали'] || r.location || ''})</span></p>
+                                <p class="text-xs line-clamp-1">${r['Текст'] || r['Отзыв'] || r.text || ''}</p>
                             </div>
-                            <button onclick="deleteItem('review', ${idx})" class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded hover:bg-red-200 shrink-0">Удалить</button>
+                            <button onclick="deleteItem('review', ${r.row_index})" class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded hover:bg-red-200 shrink-0">Удалить</button>
                         </div>
                     `).join('')
                     : 'Отзывов пока нет';
@@ -376,21 +355,13 @@
             }
         }
 
-        async function deleteItem(type, index) {
+        async function deleteItem(type, rowIndex) {
             if (!confirm('Точно удалить эту запись с сайта?')) return;
             try {
-                const res = await fetch(`${API_BASE_URL}/api/admin/${type}/delete`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Admin-Password': adminPassword
-                    },
-                    body: JSON.stringify({ index })
-                });
-                if (res.status === 401) { alert('Неверный пароль!'); logout(); return; }
+                await postToGAS({ action: `${type}_delete`, row_index: rowIndex });
                 loadAdminData();
             } catch (e) {
-                alert('Ошибка при удалении');
+                if (e.message !== 'Unauthorized') alert('Ошибка при удалении: ' + e.message);
             }
         }
     </script>
