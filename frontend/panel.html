@@ -234,7 +234,7 @@
                 throw new Error(data.error?.message || `Ошибка Cloudinary (${res.status})`);
             }
             return data.secure_url;
-        }}
+        }
 
         // Загрузка в Cloudinary
         async function uploadToCloudinary(file) {
