@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Withiv — Турагентство индивидуальных путешествий</title>
-    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
+
     <meta property="og:title" content="Withiv — Бутик-турагентство">
     <meta property="og:description" content="Индивидуальный подбор туров, бронирование отелей и полное сопровождение в поездке по всему миру.">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=1200&auto=format&fit=crop">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -41,7 +42,7 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1B3B2B; border-radius: 3px; }
         input, select, textarea { font-size: 16px !important; }
-        
+
         .reviews-scroll {
             scrollbar-width: none;
             -ms-overflow-style: none;
@@ -53,8 +54,7 @@
         #modal-content { transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .modal-closed #modal-content { transform: translateY(60px) scale(0.96); opacity: 0; }
         .modal-open #modal-content { transform: translateY(0) scale(1); opacity: 1; }
-        
-        /* Стили для кастомных радиокнопок в квизе */
+
         .quiz-radio:checked + div {
             border-color: #1B3B2B;
             background-color: rgba(27, 59, 43, 0.05);
@@ -65,7 +65,6 @@
         }
     </style>
 </head>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
 <body class="font-sans selection:bg-brand_dark selection:text-white flex flex-col min-h-screen">
 
     <!-- Header -->
@@ -78,14 +77,14 @@
                 </svg>
                 <span class="text-2xl md:text-3xl font-bold tracking-tight">Withiv</span>
             </a>
-            
+
             <nav class="hidden md:flex space-x-9 text-sm font-medium text-brand_dark/80">
                 <a href="#tours" class="hover:text-brand_dark transition-colors">Коллекция туров</a>
                 <a href="#quiz-section" class="hover:text-brand_dark transition-colors">Подобрать тур</a>
                 <a href="#reviews" class="hover:text-brand_dark transition-colors">Отзывы</a>
                 <a href="#about" class="hover:text-brand_dark transition-colors">Об агентстве</a>
             </nav>
-            
+
             <div class="hidden md:flex items-center gap-3">
                 <a href="https://t.me/withivtravel13" target="_blank" class="bg-brand_dark text-brand_bg px-5 py-2.5 rounded-sm text-sm font-semibold hover:bg-brand_accent transition-colors">
                     Telegram-канал
@@ -122,21 +121,21 @@
             <img src="https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=2000&auto=format&fit=crop" alt="Withiv Travel" class="w-full h-full object-cover opacity-45">
             <div class="absolute inset-0 bg-gradient-to-t from-brand_dark via-brand_dark/40 to-transparent"></div>
         </div>
-        
+
         <div class="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 text-white py-12">
             <div class="inline-block border border-white/25 bg-white/10 backdrop-blur-sm px-3.5 py-1.5 rounded-sm mb-6">
                 <span class="text-xs font-semibold tracking-[0.2em] uppercase text-brand_bg">Турагентство Withiv</span>
             </div>
-            
+
             <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold leading-[1.12] tracking-tight mb-6 max-w-4xl">
                 Не просто туры —<br>
                 <span class="font-light text-brand_bg/90">впечатления на всю жизнь</span>
             </h1>
-            
+
             <p class="text-base md:text-lg text-white/80 max-w-xl mb-10 font-normal leading-relaxed">
                 Организуем отдых по всему миру: от проверенных семейных курортов до уединенных вилл и индивидуальных маршрутов без лишней суеты
             </p>
-            
+
             <div class="flex flex-col sm:flex-row gap-4">
                 <a href="#tours" class="bg-brand_bg text-brand_dark px-8 py-4 rounded-sm font-bold hover:bg-brand_accent hover:text-white transition-colors text-center text-sm md:text-base">
                     Смотреть коллекцию
@@ -146,14 +145,16 @@
                 </a>
             </div>
         </div>
-    </section><!-- Онлайн Поиск Tourvisor -->
-    <section id="tourvisor-search" class="py-12 md:py-16 bg-white relative z-20 -mt-6 md:-mt-10 mx-4 md:mx-8 rounded-xl shadow-[0_10px_40px_rgba(27,59,43,0.08)] border border-brand_dark/5">
+    </section>
+
+    <!-- Онлайн Поиск Tourvisor (скрыт через hidden до подключения виджета) -->
+    <section id="tourvisor-search" class="hidden py-12 md:py-16 bg-white relative z-20 -mt-6 md:-mt-10 mx-4 md:mx-8 rounded-xl shadow-[0_10px_40px_rgba(27,59,43,0.08)] border border-brand_dark/5">
         <div class="max-w-7xl mx-auto px-4 md:px-8">
             <div class="text-center mb-8">
                 <span class="text-brand_accent text-xs uppercase tracking-[0.2em] font-bold block mb-2">Поиск по всем туроператорам</span>
                 <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-brand_dark">Найти тур самостоятельно</h2>
             </div>
-            
+
             <!-- КОНТЕЙНЕР ДЛЯ ВИДЖЕТА TOURVISOR -->
             <div id="tourvisor-widget-container" class="w-full min-h-[350px] bg-brand_bg/30 rounded-md flex items-center justify-center border border-brand_dark/10">
                 <div class="text-center">
@@ -162,8 +163,6 @@
                     <p class="text-xs text-brand_dark/40 mt-1">Ожидаем подключение к базе туроператоров</p>
                 </div>
             </div>
-            <!-- КОНЕЦ КОНТЕЙНЕРА -->
-
         </div>
     </section>
 
@@ -174,10 +173,8 @@
                 <span class="text-brand_accent text-xs uppercase tracking-[0.2em] font-bold block mb-2">Актуальные предложения</span>
                 <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Коллекция Withiv</h2>
             </div>
-            
-            <div id="filter-tabs" class="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto hide-scrollbar">
-                <!-- Заполняется через JS -->
-            </div>
+
+            <div id="filter-tabs" class="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto hide-scrollbar"></div>
         </div>
 
         <div id="tours-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -194,7 +191,7 @@
             <span class="text-brand_accent text-xs uppercase tracking-[0.2em] font-bold block mb-2">Доверие</span>
             <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Отзывы наших туристов</h2>
         </div>
-        
+
         <div id="reviews-container" class="flex overflow-x-auto gap-6 px-4 md:px-8 max-w-7xl mx-auto pb-8 snap-x snap-mandatory reviews-scroll">
             <div class="w-full text-center py-10 text-brand_dark/50 text-sm">Проверяем отзывы...</div>
         </div>
@@ -203,13 +200,13 @@
     <!-- Quick View Modal -->
     <div id="tour-modal" class="fixed inset-0 z-[1050] hidden items-end md:items-center justify-center sm:p-6 modal-closed">
         <div id="modal-backdrop" class="absolute inset-0 bg-brand_dark/80 backdrop-blur-md opacity-0" onclick="closeModal()"></div>
-        
+
         <div id="modal-content" class="relative bg-brand_bg w-full md:max-w-4xl rounded-t-2xl md:rounded-md shadow-2xl flex flex-col md:flex-row max-h-[90vh] overflow-hidden z-10">
-            
+
             <button onclick="closeModal()" type="button" aria-label="Закрыть" class="absolute top-4 right-4 z-30 w-10 h-10 bg-black/40 hover:bg-brand_dark text-white backdrop-blur-md rounded-full flex items-center justify-center transition-all duration-300 shadow-lg border border-white/20">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            
+
             <div class="w-full md:w-1/2 h-56 sm:h-64 md:h-auto bg-brand_dark shrink-0 relative overflow-hidden">
                 <img id="modal-img" src="" alt="Тур" class="w-full h-full object-cover">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent md:hidden"></div>
@@ -218,7 +215,7 @@
                     <h3 id="modal-title-mobile" class="text-xl font-bold text-white leading-snug">Название</h3>
                 </div>
             </div>
-            
+
             <div class="w-full md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto bg-brand_bg">
                 <div class="hidden md:block mb-5 pr-8">
                     <p id="modal-location" class="text-xs font-bold uppercase tracking-widest text-brand_accent mb-2 flex items-center gap-1.5">
@@ -227,19 +224,19 @@
                     </p>
                     <h3 id="modal-title-desktop" class="text-2xl lg:text-3xl font-bold leading-tight text-brand_dark">Название</h3>
                 </div>
-                
+
                 <div id="modal-details-badge" class="hidden mb-4 p-3 bg-white border border-brand_dark/10 rounded-sm text-xs font-medium text-brand_dark/80"></div>
 
                 <div class="text-sm text-brand_dark/85 leading-relaxed mb-6 whitespace-pre-wrap flex-1" id="modal-desc">
                     Описание...
                 </div>
-                
+
                 <div class="border-t border-brand_dark/10 pt-5 mt-auto">
                     <div class="flex items-baseline justify-between mb-4">
                         <span class="text-[11px] uppercase tracking-wider font-bold text-brand_dark/50">Стоимость</span>
                         <span id="modal-price" class="text-xl md:text-2xl font-bold text-brand_dark">Цена</span>
                     </div>
-                    
+
                     <form id="modal-form" class="flex flex-col gap-3">
                         <input type="hidden" id="modal-tour-name">
                         <input type="text" id="modal-contact" placeholder="Телефон или @telegram" required class="w-full bg-white border border-brand_dark/20 rounded-sm px-4 py-3.5 outline-none focus:border-brand_dark text-sm transition-colors">
@@ -267,13 +264,13 @@
                 </div>
 
                 <form id="quiz-form" class="flex-1 flex flex-col">
-                    
+
                     <!-- Шаг 1: Формат отдыха -->
                     <div class="quiz-step active flex-1" id="step-1">
                         <div class="mb-auto">
                             <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Шаг 1 из 6</span>
                             <h3 class="text-2xl font-bold mb-6">Какой формат отдыха вам ближе?</h3>
-                            
+
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <label class="cursor-pointer relative">
                                     <input type="radio" name="quiz-format" value="Пляж и релакс" class="quiz-radio sr-only" checked>
@@ -335,7 +332,7 @@
                         <div class="mb-auto">
                             <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Шаг 2 из 6</span>
                             <h3 class="text-2xl font-bold mb-6">Куда бы вы хотели отправиться?</h3>
-                            
+
                             <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
                                 <label class="cursor-pointer relative">
                                     <input type="radio" name="quiz-dest" value="Турция" class="quiz-radio sr-only">
@@ -387,7 +384,7 @@
                         <div class="mb-auto">
                             <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Шаг 3 из 6</span>
                             <h3 class="text-2xl font-bold mb-6">Даты поездки и состав отдыхающих</h3>
-                            
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <label class="block text-xs font-bold text-brand_dark/60 mb-1.5">Взрослых</label>
@@ -409,12 +406,12 @@
                                     </select>
                                 </div>
                             </div>
-                            
+
                             <div id="children-ages-div" class="hidden mb-4">
                                 <label class="block text-xs font-bold text-brand_dark/60 mb-1.5">Возраст детей (важно для расчета авиабилетов)</label>
                                 <input type="text" id="quiz-children-ages" placeholder="Например: 4 года и 10 лет" class="w-full border border-brand_dark/20 px-4 py-3 rounded-sm outline-none focus:border-brand_dark text-sm bg-white">
                             </div>
-                            
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-bold text-brand_dark/60 mb-1.5">Примерные даты вылета</label>
@@ -437,7 +434,7 @@
                         <div class="mb-auto">
                             <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Шаг 4 из 6</span>
                             <h3 class="text-2xl font-bold mb-6">Уровень отеля и питание</h3>
-                            
+
                             <label class="block text-xs font-bold text-brand_dark/60 mb-2">Категория отеля</label>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                                 <label class="cursor-pointer relative">
@@ -465,7 +462,7 @@
                                     </div>
                                 </label>
                             </div>
-                            
+
                             <label class="block text-xs font-bold text-brand_dark/60 mb-2">Предпочтения по питанию</label>
                             <select id="quiz-food" class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark bg-white text-sm">
                                 <option value="Всё включено (AI/UAI)">Всё включено / Ультра всё включено</option>
@@ -486,10 +483,10 @@
                         <div class="mb-auto">
                             <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Шаг 5 из 6</span>
                             <h3 class="text-2xl font-bold mb-6">Бюджет и особые пожелания</h3>
-                            
+
                             <label class="block text-xs font-bold text-brand_dark/60 mb-2">Ориентировочный бюджет (на всех)</label>
                             <input type="text" id="quiz-budget" placeholder="Например: до 400 000 руб." class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark text-sm bg-white mb-5">
-                            
+
                             <label class="block text-xs font-bold text-brand_dark/60 mb-2">Важные детали (по желанию)</label>
                             <textarea id="quiz-notes" rows="3" placeholder="Первая линия, пологий вход в море, тихое место, нужен дайвинг..." class="w-full border border-brand_dark/20 px-4 py-3 rounded-sm outline-none focus:border-brand_dark text-sm bg-white resize-none"></textarea>
                         </div>
@@ -505,12 +502,12 @@
                             <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Финал</span>
                             <h3 class="text-2xl font-bold mb-2">Куда отправить подборку туров?</h3>
                             <p class="text-sm text-brand_dark/70 mb-6">Менеджер изучит заявку и пришлет 3-5 проверенных вариантов с расчетом цены.</p>
-                            
+
                             <div>
                                 <label class="block text-xs font-bold text-brand_dark/60 mb-1.5">Как к вам обращаться?</label>
                                 <input type="text" id="quiz-name" placeholder="Ваше имя" required class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark text-base bg-white mb-4">
                             </div>
-                            
+
                             <div>
                                 <label class="block text-xs font-bold text-brand_dark/60 mb-1.5">Номер телефона или Telegram</label>
                                 <input type="text" id="quiz-contact" placeholder="+7 (999) 000-00-00 или @username" required class="w-full border border-brand_dark/25 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark text-base bg-white">
@@ -521,7 +518,7 @@
                             <button type="submit" id="quiz-submit-btn" class="w-full sm:flex-1 bg-brand_accent text-white px-8 py-4 font-bold rounded-sm hover:bg-brand_dark transition-colors shadow-lg order-1 sm:order-2 text-sm">Получить расчет стоимости</button>
                         </div>
                     </div>
-                    
+
                     <!-- Успех -->
                     <div class="quiz-step text-center py-8 md:py-12 flex-1 flex-col justify-center" id="step-success">
                         <svg class="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -540,18 +537,18 @@
                 <div class="w-full md:w-3/5 text-center md:text-left">
                     <span class="text-brand_accent uppercase tracking-[0.15em] text-xs font-bold block mb-2">Философия отдыха</span>
                     <h2 class="text-3xl md:text-4xl font-bold mb-6 tracking-tight">Об агентстве Withiv</h2>
-                    
+
                     <div class="space-y-4 text-sm md:text-base text-brand_dark/80 leading-relaxed text-left">
                         <p>Withiv — современное, динамично развивающееся туристическое агентство. Мы создаем путешествия, в которых продумана каждая деталь: от выбора пляжа и концепции отеля до удобных стыковок и индивидуальных трансферов.</p>
                         <p>Мы не предлагаем шаблонные варианты «для галочки». Наша команда лично проверяет отельную базу, следит за актуальными правилами въезда и остается на связи 24/7 с момента бронирования до вашего возвращения домой.</p>
                     </div>
-                    
+
                     <div class="mt-8 flex flex-col sm:flex-row justify-center md:justify-start gap-4">
                         <a href="https://t.me/withivtravel13" target="_blank" class="bg-brand_dark text-white px-7 py-3.5 rounded-sm font-bold hover:bg-brand_accent transition-colors text-sm text-center">Наш Telegram-канал</a>
                         <a href="https://wa.me/79127415413" target="_blank" class="border border-[#25D366] text-[#25D366] bg-white px-7 py-3.5 rounded-sm font-bold hover:bg-[#25D366] hover:text-white transition-colors text-sm text-center flex justify-center items-center gap-2">WhatsApp</a>
                     </div>
                 </div>
-                
+
                 <div class="w-full md:w-2/5 flex flex-row justify-center md:justify-end gap-4">
                     <div class="text-center p-4 border border-brand_dark/10 rounded-sm bg-white w-40 shrink-0 shadow-sm">
                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/nast_ivn&color=1B3B2B" alt="QR Менеджер" class="w-28 h-28 mb-3 mx-auto" loading="lazy">
@@ -570,7 +567,7 @@
     <footer class="bg-brand_dark text-brand_bg mt-auto border-t border-white/10">
         <div class="max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-16">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8">
-                
+
                 <div class="md:col-span-5 text-center md:text-left flex flex-col items-center md:items-start">
                     <a href="#" class="flex items-center gap-2 mb-3">
                         <svg class="w-6 h-6 text-brand_accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
@@ -582,7 +579,7 @@
                     <p class="text-xs text-brand_accent uppercase tracking-widest font-semibold mb-4">Турагентство</p>
                     <p class="text-sm text-brand_bg/70 leading-relaxed max-w-sm">Индивидуальный подбор туров, бронирование отелей и полное сопровождение в поездке.</p>
                 </div>
-                
+
                 <div class="md:col-span-3 text-center md:text-left">
                     <h4 class="text-white font-bold mb-5 text-xs uppercase tracking-wider">Разделы</h4>
                     <ul class="space-y-3 text-sm text-brand_bg/75">
@@ -592,7 +589,7 @@
                         <li><a href="#about" class="hover:text-brand_accent transition-colors">Об агентстве</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="md:col-span-4 text-center md:text-left">
                     <h4 class="text-white font-bold mb-5 text-xs uppercase tracking-wider">Контакты</h4>
                     <ul class="space-y-3 text-sm text-brand_bg/75">
@@ -602,7 +599,7 @@
                     </ul>
                 </div>
             </div>
-            
+
             <div class="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-brand_bg/60">
                 <p>&copy; 2026 Withiv. Все права защищены</p>
                 <a href="#quiz-section" class="hover:text-white transition-colors underline underline-offset-4">Политика конфиденциальности</a>
@@ -610,11 +607,19 @@
         </div>
     </footer>
 
-  <script>
-        // --- 1. БАЗОВЫЕ НАСТРОЙКИ И ЗАГЛУШКИ ---
+    <script>
+        // --- 1. БАЗОВЫЕ НАСТРОЙКИ И ОПТИМИЗАЦИЯ КАРТИНОК ---
         const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyfm98Wbr_Mwar3n8924oXOSQ1ZwVMg2jB_Ik1d_kULMANbzj332Odu2D9R6w0b4ts/exec';
         const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=800&auto=format&fit=crop';
         let globalTours = [];
+
+        function optimizeCloudinaryUrl(url, width = 800) {
+            if (!url || !String(url).startsWith('http')) return FALLBACK_IMAGE;
+            if (url.includes('res.cloudinary.com') && url.includes('/upload/') && !url.includes('f_auto')) {
+                return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width}/`);
+            }
+            return url;
+        }
 
         const urlParams = new URLSearchParams(window.location.search);
         const utmData = {
@@ -744,7 +749,7 @@
             if (!grid) return;
 
             if (!Array.isArray(list) || list.length === 0) {
-                grid.innerHTML = '<div class="col-span-full py-12 text-center font-medium text-brand_dark/60">В данный момент по этому направлению нет предложений в ручной коллекции. Воспользуйтесь глобальным поиском выше.</div>';
+                grid.innerHTML = '<div class="col-span-full py-12 text-center font-medium text-brand_dark/60">В данный момент по этому направлению нет предложений в коллекции.</div>';
                 return;
             }
 
@@ -757,7 +762,7 @@
                     const location = tour['Локация'] ? String(tour['Локация']).replace(/</g, "&lt;") : 'Секретное место';
                     const price = tour['Цена'] ? String(tour['Цена']).replace(/</g, "&lt;") : 'По запросу';
                     const details = tour['Детали'] ? String(tour['Детали']).replace(/</g, "&lt;") : '';
-                    const imgUrl = tour['Фото'] && String(tour['Фото']).startsWith('http') ? tour['Фото'] : FALLBACK_IMAGE;
+                    const imgUrl = optimizeCloudinaryUrl(tour['Фото'], 800);
 
                     return `
                         <article onclick="openModal(${realIdx})" class="cursor-pointer group bg-white rounded-sm shadow-sm hover:shadow-xl transition-all duration-300 border border-brand_dark/10 overflow-hidden flex flex-col">
@@ -784,51 +789,87 @@
             }
         }
 
-        // --- 6. ЗАГРУЗКА ДАННЫХ ИЗ GOOGLE APPS SCRIPT ---
+        function renderReviewsHtml(reviews) {
+            const container = document.getElementById('reviews-container');
+            if (!container) return;
+
+            if (!Array.isArray(reviews) || reviews.length === 0) {
+                container.innerHTML = '<div class="w-full text-center py-12 text-brand_dark/50 text-sm">Отзывы скоро появятся...</div>';
+                return;
+            }
+
+            container.innerHTML = reviews.map(r => {
+                const text = String(r['Текст'] || r['Отзыв'] || r.text || '').replace(/</g, "&lt;");
+                const name = String(r['Имя'] || r.name || 'Гость').replace(/</g, "&lt;");
+                const loc = String(r['Локация'] || r['Куда летали'] || r.location || '').replace(/</g, "&lt;");
+                return `
+                <div class="w-80 md:w-96 shrink-0 bg-white border border-brand_dark/10 p-6 md:p-8 rounded-sm snap-center shadow-sm flex flex-col">
+                    <div class="flex items-center gap-1 mb-4 text-brand_accent">
+                        ${'<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'.repeat(5)}
+                    </div>
+                    <p class="text-brand_dark/80 text-sm md:text-base leading-relaxed mb-6 italic flex-1">«${text}»</p>
+                    <div class="mt-auto border-t border-brand_dark/10 pt-4">
+                        <p class="font-bold text-sm text-brand_dark">${name}</p>
+                        ${loc ? `<p class="text-[11px] text-brand_dark/50 uppercase tracking-wider font-semibold mt-0.5">${loc}</p>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // --- 6. ЗАГРУЗКА ДАННЫХ (КЭШ 0 МС + ФОНОВОЕ ОБНОВЛЕНИЕ) ---
         async function loadTours() {
             const grid = document.getElementById('tours-grid');
             if (!grid) return;
+
+            const cached = localStorage.getItem('withiv_cache_tours');
+            if (cached) {
+                try {
+                    globalTours = JSON.parse(cached);
+                    renderFilters(globalTours);
+                    renderTours(globalTours);
+                } catch (e) {}
+            }
+
             try {
                 const data = await fetchWithRetry(`${GAS_API_URL}?action=tours&site=1`);
-                globalTours = Array.isArray(data) ? data : [];
-                renderFilters(globalTours);
-                renderTours(globalTours);
+                const fresh = Array.isArray(data) ? data : [];
+                const freshStr = JSON.stringify(fresh);
+                if (freshStr !== cached) {
+                    localStorage.setItem('withiv_cache_tours', freshStr);
+                    globalTours = fresh;
+                    renderFilters(globalTours);
+                    renderTours(globalTours);
+                }
             } catch (err) {
                 console.error("Tours Fetch Error:", err);
-                grid.innerHTML = '<div class="col-span-full py-12 text-center font-medium text-brand_dark/60 bg-white border border-brand_dark/10 rounded-sm p-6">Временно не удалось загрузить авторскую коллекцию туров. Воспользуйтесь глобальным поиском.</div>';
+                if (!cached) {
+                    grid.innerHTML = '<div class="col-span-full py-12 text-center font-medium text-brand_dark/60 bg-white border border-brand_dark/10 rounded-sm p-6">Временно не удалось загрузить авторскую коллекцию туров.</div>';
+                }
             }
         }
 
         async function loadReviews() {
             const container = document.getElementById('reviews-container');
             if (!container) return;
+
+            const cached = localStorage.getItem('withiv_cache_reviews');
+            if (cached) {
+                try { renderReviewsHtml(JSON.parse(cached)); } catch (e) {}
+            }
+
             try {
                 const reviews = await fetchWithRetry(`${GAS_API_URL}?action=reviews`, 2, 2000);
-
-                if (!Array.isArray(reviews) || reviews.length === 0) {
-                    container.innerHTML = '<div class="w-full text-center py-12 text-brand_dark/50 text-sm">Отзывы скоро появятся...</div>';
-                    return;
+                const fresh = Array.isArray(reviews) ? reviews : [];
+                const freshStr = JSON.stringify(fresh);
+                if (freshStr !== cached) {
+                    localStorage.setItem('withiv_cache_reviews', freshStr);
+                    renderReviewsHtml(fresh);
                 }
-
-                container.innerHTML = reviews.map(r => {
-                    const text = String(r['Текст'] || r['Отзыв'] || r.text || '').replace(/</g, "&lt;");
-                    const name = String(r['Имя'] || r.name || 'Гость').replace(/</g, "&lt;");
-                    const loc = String(r['Локация'] || r['Куда летали'] || r.location || '').replace(/</g, "&lt;");
-                    return `
-                    <div class="w-80 md:w-96 shrink-0 bg-white border border-brand_dark/10 p-6 md:p-8 rounded-sm snap-center shadow-sm flex flex-col">
-                        <div class="flex items-center gap-1 mb-4 text-brand_accent">
-                            ${'<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'.repeat(5)}
-                        </div>
-                        <p class="text-brand_dark/80 text-sm md:text-base leading-relaxed mb-6 italic flex-1">«${text}»</p>
-                        <div class="mt-auto border-t border-brand_dark/10 pt-4">
-                            <p class="font-bold text-sm text-brand_dark">${name}</p>
-                            ${loc ? `<p class="text-[11px] text-brand_dark/50 uppercase tracking-wider font-semibold mt-0.5">${loc}</p>` : ''}
-                        </div>
-                    </div>
-                `}).join('');
             } catch (err) {
                 console.error("Reviews Fetch Error:", err);
-                container.innerHTML = '<div class="w-full text-center py-10 text-brand_dark/50 text-sm">Временно не удалось загрузить отзывы</div>';
+                if (!cached) {
+                    container.innerHTML = '<div class="w-full text-center py-10 text-brand_dark/50 text-sm">Временно не удалось загрузить отзывы</div>';
+                }
             }
         }
 
@@ -842,7 +883,7 @@
                 if (!t || !modal || !modalBackdrop) return;
 
                 const imgEl = document.getElementById('modal-img');
-                imgEl.src = t['Фото'] && String(t['Фото']).startsWith('http') ? t['Фото'] : FALLBACK_IMAGE;
+                imgEl.src = optimizeCloudinaryUrl(t['Фото'], 1200);
                 imgEl.onerror = function() { this.onerror=null; this.src=FALLBACK_IMAGE; };
 
                 document.getElementById('modal-title-desktop').innerText = t['Название'] || 'Тур';
@@ -896,7 +937,6 @@
             if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) window.closeModal();
         });
 
-        // Отправка заявки из модалки в GAS
         const modalForm = document.getElementById('modal-form');
         if (modalForm) {
             modalForm.addEventListener('submit', async (e) => {
