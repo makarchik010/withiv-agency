@@ -609,13 +609,12 @@
         </div>
     </footer>
 
-    <script>
+  <script>
         // --- 1. БАЗОВЫЕ НАСТРОЙКИ И ЗАГЛУШКИ ---
-        const API_BASE_URL = 'https://withiv-backend-makarchik010.waw0.amvera.tech'; // Позже заменишь на Amvera
+        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyfm98Wbr_Mwar3n8924oXOSQ1ZwVMg2jB_Ik1d_kULMANbzj332Odu2D9R6w0b4ts/exec';
         const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=800&auto=format&fit=crop';
         let globalTours = [];
 
-        // Безопасное чтение UTM-меток
         const urlParams = new URLSearchParams(window.location.search);
         const utmData = {
             source: urlParams.get('utm_source') || 'Органика',
@@ -623,7 +622,7 @@
             campaign: urlParams.get('utm_campaign') || 'Без кампании'
         };
 
-        // --- 2. МОБИЛЬНОЕ МЕНЮ (Изолировано от ошибок загрузки данных) ---
+        // --- 2. МОБИЛЬНОЕ МЕНЮ ---
         try {
             const mobileBtn = document.getElementById('mobile-menu-btn');
             const mobileMenu = document.getElementById('mobile-menu');
@@ -657,76 +656,65 @@
                 const childrenSelect = document.getElementById('quiz-children');
                 const agesDiv = document.getElementById('children-ages-div');
                 if (childrenSelect && agesDiv) {
-                    if (childrenSelect.value !== 'Без детей') {
-                        agesDiv.classList.remove('hidden');
-                    } else {
-                        agesDiv.classList.add('hidden');
-                    }
+                    agesDiv.classList.toggle('hidden', childrenSelect.value === 'Без детей');
                 }
             } catch (e) {
                 console.error("Ошибка отображения возраста:", e);
             }
         };
 
-        // --- 4. БЕЗОПАСНАЯ СЕТЕВАЯ ФУНКЦИЯ (С защитой от зависаний) ---
-        async function fetchWithRetry(url, maxRetries = 3, delay = 5000) {
+        // --- 4. БЕЗОПАСНАЯ СЕТЕВАЯ ФУНКЦИЯ ---
+        async function fetchWithRetry(url, maxRetries = 3, delay = 3000) {
             for (let i = 0; i < maxRetries; i++) {
                 try {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 секунд на попытку
-                    
-                    // Добавляем timestamp для обхода жесткого кэширования на телефонах
+                    const timeoutId = setTimeout(() => controller.abort(), 12000);
+
                     const cacheBusterUrl = new URL(url);
                     cacheBusterUrl.searchParams.append('_t', new Date().getTime());
 
-                    const response = await fetch(cacheBusterUrl.toString(), { 
-                        signal: controller.signal,
-                        headers: { 'Accept': 'application/json' }
+                    const response = await fetch(cacheBusterUrl.toString(), {
+                        signal: controller.signal
                     });
                     clearTimeout(timeoutId);
-                    
+
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    
-                    const data = await response.json();
-                    return data;
+                    return await response.json();
                 } catch (e) {
                     if (i === maxRetries - 1) throw e;
-                    
                     const loadingText = document.getElementById('loading-text');
                     if (loadingText) {
-                        loadingText.innerText = `Подключение к серверу базы данных (${i + 1}/${maxRetries})...`;
+                        loadingText.innerText = `Подключение к базе туров (${i + 1}/${maxRetries})...`;
                     }
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
             }
         }
 
-        // --- 5. РЕНДЕР ТУРОВ И ФИЛЬТРОВ (С защитой от битых данных) ---
+        // --- 5. РЕНДЕР ТУРОВ И ФИЛЬТРОВ ---
         function renderFilters(tours) {
             try {
                 const tabsContainer = document.getElementById('filter-tabs');
                 if (!tabsContainer) return;
-                
+
                 if (!Array.isArray(tours) || tours.length === 0) {
                     tabsContainer.innerHTML = '';
                     return;
                 }
-                
-                // Извлекаем только валидные локации
+
                 const locationsRaw = tours
                     .filter(t => t && typeof t === 'object' && t['Локация'])
                     .map(t => String(t['Локация']).split(',')[0].trim())
                     .filter(Boolean);
-                
+
                 const uniqueLocations = [...new Set(locationsRaw)];
-                
+
                 let html = `<button data-filter="all" class="filter-btn px-4 py-2 bg-brand_dark text-brand_bg text-xs md:text-sm font-semibold rounded-sm whitespace-nowrap transition-colors">Все направления</button>`;
                 uniqueLocations.forEach(loc => {
                     html += `<button data-filter="${loc}" class="filter-btn px-4 py-2 border border-brand_dark/20 text-brand_dark text-xs md:text-sm font-semibold rounded-sm hover:border-brand_dark transition-colors whitespace-nowrap">${loc}</button>`;
                 });
                 tabsContainer.innerHTML = html;
 
-                // Навешиваем события на фильтры
                 document.querySelectorAll('.filter-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         document.querySelectorAll('.filter-btn').forEach(b => {
@@ -762,16 +750,13 @@
             try {
                 grid.innerHTML = list.map((tour) => {
                     if (!tour || typeof tour !== 'object') return '';
-                    
+
                     const realIdx = globalTours.indexOf(tour);
-                    // Защита от undefined и битых картинок
                     const title = tour['Название'] ? String(tour['Название']).replace(/</g, "&lt;") : 'Тур под запрос';
                     const location = tour['Локация'] ? String(tour['Локация']).replace(/</g, "&lt;") : 'Секретное место';
                     const price = tour['Цена'] ? String(tour['Цена']).replace(/</g, "&lt;") : 'По запросу';
                     const details = tour['Детали'] ? String(tour['Детали']).replace(/</g, "&lt;") : '';
-                    
-                    // Бронебойная вставка картинки с onerror
-                    const imgUrl = tour['Фото'] && tour['Фото'].startsWith('http') ? tour['Фото'] : FALLBACK_IMAGE;
+                    const imgUrl = tour['Фото'] && String(tour['Фото']).startsWith('http') ? tour['Фото'] : FALLBACK_IMAGE;
 
                     return `
                         <article onclick="openModal(${realIdx})" class="cursor-pointer group bg-white rounded-sm shadow-sm hover:shadow-xl transition-all duration-300 border border-brand_dark/10 overflow-hidden flex flex-col">
@@ -798,12 +783,12 @@
             }
         }
 
-        // --- 6. ЗАГРУЗКА ДАННЫХ (Независимая) ---
+        // --- 6. ЗАГРУЗКА ДАННЫХ ИЗ GOOGLE APPS SCRIPT ---
         async function loadTours() {
             const grid = document.getElementById('tours-grid');
             if (!grid) return;
             try {
-                const data = await fetchWithRetry(`${API_BASE_URL}/api/tours`);
+                const data = await fetchWithRetry(`${GAS_API_URL}?action=tours&site=1`);
                 globalTours = Array.isArray(data) ? data : [];
                 renderFilters(globalTours);
                 renderTours(globalTours);
@@ -817,17 +802,17 @@
             const container = document.getElementById('reviews-container');
             if (!container) return;
             try {
-                const reviews = await fetchWithRetry(`${API_BASE_URL}/api/reviews`, 2, 2000); // Быстрый ретрай для отзывов
-                
+                const reviews = await fetchWithRetry(`${GAS_API_URL}?action=reviews`, 2, 2000);
+
                 if (!Array.isArray(reviews) || reviews.length === 0) {
-                    container.innerHTML = '<div class="w-full text-center py-12 text-brand_dark/50 text-sm">Отзывы загружаются или скоро появятся...</div>';
+                    container.innerHTML = '<div class="w-full text-center py-12 text-brand_dark/50 text-sm">Отзывы скоро появятся...</div>';
                     return;
                 }
-                
+
                 container.innerHTML = reviews.map(r => {
-                    const text = r.text ? String(r.text).replace(/</g, "&lt;") : '';
-                    const name = r.name ? String(r.name).replace(/</g, "&lt;") : 'Гость';
-                    const loc = r.location ? String(r.location).replace(/</g, "&lt;") : '';
+                    const text = String(r['Текст'] || r['Отзыв'] || r.text || '').replace(/</g, "&lt;");
+                    const name = String(r['Имя'] || r.name || 'Гость').replace(/</g, "&lt;");
+                    const loc = String(r['Локация'] || r['Куда летали'] || r.location || '').replace(/</g, "&lt;");
                     return `
                     <div class="w-80 md:w-96 shrink-0 bg-white border border-brand_dark/10 p-6 md:p-8 rounded-sm snap-center shadow-sm flex flex-col">
                         <div class="flex items-center gap-1 mb-4 text-brand_accent">
@@ -849,24 +834,24 @@
         // --- 7. МОДАЛЬНОЕ ОКНО ---
         const modal = document.getElementById('tour-modal');
         const modalBackdrop = document.getElementById('modal-backdrop');
-        
+
         window.openModal = function(idx) {
             try {
                 const t = globalTours[idx];
                 if (!t || !modal || !modalBackdrop) return;
-                
+
                 const imgEl = document.getElementById('modal-img');
-                imgEl.src = t['Фото'] && t['Фото'].startsWith('http') ? t['Фото'] : FALLBACK_IMAGE;
+                imgEl.src = t['Фото'] && String(t['Фото']).startsWith('http') ? t['Фото'] : FALLBACK_IMAGE;
                 imgEl.onerror = function() { this.onerror=null; this.src=FALLBACK_IMAGE; };
 
                 document.getElementById('modal-title-desktop').innerText = t['Название'] || 'Тур';
                 document.getElementById('modal-title-mobile').innerText = t['Название'] || 'Тур';
                 document.getElementById('modal-location').querySelector('span').innerText = t['Локация'] || '';
                 document.getElementById('modal-location-mobile').innerText = t['Локация'] || '';
-                
+
                 const detailsBadge = document.getElementById('modal-details-badge');
                 const descEl = document.getElementById('modal-desc');
-                
+
                 if (t['Описание'] && t['Детали']) {
                     detailsBadge.innerText = t['Детали'];
                     detailsBadge.classList.remove('hidden');
@@ -875,14 +860,14 @@
                     detailsBadge.classList.add('hidden');
                     descEl.innerHTML = String(t['Описание'] || t['Детали'] || 'Подробную программу тура уточняйте у менеджера').replace(/\n/g, '<br>');
                 }
-                
+
                 document.getElementById('modal-price').innerText = t['Цена'] || 'По запросу';
                 document.getElementById('modal-tour-name').value = t['Название'] || 'Без названия';
-                
+
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
                 document.body.style.overflow = 'hidden';
-                
+
                 requestAnimationFrame(() => {
                     modalBackdrop.classList.remove('opacity-0');
                     modal.classList.remove('modal-closed');
@@ -892,13 +877,13 @@
                 console.error("Ошибка открытия модального окна:", e);
             }
         };
-        
+
         window.closeModal = function() {
             if (!modal || !modalBackdrop) return;
             modalBackdrop.classList.add('opacity-0');
             modal.classList.remove('modal-open');
             modal.classList.add('modal-closed');
-            
+
             setTimeout(() => {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
@@ -906,12 +891,11 @@
             }, 400);
         };
 
-        // Закрытие по Escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) window.closeModal();
         });
 
-        // Отправка формы из модалки
+        // Отправка заявки из модалки в GAS
         const modalForm = document.getElementById('modal-form');
         if (modalForm) {
             modalForm.addEventListener('submit', async (e) => {
@@ -924,34 +908,34 @@
                 btn.disabled = true;
 
                 try {
-                    const response = await fetch(`${API_BASE_URL}/api/lead`, {
-                        method: 'POST', 
-                        headers: {'Content-Type': 'application/json'},
+                    const response = await fetch(GAS_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify({
-                            destination: 'Запрос из каталога: ' + document.getElementById('modal-tour-name').value,
-                            dates: '-', 
-                            budget: document.getElementById('modal-price').innerText,
+                            action: 'lead',
+                            name: 'Запрос по туру: ' + document.getElementById('modal-tour-name').value,
                             contact: document.getElementById('modal-contact').value,
-                            utm: `${utmData.source} | ${utmData.medium} | ${utmData.campaign}`
+                            comment: `Цена: ${document.getElementById('modal-price').innerText}\nUTM: ${utmData.source} | ${utmData.medium} | ${utmData.campaign}`
                         })
                     });
-                    
-                    if (!response.ok) throw new Error("Server rejected lead");
-                    
-                    btn.innerText = 'Успешно отправлено!'; 
+
+                    const resData = await response.json();
+                    if (!resData.ok) throw new Error("Server rejected lead");
+
+                    btn.innerText = 'Успешно отправлено!';
                     btn.classList.replace('bg-brand_dark', 'bg-green-600');
                     setTimeout(window.closeModal, 1500);
-                } catch(err) { 
+                } catch(err) {
                     console.error("Submit Error:", err);
-                    btn.innerText = 'Ошибка. Попробуйте позже'; 
+                    btn.innerText = 'Ошибка. Попробуйте позже';
                     btn.classList.replace('bg-brand_dark', 'bg-red-600');
                 } finally {
-                    setTimeout(() => { 
-                        btn.innerText = origText; 
+                    setTimeout(() => {
+                        btn.innerText = origText;
                         btn.classList.remove('bg-green-600', 'bg-red-600');
                         btn.classList.add('bg-brand_dark');
                         btn.disabled = false;
-                        e.target.reset(); 
+                        e.target.reset();
                     }, 3000);
                 }
             });
@@ -982,18 +966,17 @@
                 const origText = btn.innerText;
                 btn.innerText = 'Отправка заявки...';
                 btn.disabled = true;
-                
+
                 try {
                     const formatInput = document.querySelector('input[name="quiz-format"]:checked');
                     const destRadio = document.querySelector('input[name="quiz-dest"]:checked');
                     const customDest = document.getElementById('custom-dest');
-                    
+
                     const format = formatInput ? formatInput.value : 'Не указан';
-                    let destination = destRadio ? destRadio.value : '';
-                    if (destination === 'Другое' || !destination) {
-                        destination = customDest && customDest.value ? customDest.value : 'Не указано';
-                    }
-                    
+                    let destination = (customDest && customDest.value.trim())
+                        ? customDest.value.trim()
+                        : (destRadio ? destRadio.value : 'Не указано');
+
                     const adults = document.getElementById('quiz-adults') ? document.getElementById('quiz-adults').value : '';
                     const children = document.getElementById('quiz-children') ? document.getElementById('quiz-children').value : '';
                     let kidsAgeText = "";
@@ -1002,52 +985,52 @@
                         kidsAgeText = `(Возраст: ${agesInput && agesInput.value ? agesInput.value : 'не указан'})`;
                     }
                     const comp = `${adults}, ${children} ${kidsAgeText}`.trim();
-                    
+
                     const datesInput = document.getElementById('quiz-dates');
                     const nightsInput = document.getElementById('quiz-nights');
                     const dates = `${datesInput && datesInput.value ? datesInput.value : '-'} на ${nightsInput && nightsInput.value ? nightsInput.value : '-'}`;
-                    
+
                     const hotelInput = document.querySelector('input[name="quiz-hotel"]:checked');
                     const foodInput = document.getElementById('quiz-food');
                     const budgetInput = document.getElementById('quiz-budget');
                     const notesInput = document.getElementById('quiz-notes');
-                    
+
                     const hotel = hotelInput ? hotelInput.value : 'Любой';
                     const food = foodInput ? foodInput.value : 'Любое';
                     const budget = budgetInput && budgetInput.value ? budgetInput.value : 'Не указан';
                     const notes = notesInput && notesInput.value ? notesInput.value : 'Нет';
-                    
+
                     const name = document.getElementById('quiz-name') ? document.getElementById('quiz-name').value : 'Без имени';
                     const contact = document.getElementById('quiz-contact') ? document.getElementById('quiz-contact').value : 'Без контакта';
 
-                    const fullDescription = `[КВИЗ] ${name}\nФормат: ${format}\nСтрана: ${destination}\nСостав: ${comp}\nДаты: ${dates}\nОтель: ${hotel} (${food})\nПожелания: ${notes}`;
+                    const comment = `[КВИЗ]\nФормат: ${format}\nСтрана: ${destination}\nСостав: ${comp}\nДаты: ${dates}\nОтель: ${hotel} (${food})\nБюджет: ${budget}\nПожелания: ${notes}\nUTM: ${utmData.source} | ${utmData.medium} | ${utmData.campaign}`;
 
-                    const response = await fetch(`${API_BASE_URL}/api/lead`, {
-                        method: 'POST', 
-                        headers: {'Content-Type': 'application/json'},
+                    const response = await fetch(GAS_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify({
-                            destination: fullDescription,
-                            dates: "Смотри выше",
-                            budget: budget,
+                            action: 'lead',
+                            name: name,
                             contact: contact,
-                            utm: `${utmData.source} | ${utmData.medium} | ${utmData.campaign}`
+                            comment: comment
                         })
                     });
-                    
-                    if (!response.ok) throw new Error("Server rejected quiz lead");
-                    
+
+                    const resData = await response.json();
+                    if (!resData.ok) throw new Error("Server rejected quiz lead");
+
                     document.querySelectorAll('.quiz-step').forEach(el => el.classList.remove('active'));
                     const successStep = document.getElementById('step-success');
                     if (successStep) successStep.classList.add('active');
                     const progressEl = document.getElementById('quiz-progress');
                     if (progressEl) progressEl.style.width = '100%';
-                    
+
                 } catch(err) {
                     console.error("Quiz Submit Error:", err);
                     btn.innerText = 'Ошибка сети. Попробуйте еще раз';
                     btn.classList.add('bg-red-600');
-                    setTimeout(() => { 
-                        btn.innerText = origText; 
+                    setTimeout(() => {
+                        btn.innerText = origText;
                         btn.classList.remove('bg-red-600');
                         btn.disabled = false;
                     }, 3000);
@@ -1055,15 +1038,12 @@
             });
         }
 
-        // --- 9. ИНИЦИАЛИЗАЦИЯ (Изолированный запуск) ---
+        // --- 9. ИНИЦИАЛИЗАЦИЯ ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Запускаем независимые процессы: если один падает, другой продолжает работу
             Promise.allSettled([
                 loadTours(),
                 loadReviews()
-            ]).then(() => {
-                console.log("Инициализация компонентов завершена.");
-            });
+            ]);
         });
     </script>
 </body>
