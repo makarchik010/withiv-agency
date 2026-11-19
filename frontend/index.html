@@ -72,8 +72,9 @@
     <!-- Header -->
     <header class="fixed top-0 w-full z-[1000] glass-header border-b border-brand_dark/10">
         <div class="max-w-7xl mx-auto px-4 md:px-8 h-16 md:h-20 flex items-center justify-between">
-            <a href="#" class="flex items-center shrink-0">
-                <img src="logo.jpg" alt="Withiv Турагентство" class="h-11 md:h-14 w-auto object-contain logo-light-bg">
+            <!-- Обрезаем мелкий нижний слоган на мобилке, чтобы логотип выглядел крупно и чисто -->
+            <a href="#" class="flex items-center shrink-0 h-11 md:h-14 overflow-hidden">
+                <img src="logo.jpg" alt="Withiv Турагентство" class="h-[54px] md:h-[68px] w-auto object-cover object-top logo-light-bg">
             </a>
 
             <nav class="hidden lg:flex items-center space-x-2 text-sm font-medium text-brand_dark/85">
@@ -93,16 +94,21 @@
                 </a>
             </div>
 
-            <button id="mobile-menu-btn" type="button" class="md:hidden p-2 text-brand_dark">
-                <svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
+            <div class="flex items-center gap-2 md:hidden">
+                <a href="#quiz-section" class="bg-brand_accent text-white px-3.5 py-2 rounded-full text-xs font-bold shadow-sm">
+                    Заявка
+                </a>
+                <button id="mobile-menu-btn" type="button" aria-label="Меню" class="p-2 text-brand_dark">
+                    <svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
         </div>
     </header>
 
     <!-- Mobile Menu -->
     <div id="mobile-menu" style="background-color: #F7F4EF; z-index: 999;" class="fixed inset-0 pt-24 px-6 pb-8 hidden flex-col md:hidden overflow-y-auto">
-        <nav class="flex flex-col space-y-6 text-center text-lg font-semibold">
+        <nav class="flex flex-col space-y-5 text-center text-lg font-semibold">
             <a href="#tourvisor-search" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Поиск туров</a>
             <a href="#tours" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Авторские туры</a>
             <a href="#quiz-section" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Индивидуальный подбор</a>
@@ -118,49 +124,49 @@
         </nav>
     </div>
 
-    <!-- Hero Section (в стиле референса ZIMA&LETO + строка поиска Tourvisor) -->
-    <section id="tourvisor-search" class="relative min-h-[92vh] md:min-h-[88vh] flex flex-col justify-end pt-28 pb-10 md:pb-14">
+    <!-- Hero Section (адаптировано под iPhone и десктоп) -->
+    <section id="tourvisor-search" class="relative min-h-[100svh] md:min-h-[88vh] flex flex-col justify-end pt-24 pb-8 md:pb-14">
         <div class="absolute inset-0 z-0 bg-[#0d3b46]">
-            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2000&auto=format&fit=crop" alt="Withiv Travel" class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/20"></div>
+            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2000&auto=format&fit=crop" alt="Withiv Travel" class="w-full h-full object-cover object-center">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/15"></div>
         </div>
 
         <div class="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 text-white mt-auto">
-            <div class="max-w-3xl mb-8 md:mb-10">
-                <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-[1.08] tracking-tight mb-4 drop-shadow-md">
+            <div class="max-w-3xl mb-5 md:mb-10">
+                <h1 class="text-[28px] sm:text-5xl md:text-6xl font-extrabold leading-[1.12] tracking-tight mb-2.5 md:mb-4 drop-shadow-md">
                     Онлайн поиск туров<br>
                     по 80 туроператорам
                 </h1>
-                <p class="text-base md:text-xl text-white/95 font-medium drop-shadow">
+                <p class="text-sm sm:text-base md:text-xl text-white/95 font-medium leading-snug drop-shadow">
                     Выбирайте и бронируйте туры онлайн без забот — с полным сопровождением Withiv
                 </p>
             </div>
 
             <!-- КОНТЕЙНЕР ДЛЯ ВИДЖЕТА TOURVISOR -->
-            <div id="tourvisor-widget-container" class="w-full bg-white text-brand_dark rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.25)] p-3 md:p-4">
-                <!-- Когда Анастасия пришлет код Tourvisor — замени этот div на скрипт виджета -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2 md:gap-3 items-center">
-                    <a href="#quiz-section" class="p-3 rounded-lg hover:bg-brand_bg transition-colors border border-transparent hover:border-brand_dark/10">
-                        <span class="block text-[10px] font-bold uppercase tracking-wider text-brand_dark/50 mb-0.5">Город вылета</span>
-                        <span class="block text-sm font-bold text-brand_dark">Москва / Казань</span>
+            <div id="tourvisor-widget-container" class="w-full bg-white text-brand_dark rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.28)] p-2.5 md:p-4">
+                <!-- Компактная сетка 2x2 на телефоне и 6 колонок на ПК -->
+                <div class="grid grid-cols-2 lg:grid-cols-6 gap-1.5 md:gap-3 items-center">
+                    <a href="#quiz-section" class="p-2.5 md:p-3 rounded-lg bg-brand_bg/60 lg:bg-transparent hover:bg-brand_bg transition-colors border border-brand_dark/5 lg:border-transparent">
+                        <span class="block text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-brand_dark/50 mb-0.5">Город вылета</span>
+                        <span class="block text-xs md:text-sm font-bold text-brand_dark truncate">Москва / Казань</span>
                     </a>
-                    <a href="#quiz-section" class="p-3 rounded-lg hover:bg-brand_bg transition-colors border border-transparent hover:border-brand_dark/10">
-                        <span class="block text-[10px] font-bold uppercase tracking-wider text-brand_dark/50 mb-0.5">Страна</span>
-                        <span class="block text-sm font-bold text-brand_dark">Турция, ОАЭ, Египет...</span>
+                    <a href="#quiz-section" class="p-2.5 md:p-3 rounded-lg bg-brand_bg/60 lg:bg-transparent hover:bg-brand_bg transition-colors border border-brand_dark/5 lg:border-transparent">
+                        <span class="block text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-brand_dark/50 mb-0.5">Страна</span>
+                        <span class="block text-xs md:text-sm font-bold text-brand_dark truncate">Турция, ОАЭ, Египет</span>
                     </a>
-                    <a href="#quiz-section" class="p-3 rounded-lg hover:bg-brand_bg transition-colors border border-transparent hover:border-brand_dark/10">
-                        <span class="block text-[10px] font-bold uppercase tracking-wider text-brand_dark/50 mb-0.5">Даты вылета</span>
-                        <span class="block text-sm font-bold text-brand_dark">Любые даты</span>
+                    <a href="#quiz-section" class="p-2.5 md:p-3 rounded-lg bg-brand_bg/60 lg:bg-transparent hover:bg-brand_bg transition-colors border border-brand_dark/5 lg:border-transparent">
+                        <span class="block text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-brand_dark/50 mb-0.5">Даты вылета</span>
+                        <span class="block text-xs md:text-sm font-bold text-brand_dark truncate">Любые даты</span>
                     </a>
-                    <a href="#quiz-section" class="p-3 rounded-lg hover:bg-brand_bg transition-colors border border-transparent hover:border-brand_dark/10">
-                        <span class="block text-[10px] font-bold uppercase tracking-wider text-brand_dark/50 mb-0.5">Ночей</span>
-                        <span class="block text-sm font-bold text-brand_dark">6 – 14 ночей</span>
+                    <a href="#quiz-section" class="p-2.5 md:p-3 rounded-lg bg-brand_bg/60 lg:bg-transparent hover:bg-brand_bg transition-colors border border-brand_dark/5 lg:border-transparent">
+                        <span class="block text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-brand_dark/50 mb-0.5">Ночей и туристы</span>
+                        <span class="block text-xs md:text-sm font-bold text-brand_dark truncate">6–14 н. • 2 взр.</span>
                     </a>
-                    <a href="#quiz-section" class="p-3 rounded-lg hover:bg-brand_bg transition-colors border border-transparent hover:border-brand_dark/10">
+                    <a href="#quiz-section" class="hidden lg:block p-3 rounded-lg hover:bg-brand_bg transition-colors">
                         <span class="block text-[10px] font-bold uppercase tracking-wider text-brand_dark/50 mb-0.5">Туристы</span>
                         <span class="block text-sm font-bold text-brand_dark">2 взрослых</span>
                     </a>
-                    <a href="#quiz-section" class="w-full py-4 px-6 bg-brand_accent hover:bg-brand_dark text-white font-bold text-sm rounded-lg text-center transition-colors shadow-md">
+                    <a href="#quiz-section" class="col-span-2 lg:col-span-1 w-full py-3.5 md:py-4 px-6 bg-brand_accent hover:bg-brand_dark text-white font-bold text-sm rounded-lg text-center transition-colors shadow-md">
                         Найти туры
                     </a>
                 </div>
@@ -170,11 +176,11 @@
     </section>
 
     <!-- Author Tours Collection -->
-    <section id="tours" class="py-16 md:py-24 max-w-7xl mx-auto px-4 md:px-8">
+    <section id="tours" class="py-14 md:py-24 max-w-7xl mx-auto px-4 md:px-8">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-5">
             <div>
                 <span class="text-brand_accent text-xs uppercase tracking-[0.2em] font-bold block mb-2">Эксклюзивные маршруты</span>
-                <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Авторские туры Withiv</h2>
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">Авторские туры Withiv</h2>
             </div>
 
             <div id="filter-tabs" class="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto hide-scrollbar"></div>
@@ -189,13 +195,13 @@
     </section>
 
     <!-- Reviews Section -->
-    <section id="reviews" class="py-16 md:py-24 bg-white border-t border-brand_dark/5 overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 md:px-8 mb-10">
+    <section id="reviews" class="py-14 md:py-24 bg-white border-t border-brand_dark/5 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 mb-8 md:mb-10">
             <span class="text-brand_accent text-xs uppercase tracking-[0.2em] font-bold block mb-2">Доверие</span>
-            <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Отзывы наших туристов</h2>
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">Отзывы наших туристов</h2>
         </div>
 
-        <div id="reviews-container" class="flex overflow-x-auto gap-6 px-4 md:px-8 max-w-7xl mx-auto pb-8 snap-x snap-mandatory reviews-scroll">
+        <div id="reviews-container" class="flex overflow-x-auto gap-4 md:gap-6 px-4 md:px-8 max-w-7xl mx-auto pb-6 snap-x snap-mandatory reviews-scroll">
             <div class="w-full text-center py-10 text-brand_dark/50 text-sm">Проверяем отзывы...</div>
         </div>
     </section>
@@ -210,7 +216,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
 
-            <div class="w-full md:w-1/2 h-56 sm:h-64 md:h-auto bg-brand_dark shrink-0 relative overflow-hidden">
+            <div class="w-full md:w-1/2 h-52 sm:h-64 md:h-auto bg-brand_dark shrink-0 relative overflow-hidden">
                 <img id="modal-img" src="" alt="Тур" class="w-full h-full object-cover">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent md:hidden"></div>
                 <div class="absolute bottom-4 left-5 right-5 md:hidden">
@@ -219,7 +225,7 @@
                 </div>
             </div>
 
-            <div class="w-full md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto bg-brand_bg">
+            <div class="w-full md:w-1/2 p-5 md:p-8 flex flex-col overflow-y-auto bg-brand_bg">
                 <div class="hidden md:block mb-5 pr-8">
                     <p id="modal-location" class="text-xs font-bold uppercase tracking-widest text-brand_accent mb-2 flex items-center gap-1.5">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
@@ -234,16 +240,16 @@
                     Описание...
                 </div>
 
-                <div class="border-t border-brand_dark/10 pt-5 mt-auto">
-                    <div class="flex items-baseline justify-between mb-4">
+                <div class="border-t border-brand_dark/10 pt-4 mt-auto">
+                    <div class="flex items-baseline justify-between mb-3">
                         <span class="text-[11px] uppercase tracking-wider font-bold text-brand_dark/50">Стоимость</span>
                         <span id="modal-price" class="text-xl md:text-2xl font-bold text-brand_dark">Цена</span>
                     </div>
 
-                    <form id="modal-form" class="flex flex-col gap-3">
+                    <form id="modal-form" class="flex flex-col gap-2.5">
                         <input type="hidden" id="modal-tour-name">
-                        <input type="text" id="modal-contact" placeholder="Телефон или @telegram" required class="w-full bg-white border border-brand_dark/20 rounded-sm px-4 py-3.5 outline-none focus:border-brand_dark text-sm transition-colors">
-                        <button type="submit" class="w-full bg-brand_dark text-brand_bg font-bold py-4 rounded-sm hover:bg-brand_accent transition-colors shadow-md text-sm">
+                        <input type="text" id="modal-contact" placeholder="Телефон или @telegram" required class="w-full bg-white border border-brand_dark/20 rounded-sm px-4 py-3 outline-none focus:border-brand_dark text-sm transition-colors">
+                        <button type="submit" class="w-full bg-brand_dark text-brand_bg font-bold py-3.5 rounded-sm hover:bg-brand_accent transition-colors shadow-md text-sm">
                             Хочу сюда
                         </button>
                     </form>
@@ -253,15 +259,15 @@
     </div>
 
     <!-- Продвинутый Интерактивный Квиз -->
-    <section id="quiz-section" class="py-16 md:py-24 bg-brand_dark text-brand_bg">
+    <section id="quiz-section" class="py-14 md:py-24 bg-brand_dark text-brand_bg">
         <div class="max-w-4xl mx-auto px-4">
             <div class="text-center mb-8 md:mb-12">
                 <span class="text-brand_accent text-xs uppercase tracking-[0.2em] font-bold block mb-2">Глубокий подбор</span>
-                <h2 class="text-3xl md:text-4xl font-bold mb-3 tracking-tight">Конструктор путешествия</h2>
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 tracking-tight">Конструктор путешествия</h2>
                 <p class="text-brand_bg/75 text-sm md:text-base max-w-xl mx-auto">Расскажите подробно о своих предпочтениях, чтобы менеджер подготовил максимально точные варианты</p>
             </div>
 
-            <div class="bg-white text-brand_dark rounded-md p-6 md:p-10 shadow-2xl relative min-h-[450px] flex flex-col">
+            <div class="bg-white text-brand_dark rounded-md p-5 sm:p-6 md:p-10 shadow-2xl relative min-h-[420px] flex flex-col">
                 <div class="absolute top-0 left-0 w-full h-1.5 bg-gray-100 rounded-t-md overflow-hidden">
                     <div id="quiz-progress" class="h-full bg-brand_accent transition-all duration-300 w-[16%]"></div>
                 </div>
@@ -272,12 +278,12 @@
                     <div class="quiz-step active flex-1" id="step-1">
                         <div class="mb-auto">
                             <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Шаг 1 из 6</span>
-                            <h3 class="text-2xl font-bold mb-6">Какой формат отдыха вам ближе?</h3>
+                            <h3 class="text-xl sm:text-2xl font-bold mb-5">Какой формат отдыха вам ближе?</h3>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                                 <label class="cursor-pointer relative">
                                     <input type="radio" name="quiz-format" value="Пляж и релакс" class="quiz-radio sr-only" checked>
-                                    <div class="border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark transition-colors flex items-start gap-3">
+                                    <div class="border border-brand_dark/20 rounded-sm p-3.5 sm:p-4 hover:border-brand_dark transition-colors flex items-start gap-3">
                                         <div class="w-5 h-5 rounded-full border-2 border-brand_dark/30 mt-0.5 flex items-center justify-center shrink-0 radio-inner">
                                             <div class="w-2.5 h-2.5 rounded-full bg-transparent"></div>
                                         </div>
@@ -289,7 +295,7 @@
                                 </label>
                                 <label class="cursor-pointer relative">
                                     <input type="radio" name="quiz-format" value="Активный / Экскурсии" class="quiz-radio sr-only">
-                                    <div class="border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark transition-colors flex items-start gap-3">
+                                    <div class="border border-brand_dark/20 rounded-sm p-3.5 sm:p-4 hover:border-brand_dark transition-colors flex items-start gap-3">
                                         <div class="w-5 h-5 rounded-full border-2 border-brand_dark/30 mt-0.5 flex items-center justify-center shrink-0 radio-inner">
                                             <div class="w-2.5 h-2.5 rounded-full bg-transparent"></div>
                                         </div>
@@ -301,7 +307,7 @@
                                 </label>
                                 <label class="cursor-pointer relative">
                                     <input type="radio" name="quiz-format" value="Баланс (Пляж + Город)" class="quiz-radio sr-only">
-                                    <div class="border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark transition-colors flex items-start gap-3">
+                                    <div class="border border-brand_dark/20 rounded-sm p-3.5 sm:p-4 hover:border-brand_dark transition-colors flex items-start gap-3">
                                         <div class="w-5 h-5 rounded-full border-2 border-brand_dark/30 mt-0.5 flex items-center justify-center shrink-0 radio-inner">
                                             <div class="w-2.5 h-2.5 rounded-full bg-transparent"></div>
                                         </div>
@@ -313,7 +319,7 @@
                                 </label>
                                 <label class="cursor-pointer relative">
                                     <input type="radio" name="quiz-format" value="Романтика / Уединение" class="quiz-radio sr-only">
-                                    <div class="border border-brand_dark/20 rounded-sm p-4 hover:border-brand_dark transition-colors flex items-start gap-3">
+                                    <div class="border border-brand_dark/20 rounded-sm p-3.5 sm:p-4 hover:border-brand_dark transition-colors flex items-start gap-3">
                                         <div class="w-5 h-5 rounded-full border-2 border-brand_dark/30 mt-0.5 flex items-center justify-center shrink-0 radio-inner">
                                             <div class="w-2.5 h-2.5 rounded-full bg-transparent"></div>
                                         </div>
@@ -325,7 +331,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="mt-8 flex justify-end">
+                        <div class="mt-6 flex justify-end">
                             <button type="button" onclick="nextStep(2)" class="bg-brand_dark text-white w-full sm:w-auto px-8 py-3.5 font-bold rounded-sm hover:bg-brand_accent transition-colors text-sm">Следующий шаг</button>
                         </div>
                     </div>
@@ -334,9 +340,9 @@
                     <div class="quiz-step flex-1" id="step-2">
                         <div class="mb-auto">
                             <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Шаг 2 из 6</span>
-                            <h3 class="text-2xl font-bold mb-6">Куда бы вы хотели отправиться?</h3>
+                            <h3 class="text-xl sm:text-2xl font-bold mb-5">Куда бы вы хотели отправиться?</h3>
 
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3 mb-4">
                                 <label class="cursor-pointer relative">
                                     <input type="radio" name="quiz-dest" value="Турция" class="quiz-radio sr-only">
                                     <div class="border border-brand_dark/20 rounded-sm p-3 text-center hover:border-brand_dark transition-colors">
@@ -376,7 +382,7 @@
                             </div>
                             <input type="text" id="custom-dest" placeholder="Или напишите свой вариант (страна, город, отель)..." class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark text-sm bg-white">
                         </div>
-                        <div class="mt-8 flex gap-3">
+                        <div class="mt-6 flex gap-3">
                             <button type="button" onclick="nextStep(1)" class="w-1/3 sm:w-auto bg-gray-100 text-brand_dark hover:bg-gray-200 font-bold px-5 py-3.5 rounded-sm transition-colors text-sm">Назад</button>
                             <button type="button" onclick="nextStep(3)" class="flex-1 sm:flex-none bg-brand_dark text-white px-8 py-3.5 font-bold rounded-sm hover:bg-brand_accent transition-colors text-sm">Далее</button>
                         </div>
@@ -386,9 +392,9 @@
                     <div class="quiz-step flex-1" id="step-3">
                         <div class="mb-auto">
                             <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Шаг 3 из 6</span>
-                            <h3 class="text-2xl font-bold mb-6">Даты поездки и состав отдыхающих</h3>
+                            <h3 class="text-xl sm:text-2xl font-bold mb-5">Даты поездки и состав отдыхающих</h3>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-3.5">
                                 <div>
                                     <label class="block text-xs font-bold text-brand_dark/60 mb-1.5">Взрослых</label>
                                     <select id="quiz-adults" class="w-full border border-brand_dark/20 px-4 py-3 rounded-sm outline-none focus:border-brand_dark bg-white text-sm">
@@ -410,12 +416,12 @@
                                 </div>
                             </div>
 
-                            <div id="children-ages-div" class="hidden mb-4">
+                            <div id="children-ages-div" class="hidden mb-3.5">
                                 <label class="block text-xs font-bold text-brand_dark/60 mb-1.5">Возраст детей (важно для расчета авиабилетов)</label>
                                 <input type="text" id="quiz-children-ages" placeholder="Например: 4 года и 10 лет" class="w-full border border-brand_dark/20 px-4 py-3 rounded-sm outline-none focus:border-brand_dark text-sm bg-white">
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                                 <div>
                                     <label class="block text-xs font-bold text-brand_dark/60 mb-1.5">Примерные даты вылета</label>
                                     <input type="text" id="quiz-dates" placeholder="Напр: с 15 по 20 августа" class="w-full border border-brand_dark/20 px-4 py-3 rounded-sm outline-none focus:border-brand_dark text-sm bg-white">
@@ -426,7 +432,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-8 flex gap-3">
+                        <div class="mt-6 flex gap-3">
                             <button type="button" onclick="nextStep(2)" class="w-1/3 sm:w-auto bg-gray-100 text-brand_dark hover:bg-gray-200 font-bold px-5 py-3.5 rounded-sm transition-colors text-sm">Назад</button>
                             <button type="button" onclick="nextStep(4)" class="flex-1 sm:flex-none bg-brand_dark text-white px-8 py-3.5 font-bold rounded-sm hover:bg-brand_accent transition-colors text-sm">Далее</button>
                         </div>
@@ -436,10 +442,10 @@
                     <div class="quiz-step flex-1" id="step-4">
                         <div class="mb-auto">
                             <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Шаг 4 из 6</span>
-                            <h3 class="text-2xl font-bold mb-6">Уровень отеля и питание</h3>
+                            <h3 class="text-xl sm:text-2xl font-bold mb-5">Уровень отеля и питание</h3>
 
                             <label class="block text-xs font-bold text-brand_dark/60 mb-2">Категория отеля</label>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 mb-5">
                                 <label class="cursor-pointer relative">
                                     <input type="radio" name="quiz-hotel" value="Любые варианты" class="quiz-radio sr-only" checked>
                                     <div class="border border-brand_dark/20 rounded-sm p-3 text-center hover:border-brand_dark transition-colors">
@@ -475,7 +481,7 @@
                                 <option value="Зависит от страны" selected>Зависит от страны (посоветуйте)</option>
                             </select>
                         </div>
-                        <div class="mt-8 flex gap-3">
+                        <div class="mt-6 flex gap-3">
                             <button type="button" onclick="nextStep(3)" class="w-1/3 sm:w-auto bg-gray-100 text-brand_dark hover:bg-gray-200 font-bold px-5 py-3.5 rounded-sm transition-colors text-sm">Назад</button>
                             <button type="button" onclick="nextStep(5)" class="flex-1 sm:flex-none bg-brand_dark text-white px-8 py-3.5 font-bold rounded-sm hover:bg-brand_accent transition-colors text-sm">Далее</button>
                         </div>
@@ -485,15 +491,15 @@
                     <div class="quiz-step flex-1" id="step-5">
                         <div class="mb-auto">
                             <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Шаг 5 из 6</span>
-                            <h3 class="text-2xl font-bold mb-6">Бюджет и особые пожелания</h3>
+                            <h3 class="text-xl sm:text-2xl font-bold mb-5">Бюджет и особые пожелания</h3>
 
                             <label class="block text-xs font-bold text-brand_dark/60 mb-2">Ориентировочный бюджет (на всех)</label>
-                            <input type="text" id="quiz-budget" placeholder="Например: до 400 000 руб." class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark text-sm bg-white mb-5">
+                            <input type="text" id="quiz-budget" placeholder="Например: до 400 000 руб." class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark text-sm bg-white mb-4">
 
                             <label class="block text-xs font-bold text-brand_dark/60 mb-2">Важные детали (по желанию)</label>
                             <textarea id="quiz-notes" rows="3" placeholder="Первая линия, пологий вход в море, тихое место, нужен дайвинг..." class="w-full border border-brand_dark/20 px-4 py-3 rounded-sm outline-none focus:border-brand_dark text-sm bg-white resize-none"></textarea>
                         </div>
-                        <div class="mt-8 flex gap-3">
+                        <div class="mt-6 flex gap-3">
                             <button type="button" onclick="nextStep(4)" class="w-1/3 sm:w-auto bg-gray-100 text-brand_dark hover:bg-gray-200 font-bold px-5 py-3.5 rounded-sm transition-colors text-sm">Назад</button>
                             <button type="button" onclick="nextStep(6)" class="flex-1 sm:flex-none bg-brand_dark text-white px-8 py-3.5 font-bold rounded-sm hover:bg-brand_accent transition-colors text-sm">Финальный шаг</button>
                         </div>
@@ -503,12 +509,12 @@
                     <div class="quiz-step flex-1" id="step-6">
                         <div class="mb-auto">
                             <span class="text-xs font-bold uppercase tracking-wider text-brand_dark/50 mb-2 block">Финал</span>
-                            <h3 class="text-2xl font-bold mb-2">Куда отправить подборку туров?</h3>
-                            <p class="text-sm text-brand_dark/70 mb-6">Менеджер изучит заявку и пришлет 3-5 проверенных вариантов с расчетом цены.</p>
+                            <h3 class="text-xl sm:text-2xl font-bold mb-2">Куда отправить подборку туров?</h3>
+                            <p class="text-sm text-brand_dark/70 mb-5">Менеджер изучит заявку и пришлет 3-5 проверенных вариантов с расчетом цены.</p>
 
                             <div>
                                 <label class="block text-xs font-bold text-brand_dark/60 mb-1.5">Как к вам обращаться?</label>
-                                <input type="text" id="quiz-name" placeholder="Ваше имя" required class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark text-base bg-white mb-4">
+                                <input type="text" id="quiz-name" placeholder="Ваше имя" required class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark text-base bg-white mb-3.5">
                             </div>
 
                             <div>
@@ -516,7 +522,7 @@
                                 <input type="text" id="quiz-contact" placeholder="+7 (999) 000-00-00 или @username" required class="w-full border border-brand_dark/25 px-4 py-3.5 rounded-sm outline-none focus:border-brand_dark text-base bg-white">
                             </div>
                         </div>
-                        <div class="mt-8 flex flex-col sm:flex-row gap-3 items-center">
+                        <div class="mt-6 flex flex-col sm:flex-row gap-3 items-center">
                             <button type="button" onclick="nextStep(5)" class="w-full sm:w-auto bg-gray-100 text-brand_dark hover:bg-gray-200 font-bold px-6 py-4 rounded-sm transition-colors order-2 sm:order-1 text-sm">Назад</button>
                             <button type="submit" id="quiz-submit-btn" class="w-full sm:flex-1 bg-brand_accent text-white px-8 py-4 font-bold rounded-sm hover:bg-brand_dark transition-colors shadow-lg order-1 sm:order-2 text-sm">Получить расчет стоимости</button>
                         </div>
@@ -534,31 +540,31 @@
     </section>
 
     <!-- Agency Profile -->
-    <section id="about" class="py-16 md:py-24 bg-brand_bg border-t border-brand_dark/10">
+    <section id="about" class="py-14 md:py-24 bg-brand_bg border-t border-brand_dark/10">
         <div class="max-w-6xl mx-auto px-4 md:px-8">
             <div class="flex flex-col md:flex-row items-center gap-10 md:gap-16">
                 <div class="w-full md:w-3/5 text-center md:text-left">
                     <span class="text-brand_accent uppercase tracking-[0.15em] text-xs font-bold block mb-2">Философия отдыха</span>
-                    <h2 class="text-3xl md:text-4xl font-bold mb-6 tracking-tight">Об агентстве Withiv</h2>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-5 tracking-tight">Об агентстве Withiv</h2>
 
                     <div class="space-y-4 text-sm md:text-base text-brand_dark/80 leading-relaxed text-left">
                         <p>Withiv — современное, динамично развивающееся туристическое агентство. Мы создаем путешествия, в которых продумана каждая деталь: от выбора пляжа и концепции отеля до удобных стыковок и индивидуальных трансферов.</p>
                         <p>Мы не предлагаем шаблонные варианты «для галочки». Наша команда лично проверяет отельную базу, следит за актуальными правилами въезда и остается на связи 24/7 с момента бронирования до вашего возвращения домой.</p>
                     </div>
 
-                    <div class="mt-8 flex flex-col sm:flex-row justify-center md:justify-start gap-4">
+                    <div class="mt-8 flex flex-col sm:flex-row justify-center md:justify-start gap-3">
                         <a href="https://t.me/withivtravel13" target="_blank" class="bg-brand_dark text-white px-7 py-3.5 rounded-sm font-bold hover:bg-brand_accent transition-colors text-sm text-center">Наш Telegram-канал</a>
                         <a href="https://wa.me/79127415413" target="_blank" class="border border-[#25D366] text-[#25D366] bg-white px-7 py-3.5 rounded-sm font-bold hover:bg-[#25D366] hover:text-white transition-colors text-sm text-center flex justify-center items-center gap-2">WhatsApp</a>
                     </div>
                 </div>
 
-                <div class="w-full md:w-2/5 flex flex-row justify-center md:justify-end gap-4">
-                    <div class="text-center p-4 border border-brand_dark/10 rounded-sm bg-white w-40 shrink-0 shadow-sm">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/nast_ivn&color=1B3B2B" alt="QR Менеджер" class="w-28 h-28 mb-3 mx-auto" loading="lazy">
+                <div class="w-full md:w-2/5 flex flex-row justify-center md:justify-end gap-3 sm:gap-4">
+                    <div class="text-center p-3.5 sm:p-4 border border-brand_dark/10 rounded-sm bg-white w-36 sm:w-40 shrink-0 shadow-sm">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/nast_ivn&color=1B3B2B" alt="QR Менеджер" class="w-24 h-24 sm:w-28 sm:h-28 mb-2.5 mx-auto" loading="lazy">
                         <p class="text-[10px] font-bold uppercase tracking-wider text-brand_dark">Написать в чат</p>
                     </div>
-                    <div class="text-center p-4 border border-brand_dark/10 rounded-sm bg-white w-40 shrink-0 shadow-sm">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/withivtravel13&color=1B3B2B" alt="QR Канал" class="w-28 h-28 mb-3 mx-auto" loading="lazy">
+                    <div class="text-center p-3.5 sm:p-4 border border-brand_dark/10 rounded-sm bg-white w-36 sm:w-40 shrink-0 shadow-sm">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/withivtravel13&color=1B3B2B" alt="QR Канал" class="w-24 h-24 sm:w-28 sm:h-28 mb-2.5 mx-auto" loading="lazy">
                         <p class="text-[10px] font-bold uppercase tracking-wider text-brand_dark">Горящие туры</p>
                     </div>
                 </div>
@@ -569,7 +575,7 @@
     <!-- Footer -->
     <footer class="bg-brand_dark text-brand_bg mt-auto border-t border-white/10">
         <div class="max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-16">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-8">
 
                 <div class="md:col-span-5 text-center md:text-left flex flex-col items-center md:items-start">
                     <a href="#" class="mb-4 block">
@@ -579,8 +585,8 @@
                 </div>
 
                 <div class="md:col-span-3 text-center md:text-left">
-                    <h4 class="text-white font-bold mb-5 text-xs uppercase tracking-wider">Разделы</h4>
-                    <ul class="space-y-3 text-sm text-brand_bg/75">
+                    <h4 class="text-white font-bold mb-4 text-xs uppercase tracking-wider">Разделы</h4>
+                    <ul class="space-y-2.5 text-sm text-brand_bg/75">
                         <li><a href="#tourvisor-search" class="hover:text-brand_accent transition-colors">Поиск туров</a></li>
                         <li><a href="#tours" class="hover:text-brand_accent transition-colors">Авторские туры</a></li>
                         <li><a href="#quiz-section" class="hover:text-brand_accent transition-colors">Подобрать тур</a></li>
@@ -590,8 +596,8 @@
                 </div>
 
                 <div class="md:col-span-4 text-center md:text-left">
-                    <h4 class="text-white font-bold mb-5 text-xs uppercase tracking-wider">Контакты</h4>
-                    <ul class="space-y-3 text-sm text-brand_bg/75">
+                    <h4 class="text-white font-bold mb-4 text-xs uppercase tracking-wider">Контакты</h4>
+                    <ul class="space-y-2.5 text-sm text-brand_bg/75">
                         <li><a href="tel:+79127415413" class="text-lg font-semibold text-white hover:text-brand_accent transition-colors">+7 (912) 741-54-13</a></li>
                         <li><a href="https://wa.me/79127415413" target="_blank" class="hover:text-brand_accent transition-colors">Написать в WhatsApp</a></li>
                         <li><a href="https://t.me/withivtravel13" target="_blank" class="hover:text-brand_accent transition-colors">Telegram-канал Withiv</a></li>
@@ -599,7 +605,7 @@
                 </div>
             </div>
 
-            <div class="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-brand_bg/60">
+            <div class="border-t border-white/10 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-brand_bg/60">
                 <p>&copy; 2026 Withiv. Все права защищены</p>
                 <a href="#quiz-section" class="hover:text-white transition-colors underline underline-offset-4">Политика конфиденциальности</a>
             </div>
@@ -649,9 +655,7 @@
                     });
                 });
             }
-        } catch (e) {
-            console.error("Ошибка инициализации меню:", e);
-        }
+        } catch (e) {}
 
         window.toggleAges = function() {
             try {
