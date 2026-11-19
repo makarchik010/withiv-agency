@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Withiv — Турагентство индивидуальных путешествий</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
 
-    <meta property="og:title" content="Withiv — Бутик-турагентство">
-    <meta property="og:description" content="Индивидуальный подбор туров, бронирование отелей и полное сопровождение в поездке по всему миру.">
+    <meta property="og:title" content="Withiv — Турагентство">
+    <meta property="og:description" content="Онлайн поиск туров по 80 туроператорам, авторские туры и полное сопровождение в поездке по всему миру.">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=1200&auto=format&fit=crop">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -34,7 +34,9 @@
     </script>
     <style>
         body { background-color: #F7F4EF; color: #1B3B2B; -webkit-font-smoothing: antialiased; }
-        .glass-header { background: rgba(247, 244, 239, 0.94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .glass-header { background: rgba(247, 244, 239, 0.96); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .logo-light-bg { mix-blend-mode: multiply; }
+        .logo-dark-bg { filter: grayscale(100%) invert(100%) contrast(200%); mix-blend-mode: screen; }
         .quiz-step { display: none; }
         .quiz-step.active { display: flex; flex-direction: column; animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -70,24 +72,24 @@
     <!-- Header -->
     <header class="fixed top-0 w-full z-[1000] glass-header border-b border-brand_dark/10">
         <div class="max-w-7xl mx-auto px-4 md:px-8 h-16 md:h-20 flex items-center justify-between">
-            <a href="#" class="flex items-center gap-2.5">
-                <svg class="w-7 h-7 md:w-8 md:h-8 text-brand_dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" class="text-brand_accent" />
-                </svg>
-                <span class="text-2xl md:text-3xl font-bold tracking-tight">Withiv</span>
+            <a href="#" class="flex items-center shrink-0">
+                <img src="logo.jpg" alt="Withiv Турагентство" class="h-11 md:h-14 w-auto object-contain logo-light-bg">
             </a>
 
-            <nav class="hidden md:flex space-x-9 text-sm font-medium text-brand_dark/80">
-                <a href="#tours" class="hover:text-brand_dark transition-colors">Коллекция туров</a>
-                <a href="#quiz-section" class="hover:text-brand_dark transition-colors">Подобрать тур</a>
-                <a href="#reviews" class="hover:text-brand_dark transition-colors">Отзывы</a>
-                <a href="#about" class="hover:text-brand_dark transition-colors">Об агентстве</a>
+            <nav class="hidden lg:flex items-center space-x-2 text-sm font-medium text-brand_dark/85">
+                <a href="#tourvisor-search" class="px-4 py-1.5 rounded-full border border-brand_dark/15 hover:border-brand_dark hover:bg-brand_dark hover:text-white transition-all">Подбор тура</a>
+                <a href="#tours" class="px-4 py-1.5 rounded-full border border-brand_dark/15 hover:border-brand_dark hover:bg-brand_dark hover:text-white transition-all">Авторские туры</a>
+                <a href="#reviews" class="px-4 py-1.5 rounded-full border border-brand_dark/15 hover:border-brand_dark hover:bg-brand_dark hover:text-white transition-all">Отзывы</a>
+                <a href="#about" class="px-4 py-1.5 rounded-full border border-brand_dark/15 hover:border-brand_dark hover:bg-brand_dark hover:text-white transition-all">Об агентстве</a>
             </nav>
 
-            <div class="hidden md:flex items-center gap-3">
-                <a href="https://t.me/withivtravel13" target="_blank" class="bg-brand_dark text-brand_bg px-5 py-2.5 rounded-sm text-sm font-semibold hover:bg-brand_accent transition-colors">
-                    Telegram-канал
+            <div class="hidden md:flex items-center gap-4">
+                <div class="text-right hidden xl:block">
+                    <a href="tel:+79127415413" class="block text-sm font-bold text-brand_dark hover:text-brand_accent transition-colors">+7 (912) 741-54-13</a>
+                    <span class="block text-[11px] text-brand_dark/60">Онлайн турагентство</span>
+                </div>
+                <a href="#quiz-section" class="bg-brand_accent text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-brand_dark transition-colors shadow-sm">
+                    Заявка на тур
                 </a>
             </div>
 
@@ -101,77 +103,78 @@
     <!-- Mobile Menu -->
     <div id="mobile-menu" style="background-color: #F7F4EF; z-index: 999;" class="fixed inset-0 pt-24 px-6 pb-8 hidden flex-col md:hidden overflow-y-auto">
         <nav class="flex flex-col space-y-6 text-center text-lg font-semibold">
-            <a href="#tours" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Коллекция туров</a>
+            <a href="#tourvisor-search" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Поиск туров</a>
+            <a href="#tours" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Авторские туры</a>
             <a href="#quiz-section" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Индивидуальный подбор</a>
             <a href="#reviews" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Отзывы клиентов</a>
             <a href="#about" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Об агентстве</a>
             <hr class="border-brand_dark/10 my-2">
-            <div class="flex flex-col gap-4 w-full pt-2">
+            <div class="flex flex-col gap-3 w-full pt-2">
+                <a href="tel:+79127415413" class="text-lg font-bold text-brand_dark">+7 (912) 741-54-13</a>
                 <a href="https://t.me/withivtravel13" target="_blank" class="w-full bg-brand_dark text-brand_bg px-5 py-4 rounded-sm font-bold text-center flex justify-center items-center gap-2">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-                    Telegram-канал
+                    Telegram-канал Withiv
                 </a>
             </div>
         </nav>
     </div>
 
-    <!-- Hero Section -->
-    <section class="relative min-h-[92vh] md:min-h-screen flex items-center pt-16 md:pt-20">
-        <div class="absolute inset-0 z-0 bg-brand_dark">
-            <img src="https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=2000&auto=format&fit=crop" alt="Withiv Travel" class="w-full h-full object-cover opacity-45">
-            <div class="absolute inset-0 bg-gradient-to-t from-brand_dark via-brand_dark/40 to-transparent"></div>
+    <!-- Hero Section (в стиле референса ZIMA&LETO + строка поиска Tourvisor) -->
+    <section id="tourvisor-search" class="relative min-h-[92vh] md:min-h-[88vh] flex flex-col justify-end pt-28 pb-10 md:pb-14">
+        <div class="absolute inset-0 z-0 bg-[#0d3b46]">
+            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2000&auto=format&fit=crop" alt="Withiv Travel" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/20"></div>
         </div>
 
-        <div class="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 text-white py-12">
-            <div class="inline-block border border-white/25 bg-white/10 backdrop-blur-sm px-3.5 py-1.5 rounded-sm mb-6">
-                <span class="text-xs font-semibold tracking-[0.2em] uppercase text-brand_bg">Турагентство Withiv</span>
-            </div>
-
-            <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold leading-[1.12] tracking-tight mb-6 max-w-4xl">
-                Не просто туры —<br>
-                <span class="font-light text-brand_bg/90">впечатления на всю жизнь</span>
-            </h1>
-
-            <p class="text-base md:text-lg text-white/80 max-w-xl mb-10 font-normal leading-relaxed">
-                Организуем отдых по всему миру: от проверенных семейных курортов до уединенных вилл и индивидуальных маршрутов без лишней суеты
-            </p>
-
-            <div class="flex flex-col sm:flex-row gap-4">
-                <a href="#tours" class="bg-brand_bg text-brand_dark px-8 py-4 rounded-sm font-bold hover:bg-brand_accent hover:text-white transition-colors text-center text-sm md:text-base">
-                    Смотреть коллекцию
-                </a>
-                <a href="#quiz-section" class="border border-white/40 bg-white/5 backdrop-blur-sm text-white px-8 py-4 rounded-sm font-semibold hover:bg-white hover:text-brand_dark transition-colors text-center text-sm md:text-base">
-                    Подобрать тур под запрос
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Онлайн Поиск Tourvisor (скрыт через hidden до подключения виджета) -->
-    <section id="tourvisor-search" class="hidden py-12 md:py-16 bg-white relative z-20 -mt-6 md:-mt-10 mx-4 md:mx-8 rounded-xl shadow-[0_10px_40px_rgba(27,59,43,0.08)] border border-brand_dark/5">
-        <div class="max-w-7xl mx-auto px-4 md:px-8">
-            <div class="text-center mb-8">
-                <span class="text-brand_accent text-xs uppercase tracking-[0.2em] font-bold block mb-2">Поиск по всем туроператорам</span>
-                <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-brand_dark">Найти тур самостоятельно</h2>
+        <div class="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 text-white mt-auto">
+            <div class="max-w-3xl mb-8 md:mb-10">
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-[1.08] tracking-tight mb-4 drop-shadow-md">
+                    Онлайн поиск туров<br>
+                    по 80 туроператорам
+                </h1>
+                <p class="text-base md:text-xl text-white/95 font-medium drop-shadow">
+                    Выбирайте и бронируйте туры онлайн без забот — с полным сопровождением Withiv
+                </p>
             </div>
 
             <!-- КОНТЕЙНЕР ДЛЯ ВИДЖЕТА TOURVISOR -->
-            <div id="tourvisor-widget-container" class="w-full min-h-[350px] bg-brand_bg/30 rounded-md flex items-center justify-center border border-brand_dark/10">
-                <div class="text-center">
-                    <div class="animate-spin inline-block w-8 h-8 border-4 border-brand_accent border-t-transparent rounded-full mb-4"></div>
-                    <p class="text-sm font-medium text-brand_dark/60">Загрузка поискового модуля...</p>
-                    <p class="text-xs text-brand_dark/40 mt-1">Ожидаем подключение к базе туроператоров</p>
+            <div id="tourvisor-widget-container" class="w-full bg-white text-brand_dark rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.25)] p-3 md:p-4">
+                <!-- Когда Анастасия пришлет код Tourvisor — замени этот div на скрипт виджета -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2 md:gap-3 items-center">
+                    <a href="#quiz-section" class="p-3 rounded-lg hover:bg-brand_bg transition-colors border border-transparent hover:border-brand_dark/10">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-brand_dark/50 mb-0.5">Город вылета</span>
+                        <span class="block text-sm font-bold text-brand_dark">Москва / Казань</span>
+                    </a>
+                    <a href="#quiz-section" class="p-3 rounded-lg hover:bg-brand_bg transition-colors border border-transparent hover:border-brand_dark/10">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-brand_dark/50 mb-0.5">Страна</span>
+                        <span class="block text-sm font-bold text-brand_dark">Турция, ОАЭ, Египет...</span>
+                    </a>
+                    <a href="#quiz-section" class="p-3 rounded-lg hover:bg-brand_bg transition-colors border border-transparent hover:border-brand_dark/10">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-brand_dark/50 mb-0.5">Даты вылета</span>
+                        <span class="block text-sm font-bold text-brand_dark">Любые даты</span>
+                    </a>
+                    <a href="#quiz-section" class="p-3 rounded-lg hover:bg-brand_bg transition-colors border border-transparent hover:border-brand_dark/10">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-brand_dark/50 mb-0.5">Ночей</span>
+                        <span class="block text-sm font-bold text-brand_dark">6 – 14 ночей</span>
+                    </a>
+                    <a href="#quiz-section" class="p-3 rounded-lg hover:bg-brand_bg transition-colors border border-transparent hover:border-brand_dark/10">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-brand_dark/50 mb-0.5">Туристы</span>
+                        <span class="block text-sm font-bold text-brand_dark">2 взрослых</span>
+                    </a>
+                    <a href="#quiz-section" class="w-full py-4 px-6 bg-brand_accent hover:bg-brand_dark text-white font-bold text-sm rounded-lg text-center transition-colors shadow-md">
+                        Найти туры
+                    </a>
                 </div>
             </div>
+            <!-- КОНЕЦ КОНТЕЙНЕРА TOURVISOR -->
         </div>
     </section>
 
-    <!-- Tours Collection -->
+    <!-- Author Tours Collection -->
     <section id="tours" class="py-16 md:py-24 max-w-7xl mx-auto px-4 md:px-8">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-5">
             <div>
-                <span class="text-brand_accent text-xs uppercase tracking-[0.2em] font-bold block mb-2">Актуальные предложения</span>
-                <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Коллекция Withiv</h2>
+                <span class="text-brand_accent text-xs uppercase tracking-[0.2em] font-bold block mb-2">Эксклюзивные маршруты</span>
+                <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Авторские туры Withiv</h2>
             </div>
 
             <div id="filter-tabs" class="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto hide-scrollbar"></div>
@@ -569,21 +572,17 @@
             <div class="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8">
 
                 <div class="md:col-span-5 text-center md:text-left flex flex-col items-center md:items-start">
-                    <a href="#" class="flex items-center gap-2 mb-3">
-                        <svg class="w-6 h-6 text-brand_accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-                        </svg>
-                        <span class="text-2xl font-bold text-white tracking-tight">Withiv</span>
+                    <a href="#" class="mb-4 block">
+                        <img src="logo.jpg" alt="Withiv Турагентство" class="h-16 md:h-20 w-auto object-contain logo-dark-bg">
                     </a>
-                    <p class="text-xs text-brand_accent uppercase tracking-widest font-semibold mb-4">Турагентство</p>
                     <p class="text-sm text-brand_bg/70 leading-relaxed max-w-sm">Индивидуальный подбор туров, бронирование отелей и полное сопровождение в поездке.</p>
                 </div>
 
                 <div class="md:col-span-3 text-center md:text-left">
                     <h4 class="text-white font-bold mb-5 text-xs uppercase tracking-wider">Разделы</h4>
                     <ul class="space-y-3 text-sm text-brand_bg/75">
-                        <li><a href="#tours" class="hover:text-brand_accent transition-colors">Коллекция туров</a></li>
+                        <li><a href="#tourvisor-search" class="hover:text-brand_accent transition-colors">Поиск туров</a></li>
+                        <li><a href="#tours" class="hover:text-brand_accent transition-colors">Авторские туры</a></li>
                         <li><a href="#quiz-section" class="hover:text-brand_accent transition-colors">Подобрать тур</a></li>
                         <li><a href="#reviews" class="hover:text-brand_accent transition-colors">Отзывы туристов</a></li>
                         <li><a href="#about" class="hover:text-brand_accent transition-colors">Об агентстве</a></li>
@@ -608,9 +607,8 @@
     </footer>
 
     <script>
-        // --- 1. БАЗОВЫЕ НАСТРОЙКИ И ОПТИМИЗАЦИЯ КАРТИНОК ---
         const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyfm98Wbr_Mwar3n8924oXOSQ1ZwVMg2jB_Ik1d_kULMANbzj332Odu2D9R6w0b4ts/exec';
-        const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=800&auto=format&fit=crop';
+        const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop';
         let globalTours = [];
 
         function optimizeCloudinaryUrl(url, width = 800) {
@@ -628,7 +626,6 @@
             campaign: urlParams.get('utm_campaign') || 'Без кампании'
         };
 
-        // --- 2. МОБИЛЬНОЕ МЕНЮ ---
         try {
             const mobileBtn = document.getElementById('mobile-menu-btn');
             const mobileMenu = document.getElementById('mobile-menu');
@@ -656,7 +653,6 @@
             console.error("Ошибка инициализации меню:", e);
         }
 
-        // --- 3. ЛОГИКА КВИЗА (Возраст детей) ---
         window.toggleAges = function() {
             try {
                 const childrenSelect = document.getElementById('quiz-children');
@@ -664,12 +660,9 @@
                 if (childrenSelect && agesDiv) {
                     agesDiv.classList.toggle('hidden', childrenSelect.value === 'Без детей');
                 }
-            } catch (e) {
-                console.error("Ошибка отображения возраста:", e);
-            }
+            } catch (e) {}
         };
 
-        // --- 4. БЕЗОПАСНАЯ СЕТЕВАЯ ФУНКЦИЯ ---
         async function fetchWithRetry(url, maxRetries = 3, delay = 3000) {
             for (let i = 0; i < maxRetries; i++) {
                 try {
@@ -697,7 +690,6 @@
             }
         }
 
-        // --- 5. РЕНДЕР ТУРОВ И ФИЛЬТРОВ ---
         function renderFilters(tours) {
             try {
                 const tabsContainer = document.getElementById('filter-tabs');
@@ -739,9 +731,7 @@
                         }
                     });
                 });
-            } catch (e) {
-                console.error("Ошибка рендера фильтров:", e);
-            }
+            } catch (e) {}
         }
 
         function renderTours(list) {
@@ -784,7 +774,6 @@
                     `;
                 }).join('');
             } catch (e) {
-                console.error("Ошибка рендера карточек туров:", e);
                 grid.innerHTML = '<div class="col-span-full py-12 text-center text-red-600">Произошла ошибка при отображении коллекции туров.</div>';
             }
         }
@@ -816,7 +805,6 @@
             }).join('');
         }
 
-        // --- 6. ЗАГРУЗКА ДАННЫХ (КЭШ 0 МС + ФОНОВОЕ ОБНОВЛЕНИЕ) ---
         async function loadTours() {
             const grid = document.getElementById('tours-grid');
             if (!grid) return;
@@ -841,7 +829,6 @@
                     renderTours(globalTours);
                 }
             } catch (err) {
-                console.error("Tours Fetch Error:", err);
                 if (!cached) {
                     grid.innerHTML = '<div class="col-span-full py-12 text-center font-medium text-brand_dark/60 bg-white border border-brand_dark/10 rounded-sm p-6">Временно не удалось загрузить авторскую коллекцию туров.</div>';
                 }
@@ -866,14 +853,12 @@
                     renderReviewsHtml(fresh);
                 }
             } catch (err) {
-                console.error("Reviews Fetch Error:", err);
                 if (!cached) {
                     container.innerHTML = '<div class="w-full text-center py-10 text-brand_dark/50 text-sm">Временно не удалось загрузить отзывы</div>';
                 }
             }
         }
 
-        // --- 7. МОДАЛЬНОЕ ОКНО ---
         const modal = document.getElementById('tour-modal');
         const modalBackdrop = document.getElementById('modal-backdrop');
 
@@ -915,9 +900,7 @@
                     modal.classList.remove('modal-closed');
                     modal.classList.add('modal-open');
                 });
-            } catch (e) {
-                console.error("Ошибка открытия модального окна:", e);
-            }
+            } catch (e) {}
         };
 
         window.closeModal = function() {
@@ -967,7 +950,6 @@
                     btn.classList.replace('bg-brand_dark', 'bg-green-600');
                     setTimeout(window.closeModal, 1500);
                 } catch(err) {
-                    console.error("Submit Error:", err);
                     btn.innerText = 'Ошибка. Попробуйте позже';
                     btn.classList.replace('bg-brand_dark', 'bg-red-600');
                 } finally {
@@ -982,7 +964,6 @@
             });
         }
 
-        // --- 8. ЛОГИКА МНОГОШАГОВОГО КВИЗА ---
         window.nextStep = function(step) {
             try {
                 document.querySelectorAll('.quiz-step').forEach(el => el.classList.remove('active'));
@@ -992,9 +973,7 @@
                     const progressEl = document.getElementById('quiz-progress');
                     if (progressEl) progressEl.style.width = `${(step / 6) * 100}%`;
                 }
-            } catch (e) {
-                console.error("Ошибка переключения шагов квиза:", e);
-            }
+            } catch (e) {}
         };
 
         const quizForm = document.getElementById('quiz-form');
@@ -1067,7 +1046,6 @@
                     if (progressEl) progressEl.style.width = '100%';
 
                 } catch(err) {
-                    console.error("Quiz Submit Error:", err);
                     btn.innerText = 'Ошибка сети. Попробуйте еще раз';
                     btn.classList.add('bg-red-600');
                     setTimeout(() => {
@@ -1079,7 +1057,6 @@
             });
         }
 
-        // --- 9. ИНИЦИАЛИЗАЦИЯ ---
         document.addEventListener('DOMContentLoaded', () => {
             Promise.allSettled([
                 loadTours(),
