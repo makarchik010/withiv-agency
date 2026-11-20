@@ -677,7 +677,7 @@
             }
         }
 
-        function renderReviewsHtml(reviews) {
+function renderReviewsHtml(reviews) {
             const container = document.getElementById('reviews-container');
             if (!container) return;
 
@@ -686,22 +686,38 @@
                 return;
             }
 
+            const getVal = (obj, keys) => {
+                for (const k of keys) {
+                    if (obj[k] !== undefined && String(obj[k]).trim() !== '') return String(obj[k]).trim();
+                }
+                // Поиск без учёта регистра и лишних пробелов в заголовке таблицы
+                const normMap = {};
+                Object.keys(obj).forEach(ok => { normMap[ok.trim().toLowerCase()] = obj[ok]; });
+                for (const k of keys) {
+                    const v = normMap[k.toLowerCase()];
+                    if (v !== undefined && String(v).trim() !== '') return String(v).trim();
+                }
+                return '';
+            };
+
             container.innerHTML = reviews.map(r => {
-                const text = String(r['Текст'] || r['Отзыв'] || r.text || '').replace(/</g, "&lt;");
-                const name = String(r['Имя'] || r.name || 'Гость').replace(/</g, "&lt;");
-                const loc = String(r['Локация'] || r['Куда летали'] || r.location || '').replace(/</g, "&lt;");
-                const tripDate = String(r['Дата поездки'] || r['Дата'] || r.date || '').replace(/</g, "&lt;");
-                const metaParts = [loc, tripDate].filter(Boolean);
+                const text = getVal(r, ['Текст', 'Отзыв', 'Комментарий', 'text']).replace(/</g, "&lt;");
+                const name = (getVal(r, ['Имя', 'Клиент', 'Автор', 'name']) || 'Гость').replace(/</g, "&lt;");
+                const country = getVal(r, ['Страна', 'Локация', 'Куда летали', 'Направление', 'Тур', 'country', 'location']).replace(/</g, "&lt;");
+                const reviewDate = getVal(r, ['Дата', 'Дата написания', 'Дата отзыва', 'Дата поездки', 'date']).replace(/</g, "&lt;");
 
                 return `
                 <div class="w-80 md:w-96 shrink-0 bg-white border border-brand_dark/10 p-6 md:p-8 rounded-xl snap-center shadow-sm flex flex-col">
-                    <div class="flex items-center gap-1 mb-4 text-brand_accent">
-                        ${'<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'.repeat(5)}
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <div class="flex items-center gap-1 text-brand_accent">
+                            ${'<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'.repeat(5)}
+                        </div>
+                        ${reviewDate ? `<span class="text-xs font-medium text-brand_dark/50 tabular">${reviewDate}</span>` : ''}
                     </div>
                     <p class="text-brand_dark/80 type-small leading-relaxed mb-6 italic flex-1">«${text}»</p>
                     <div class="mt-auto border-t border-brand_dark/10 pt-4">
                         <p class="font-bold type-small text-brand_dark">${name}</p>
-                        ${metaParts.length ? `<p class="type-label text-brand_dark/55 mt-1">${metaParts.join(' • ')}</p>` : ''}
+                        ${country ? `<p class="type-label text-brand_accent mt-1">${country}</p>` : ''}
                     </div>
                 </div>`;
             }).join('');
