@@ -677,7 +677,7 @@
             }
         }
 
-function renderReviewsHtml(reviews) {
+        function renderReviewsHtml(reviews) {
             const container = document.getElementById('reviews-container');
             if (!container) return;
 
@@ -690,7 +690,6 @@ function renderReviewsHtml(reviews) {
                 for (const k of keys) {
                     if (obj[k] !== undefined && String(obj[k]).trim() !== '') return String(obj[k]).trim();
                 }
-                // Поиск без учёта регистра и лишних пробелов в заголовке таблицы
                 const normMap = {};
                 Object.keys(obj).forEach(ok => { normMap[ok.trim().toLowerCase()] = obj[ok]; });
                 for (const k of keys) {
@@ -703,7 +702,8 @@ function renderReviewsHtml(reviews) {
             container.innerHTML = reviews.map(r => {
                 const text = getVal(r, ['Текст', 'Отзыв', 'Комментарий', 'text']).replace(/</g, "&lt;");
                 const name = (getVal(r, ['Имя', 'Клиент', 'Автор', 'name']) || 'Гость').replace(/</g, "&lt;");
-                const country = getVal(r, ['Страна', 'Локация', 'Куда летали', 'Направление', 'Тур', 'country', 'location']).replace(/</g, "&lt;");
+                const countryRaw = getVal(r, ['Страна', 'Локация', 'Куда летали', 'Направление', 'Тур', 'country', 'location']).replace(/</g, "&lt;");
+                const country = countryRaw ? countryRaw.charAt(0).toUpperCase() + countryRaw.slice(1) : '';
                 const reviewDate = getVal(r, ['Дата', 'Дата написания', 'Дата отзыва', 'Дата поездки', 'date']).replace(/</g, "&lt;");
 
                 return `
@@ -715,9 +715,13 @@ function renderReviewsHtml(reviews) {
                         ${reviewDate ? `<span class="text-xs font-medium text-brand_dark/50 tabular">${reviewDate}</span>` : ''}
                     </div>
                     <p class="text-brand_dark/80 type-small leading-relaxed mb-6 italic flex-1">«${text}»</p>
-                    <div class="mt-auto border-t border-brand_dark/10 pt-4">
+                    <div class="mt-auto border-t border-brand_dark/10 pt-4 flex items-center justify-between gap-3">
                         <p class="font-bold type-small text-brand_dark">${name}</p>
-                        ${country ? `<p class="type-label text-brand_accent mt-1">${country}</p>` : ''}
+                        ${country ? `
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand_bg border border-brand_dark/10 text-xs font-semibold text-brand_dark shrink-0">
+                            <svg class="w-3.5 h-3.5 text-brand_accent shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            ${country}
+                        </span>` : ''}
                     </div>
                 </div>`;
             }).join('');
@@ -987,7 +991,6 @@ function renderReviewsHtml(reviews) {
 
             function sendCleanTourvisorLead(clientName, clientContact, extraLines) {
                 const cleanContact = String(clientContact || '').trim();
-                // Отправляем ТОЛЬКО если есть реальный телефон или email (отсекаем технические запросы поиска)
                 const hasRealContact = /(?:\+?\d[\d\s\-()]{6,}\d)|(?:[^\s@]+@[^\s@]+\.[^\s@]+)/.test(cleanContact);
                 if (!hasRealContact) return;
 
@@ -1024,7 +1027,6 @@ function renderReviewsHtml(reviews) {
                     new URLSearchParams(rawBody).forEach((v, k) => { data[k] = v; });
                 }
 
-                // Игнорируем технические запросы поиска отелей
                 if (data.sessionId && !data.phone && !data.tel && !data.email) return;
 
                 const phone = data.phone || data.tel || data.clientPhone || data.email || '';
@@ -1036,7 +1038,6 @@ function renderReviewsHtml(reviews) {
                 }
             }
 
-            // Перехват fetch и XHR только при наличии реального телефона/email
             window.fetch = function(input, init) {
                 try {
                     const url = typeof input === 'string' ? input : (input && input.url) || '';
@@ -1062,7 +1063,6 @@ function renderReviewsHtml(reviews) {
                 return origSend.apply(this, arguments);
             };
 
-            // Перехват клика по кнопке отправки в окне бронирования Tourvisor
             document.addEventListener('click', (e) => {
                 const btn = e.target.closest('button, input[type="submit"], [class*="TVButton"], [class*="TVSubmit"]');
                 if (!btn) return;
