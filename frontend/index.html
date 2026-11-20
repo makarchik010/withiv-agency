@@ -33,22 +33,6 @@
         }
     </script>
     <style>
-    /* Выравнивание и полировка виджета Tourvisor */
-#tourvisor-widget-container {
-    width: 100%;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.32);
-}
-
-#tourvisor-widget-container .tv-search-form,
-#tourvisor-widget-container [class*="tv-moduleid-"] {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    box-sizing: border-box !important;
-    font-family: 'Manrope', sans-serif !important;
-}
         :root {
             --fs-h1: clamp(1.85rem, 3.6vw + 0.75rem, 3.75rem);
             --fs-h2: clamp(1.5rem, 2.2vw + 0.65rem, 2.5rem);
@@ -64,6 +48,8 @@
             scroll-padding-top: 84px;
             text-size-adjust: 100%;
             -webkit-text-size-adjust: 100%;
+            overflow-x: hidden;
+            width: 100%;
         }
 
         body {
@@ -74,6 +60,8 @@
             line-height: 1.55;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            width: 100%;
         }
 
         h1, h2, h3, h4 {
@@ -103,6 +91,34 @@
         }
         .reviews-scroll::-webkit-scrollbar, .hide-scrollbar::-webkit-scrollbar { display: none; }
 
+        /* Виджет Tourvisor: не зажимаем по высоте/попапам и чистим фон результатов */
+        #tourvisor-widget-container {
+            width: 100%;
+            max-width: 100%;
+            overflow: visible;
+        }
+
+        #tourvisor-widget-container .tv-search-form,
+        #tourvisor-widget-container [class*="tv-moduleid-"] {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+            font-family: 'Manrope', sans-serif !important;
+        }
+
+        /* Чтобы выдача результатов поиска на этой же странице имела читаемый светлый фон и не упиралась в края */
+        #tourvisor-widget-container .TVSearchResults,
+        #tourvisor-widget-container .TVResultsWrap,
+        #tourvisor-widget-container .TVMainResult {
+            background: #FFFFFF !important;
+            border-radius: 16px !important;
+            padding: 16px !important;
+            margin-top: 16px !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25) !important;
+            overflow-x: auto !important;
+        }
+
         #tour-modal, #privacy-modal { transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
         #modal-backdrop { transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.35s ease; }
         #modal-content { transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -113,33 +129,33 @@
 <body class="font-sans selection:bg-brand_dark selection:text-white flex flex-col min-h-screen">
 
     <!-- Header -->
-    <header class="fixed top-0 w-full z-[1000] glass-header border-b border-brand_dark/10">
-        <div class="max-w-7xl mx-auto px-4 md:px-8 h-16 md:h-20 flex items-center justify-between gap-4">
+    <header class="fixed top-0 left-0 right-0 w-full max-w-[100vw] z-[1000] glass-header border-b border-brand_dark/10">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 h-16 md:h-20 flex items-center justify-between gap-2">
             <a href="#" class="flex items-center shrink-0 transition-opacity duration-300 hover:opacity-80">
-                <div class="h-10 md:h-12 overflow-hidden flex items-start">
-                    <img src="logo.jpg" alt="Withiv Турагентство" class="h-[58px] md:h-[70px] w-auto max-w-none block logo-light-bg">
+                <div class="h-9 md:h-10 overflow-hidden flex items-start">
+                    <img src="logo.jpg" alt="Withiv Турагентство" class="h-[52px] md:h-[58px] w-auto max-w-none block logo-light-bg">
                 </div>
             </a>
 
-            <nav class="hidden lg:flex items-center gap-2 type-small font-medium text-brand_dark/85">
-                <a href="#tourvisor-search" class="px-4 py-1.5 rounded-full border border-brand_dark/15 hover:border-brand_dark hover:bg-brand_dark hover:text-white transition-all whitespace-nowrap">Подбор тура</a>
-                <a href="#tours" class="px-4 py-1.5 rounded-full border border-brand_dark/15 hover:border-brand_dark hover:bg-brand_dark hover:text-white transition-all whitespace-nowrap">Интересные предложения</a>
-                <a href="#reviews" class="px-4 py-1.5 rounded-full border border-brand_dark/15 hover:border-brand_dark hover:bg-brand_dark hover:text-white transition-all whitespace-nowrap">Отзывы</a>
-                <a href="#contacts" class="px-4 py-1.5 rounded-full border border-brand_dark/15 hover:border-brand_dark hover:bg-brand_dark hover:text-white transition-all whitespace-nowrap">Контакты</a>
+            <nav class="hidden lg:flex items-center gap-1.5 text-xs xl:text-[13px] font-medium text-brand_dark/85">
+                <a href="#tourvisor-search" class="px-3 xl:px-3.5 py-1.5 rounded-full border border-brand_dark/15 hover:border-brand_dark hover:bg-brand_dark hover:text-white transition-all whitespace-nowrap">Подбор тура</a>
+                <a href="#tours" class="px-3 xl:px-3.5 py-1.5 rounded-full border border-brand_dark/15 hover:border-brand_dark hover:bg-brand_dark hover:text-white transition-all whitespace-nowrap">Предложения</a>
+                <a href="#reviews" class="px-3 xl:px-3.5 py-1.5 rounded-full border border-brand_dark/15 hover:border-brand_dark hover:bg-brand_dark hover:text-white transition-all whitespace-nowrap">Отзывы</a>
+                <a href="#contacts" class="px-3 xl:px-3.5 py-1.5 rounded-full border border-brand_dark/15 hover:border-brand_dark hover:bg-brand_dark hover:text-white transition-all whitespace-nowrap">Контакты</a>
             </nav>
 
-            <div class="hidden lg:flex items-center gap-4 shrink-0">
+            <div class="hidden lg:flex items-center gap-3 shrink-0">
                 <div class="text-right hidden xl:block">
-                    <a href="tel:+79127415413" class="block type-small font-bold text-brand_dark hover:text-brand_accent transition-colors tabular">+7 (912) 741-54-13</a>
-                    <span class="block text-[11px] text-brand_dark/60">Онлайн турагентство</span>
+                    <a href="tel:+79127415413" class="block text-xs font-bold text-brand_dark hover:text-brand_accent transition-colors tabular whitespace-nowrap">+7 (912) 741-54-13</a>
+                    <span class="block text-[10px] text-brand_dark/60 whitespace-nowrap">Онлайн турагентство</span>
                 </div>
-                <a href="#request-section" class="bg-brand_accent text-white px-5 py-2.5 rounded-lg type-small font-bold hover:bg-brand_dark transition-colors shadow-sm whitespace-nowrap">
+                <a href="#request-section" class="bg-brand_accent text-white px-4 py-2.5 rounded-lg text-xs xl:text-[13px] font-bold hover:bg-brand_dark transition-colors shadow-sm whitespace-nowrap">
                     Оставить запрос
                 </a>
             </div>
 
-            <div class="flex items-center gap-2.5 lg:hidden">
-                <a href="#request-section" class="bg-brand_accent text-white px-3.5 py-2 rounded-lg type-label !tracking-wider shadow-sm">
+            <div class="flex items-center gap-2 lg:hidden shrink-0">
+                <a href="#request-section" class="bg-brand_accent text-white px-3.5 py-2 rounded-lg type-label !tracking-wider shadow-sm whitespace-nowrap">
                     Запрос
                 </a>
                 <button id="mobile-menu-btn" type="button" aria-label="Меню" class="p-2 text-brand_dark">
@@ -169,7 +185,7 @@
     </div>
 
     <!-- Hero Section + Tourvisor -->
-    <section id="tourvisor-search" class="relative min-h-[82svh] md:min-h-[85vh] md:max-h-[960px] flex flex-col justify-end pt-20 pb-6 md:pb-14">
+    <section id="tourvisor-search" class="relative min-h-[82svh] md:min-h-[85vh] flex flex-col justify-end pt-24 pb-10 md:pb-16">
         <div class="absolute inset-0 z-0 bg-[#0d3b46]">
             <img
                 src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1400&auto=format&fit=crop"
@@ -183,7 +199,7 @@
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/25"></div>
         </div>
 
-        <div class="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 mt-auto">
+        <div class="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 mt-auto">
             <div class="max-w-3xl mb-5 md:mb-10 text-white">
                 <h1 class="type-h1 mb-3 md:mb-4 drop-shadow-md">
                     Онлайн поиск туров<br>
@@ -202,7 +218,7 @@
     </section>
 
     <!-- Interesting Offers -->
-    <section id="tours" class="py-14 md:py-24 max-w-7xl mx-auto px-4 md:px-8 w-full">
+    <section id="tours" class="py-14 md:py-24 max-w-7xl mx-auto px-4 md:px-6 lg:px-8 w-full">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-5">
             <div>
                 <span class="type-label text-brand_accent block mb-2">Подборка агентства</span>
@@ -222,7 +238,7 @@
 
     <!-- Reviews Section -->
     <section id="reviews" class="py-14 md:py-24 bg-white border-t border-brand_dark/5 overflow-hidden w-full">
-        <div class="max-w-7xl mx-auto px-4 md:px-8 mb-8 md:mb-10 flex items-end justify-between gap-4">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 mb-8 md:mb-10 flex items-end justify-between gap-4">
             <div>
                 <span class="type-label text-brand_accent block mb-2">Доверие</span>
                 <h2 class="type-h2">Отзывы наших туристов</h2>
@@ -237,7 +253,7 @@
             </div>
         </div>
 
-        <div id="reviews-container" class="flex overflow-x-auto gap-4 md:gap-6 px-4 md:px-8 max-w-7xl mx-auto pb-6 snap-x snap-mandatory reviews-scroll">
+        <div id="reviews-container" class="flex overflow-x-auto gap-4 md:gap-6 px-4 md:px-6 lg:px-8 max-w-7xl mx-auto pb-6 snap-x snap-mandatory reviews-scroll">
             <div class="w-full text-center py-10 text-brand_dark/50 type-small">Проверяем отзывы...</div>
         </div>
     </section>
@@ -319,7 +335,7 @@
 
     <!-- Простая форма запроса в конце -->
     <section id="request-section" class="py-14 md:py-24 bg-brand_dark text-brand_bg w-full">
-        <div class="max-w-4xl mx-auto px-4 md:px-8">
+        <div class="max-w-4xl mx-auto px-4 md:px-6 lg:px-8">
             <div class="text-center mb-8 md:mb-10">
                 <span class="type-label text-brand_accent block mb-2">Персональный подход</span>
                 <h2 class="type-h2 mb-3">Отправить запрос на подбор тура</h2>
@@ -365,7 +381,7 @@
 
     <!-- Единый блок связей -->
     <section id="contacts" class="py-14 md:py-20 bg-brand_bg border-t border-brand_dark/10 w-full">
-        <div class="max-w-7xl mx-auto px-4 md:px-8">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
             <div class="mb-8 md:mb-10 text-center md:text-left">
                 <span class="type-label text-brand_accent block mb-2">Всегда на связи</span>
                 <h2 class="type-h2">Мессенджеры и соцсети</h2>
@@ -417,7 +433,7 @@
 
     <!-- Чистый светлый многоколоночный Footer -->
     <footer class="bg-white text-brand_dark border-t border-brand_dark/10 mt-auto w-full">
-        <div class="max-w-7xl mx-auto px-4 md:px-8 py-10 md:py-16">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-10 md:py-16">
             <div class="grid grid-cols-2 lg:grid-cols-12 gap-x-6 gap-y-8">
 
                 <!-- Колонка 1 -->
@@ -907,6 +923,33 @@
                 }
             });
         }
+
+        // Перехват заявок из виджета Tourvisor в бота и Google Таблицу
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (!form.closest('.tv-search-form, .TVModalContainer, [class*="TV"]')) return;
+
+            const inputs = Array.from(form.querySelectorAll('input, textarea'));
+            const values = inputs
+                .filter(el => el.type !== 'hidden' && el.type !== 'submit' && el.value.trim())
+                .map(el => `${el.placeholder || el.name || 'Поле'}: ${el.value.trim()}`);
+
+            if (!values.length) return;
+
+            const phoneInput = inputs.find(el => /tel|phone|телефон/i.test(el.name + el.placeholder + el.type));
+            const nameInput = inputs.find(el => /name|имя/i.test(el.name + el.placeholder));
+
+            fetch(GAS_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: 'lead',
+                    name: (nameInput && nameInput.value.trim()) || 'Заявка из поиска Tourvisor',
+                    contact: (phoneInput && phoneInput.value.trim()) || values[0],
+                    comment: `[ПОИСК TOURVISOR]\n${values.join('\n')}\nUTM: ${utmData.source} | ${utmData.medium} | ${utmData.campaign}`
+                })
+            }).catch(() => {});
+        }, true);
 
         document.addEventListener('DOMContentLoaded', () => {
             Promise.allSettled([
