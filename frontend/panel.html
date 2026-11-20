@@ -1,400 +1,1105 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Withiv — Панель управления</title>
-    <meta name="robots" content="noindex, nofollow">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
+    <title>Withiv — Турагентство индивидуальных путешествий</title>
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
+
+    <meta property="og:title" content="Withiv — Турагентство">
+    <meta property="og:description" content="Онлайн поиск туров по 80 туроператорам, интересные предложения и полное сопровождение в поездке по всему миру.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand_dark: '#1B3B2B',
                         brand_bg: '#F7F4EF',
-                        brand_accent: '#C59B27'
+                        brand_dark: '#1B3B2B',
+                        brand_accent: '#C59B27',
+                    },
+                    fontFamily: {
+                        sans: ['Manrope', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
-</head>
-<body class="bg-brand_bg text-brand_dark min-h-screen font-sans antialiased">
+    <style>
+        :root {
+            --fs-h1: clamp(1.85rem, 3.6vw + 0.75rem, 3.75rem);
+            --fs-h2: clamp(1.5rem, 2.2vw + 0.65rem, 2.5rem);
+            --fs-h3: clamp(1.125rem, 1vw + 0.7rem, 1.5rem);
+            --fs-lead: clamp(0.95rem, 0.7vw + 0.7rem, 1.25rem);
+            --fs-body: clamp(0.9375rem, 0.25vw + 0.85rem, 1.0625rem);
+            --fs-small: 0.8125rem;
+            --fs-label: 0.6875rem;
+        }
 
-    <!-- ЭКРАН АВТОРИЗАЦИИ -->
-    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full border border-brand_dark/10">
-            <h1 class="text-2xl font-bold text-center mb-2">WITHIV ADMIN</h1>
-            <p class="text-xs text-center text-brand_dark/60 mb-6">Управление турами и отзывами</p>
-            <form id="login-form" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider mb-1">Пароль доступа</label>
-                    <input type="password" id="admin-pass-input" required placeholder="Введите пароль" class="w-full px-4 py-3 border border-brand_dark/20 rounded focus:outline-none focus:border-brand_dark">
+        html {
+            font-size: 16px;
+            scroll-padding-top: 84px;
+            text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        body {
+            background-color: #F7F4EF;
+            color: #1B3B2B;
+            font-family: 'Manrope', sans-serif;
+            font-size: var(--fs-body);
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        h1, h2, h3, h4 {
+            text-wrap: balance;
+            letter-spacing: -0.02em;
+        }
+
+        .type-h1 { font-size: var(--fs-h1); line-height: 1.08; font-weight: 700; }
+        .type-h2 { font-size: var(--fs-h2); line-height: 1.15; font-weight: 700; }
+        .type-h3 { font-size: var(--fs-h3); line-height: 1.25; font-weight: 700; }
+        .type-lead { font-size: var(--fs-lead); line-height: 1.45; font-weight: 500; }
+        .type-small { font-size: var(--fs-small); line-height: 1.45; }
+        .type-label { font-size: var(--fs-label); line-height: 1.2; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; }
+        .tabular { font-variant-numeric: tabular-nums; }
+
+        .glass-header { background: rgba(247, 244, 239, 0.96); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .logo-light-bg { mix-blend-mode: multiply; }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1B3B2B; border-radius: 3px; }
+        input, select, textarea { font-size: 16px !important; }
+
+        .reviews-scroll, .hide-scrollbar {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .reviews-scroll::-webkit-scrollbar, .hide-scrollbar::-webkit-scrollbar { display: none; }
+
+        #tourvisor-widget-container {
+            width: 100%;
+            max-width: 100%;
+            overflow: visible;
+        }
+
+        #tourvisor-widget-container .tv-search-form,
+        #tourvisor-widget-container [class*="tv-moduleid-"] {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+            font-family: 'Manrope', sans-serif !important;
+        }
+
+        #tourvisor-widget-container .TVSearchResults,
+        #tourvisor-widget-container .TVResultsWrap,
+        #tourvisor-widget-container .TVMainResult {
+            background: #FFFFFF !important;
+            border-radius: 16px !important;
+            padding: 16px !important;
+            margin-top: 16px !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25) !important;
+            overflow-x: auto !important;
+        }
+
+        #tour-modal, #privacy-modal { transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        #modal-backdrop { transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.35s ease; }
+        #modal-content { transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-closed #modal-content { transform: translateY(50px) scale(0.97); opacity: 0; }
+        .modal-open #modal-content { transform: translateY(0) scale(1); opacity: 1; }
+    </style>
+</head>
+<body class="font-sans selection:bg-brand_dark selection:text-white flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 w-full max-w-[100vw] z-[1000] glass-header border-b border-brand_dark/10">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 h-16 md:h-20 flex items-center justify-between gap-2">
+            <a href="#" class="flex items-center shrink-0 transition-opacity duration-300 hover:opacity-80">
+                <div class="h-9 md:h-10 overflow-hidden flex items-start">
+                    <img src="logo.jpg" alt="Withiv Турагентство" class="h-[52px] md:h-[58px] w-auto max-w-none block logo-light-bg">
                 </div>
-                <button type="submit" class="w-full py-3 bg-brand_dark text-white font-semibold rounded hover:bg-brand_dark/90 transition">Войти</button>
-            </form>
+            </a>
+
+            <nav class="hidden lg:flex items-center gap-1.5 text-xs xl:text-[13px] font-medium text-brand_dark/85">
+                <a href="#tourvisor-search" class="px-3 xl:px-3.5 py-1.5 rounded-full border border-brand_dark/15 hover:border-brand_dark hover:bg-brand_dark hover:text-white transition-all whitespace-nowrap">Подбор тура</a>
+                <a href="#tours" class="px-3 xl:px-3.5 py-1.5 rounded-full border border-brand_dark/15 hover:border-brand_dark hover:bg-brand_dark hover:text-white transition-all whitespace-nowrap">Предложения</a>
+                <a href="#reviews" class="px-3 xl:px-3.5 py-1.5 rounded-full border border-brand_dark/15 hover:border-brand_dark hover:bg-brand_dark hover:text-white transition-all whitespace-nowrap">Отзывы</a>
+                <a href="#contacts" class="px-3 xl:px-3.5 py-1.5 rounded-full border border-brand_dark/15 hover:border-brand_dark hover:bg-brand_dark hover:text-white transition-all whitespace-nowrap">Контакты</a>
+            </nav>
+
+            <div class="hidden lg:flex items-center gap-3 shrink-0">
+                <div class="text-right hidden xl:block">
+                    <a href="tel:+79127415413" class="block text-xs font-bold text-brand_dark hover:text-brand_accent transition-colors tabular whitespace-nowrap">+7 (912) 741-54-13</a>
+                    <span class="block text-[10px] text-brand_dark/60 whitespace-nowrap">Онлайн турагентство</span>
+                </div>
+                <a href="#request-section" class="bg-brand_accent text-white px-4 py-2.5 rounded-lg text-xs xl:text-[13px] font-bold hover:bg-brand_dark transition-colors shadow-sm whitespace-nowrap">
+                    Оставить запрос
+                </a>
+            </div>
+
+            <div class="flex items-center gap-2 lg:hidden shrink-0">
+                <a href="#request-section" class="bg-brand_accent text-white px-3.5 py-2 rounded-lg type-label !tracking-wider shadow-sm whitespace-nowrap">
+                    Запрос
+                </a>
+                <button id="mobile-menu-btn" type="button" aria-label="Меню" class="p-2 text-brand_dark">
+                    <svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile & Tablet Menu -->
+    <div id="mobile-menu" style="background-color: #F7F4EF; z-index: 999;" class="fixed inset-0 pt-24 px-6 pb-8 hidden flex-col lg:hidden overflow-y-auto">
+        <nav class="flex flex-col space-y-5 text-center type-h3">
+            <a href="#tourvisor-search" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Поиск туров</a>
+            <a href="#tours" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Интересные предложения</a>
+            <a href="#reviews" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Отзывы туристов</a>
+            <a href="#request-section" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Отправить запрос</a>
+            <a href="#contacts" class="mobile-link text-brand_dark hover:text-brand_accent py-1">Контакты</a>
+            <hr class="border-brand_dark/10 my-2">
+            <div class="flex flex-col gap-3 w-full max-w-sm mx-auto pt-2">
+                <a href="tel:+79127415413" class="type-h3 text-brand_dark tabular">+7 (912) 741-54-13</a>
+                <a href="https://t.me/withivtravel13" target="_blank" rel="noopener noreferrer" class="w-full bg-brand_dark text-brand_bg px-5 py-4 rounded-lg type-small font-bold text-center">
+                    Telegram-канал Withiv
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Hero Section + Tourvisor -->
+    <section id="tourvisor-search" class="relative min-h-[82svh] md:min-h-[85vh] flex flex-col justify-end pt-24 pb-10 md:pb-16">
+        <div class="absolute inset-0 z-0 bg-[#0d3b46]">
+            <img
+                src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1400&auto=format&fit=crop"
+                srcset="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop 800w,
+                        https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1400&auto=format&fit=crop 1400w,
+                        https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2000&auto=format&fit=crop 2000w"
+                sizes="100vw"
+                fetchpriority="high"
+                alt="Withiv Travel"
+                class="w-full h-full object-cover object-center">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/25"></div>
+        </div>
+
+        <div class="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 mt-auto">
+            <div class="max-w-3xl mb-5 md:mb-10 text-white">
+                <h1 class="type-h1 mb-3 md:mb-4 drop-shadow-md">
+                    Онлайн поиск туров<br>
+                    по 80 туроператорам
+                </h1>
+                <p class="type-lead text-white/95 drop-shadow max-w-2xl">
+                    Выбирайте и бронируйте туры онлайн без забот — с полным сопровождением Withiv
+                </p>
+            </div>
+
+            <!-- ВИДЖЕТ TOURVISOR -->
+            <div id="tourvisor-widget-container" class="w-full text-brand_dark">
+                <div class="tv-search-form tv-moduleid-9982416"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interesting Offers -->
+    <section id="tours" class="py-14 md:py-24 max-w-7xl mx-auto px-4 md:px-6 lg:px-8 w-full">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-5">
+            <div>
+                <span class="type-label text-brand_accent block mb-2">Подборка агентства</span>
+                <h2 class="type-h2">Интересные предложения</h2>
+            </div>
+
+            <div id="filter-tabs" class="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto hide-scrollbar"></div>
+        </div>
+
+        <div id="tours-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <div class="col-span-full py-12 text-center text-brand_dark/60 font-medium type-small">
+                <div class="inline-block w-6 h-6 border-2 border-brand_accent border-t-transparent rounded-full animate-spin mb-3"></div><br>
+                <span id="loading-text">Соединяемся с базой предложений...</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews Section -->
+    <section id="reviews" class="py-14 md:py-24 bg-white border-t border-brand_dark/5 overflow-hidden w-full">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 mb-8 md:mb-10 flex items-end justify-between gap-4">
+            <div>
+                <span class="type-label text-brand_accent block mb-2">Доверие</span>
+                <h2 class="type-h2">Отзывы наших туристов</h2>
+            </div>
+            <div class="hidden md:flex items-center gap-2 shrink-0">
+                <button type="button" onclick="scrollReviews(-380)" aria-label="Предыдущие отзывы" class="w-11 h-11 rounded-full border border-brand_dark/20 text-brand_dark hover:bg-brand_dark hover:text-white flex items-center justify-center transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <button type="button" onclick="scrollReviews(380)" aria-label="Следующие отзывы" class="w-11 h-11 rounded-full border border-brand_dark/20 text-brand_dark hover:bg-brand_dark hover:text-white flex items-center justify-center transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="reviews-container" class="flex overflow-x-auto gap-4 md:gap-6 px-4 md:px-6 lg:px-8 max-w-7xl mx-auto pb-6 snap-x snap-mandatory reviews-scroll">
+            <div class="w-full text-center py-10 text-brand_dark/50 type-small">Проверяем отзывы...</div>
+        </div>
+    </section>
+
+    <!-- Quick View Modal -->
+    <div id="tour-modal" class="fixed inset-0 z-[1050] hidden items-end md:items-center justify-center sm:p-6 modal-closed">
+        <div id="modal-backdrop" class="absolute inset-0 bg-brand_dark/80 backdrop-blur-md opacity-0" onclick="closeModal()"></div>
+
+        <div id="modal-content" class="relative bg-brand_bg w-full md:max-w-4xl rounded-t-2xl md:rounded-xl shadow-2xl flex flex-col md:flex-row max-h-[92vh] overflow-y-auto md:overflow-hidden z-10">
+
+            <button onclick="closeModal()" type="button" aria-label="Закрыть" class="absolute top-4 right-4 z-30 w-10 h-10 bg-black/45 hover:bg-brand_dark text-white md:bg-brand_dark/10 md:text-brand_dark md:hover:bg-brand_dark md:hover:text-white backdrop-blur-md rounded-full flex items-center justify-center transition-all duration-300 shadow-sm border border-white/20 md:border-transparent">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <div class="w-full md:w-1/2 h-52 sm:h-64 md:h-auto bg-brand_dark shrink-0 relative overflow-hidden">
+                <img id="modal-img" src="" alt="Тур" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent md:hidden"></div>
+                <div class="absolute bottom-4 left-5 right-5 md:hidden">
+                    <span id="modal-location-mobile" class="inline-block type-label text-brand_accent mb-1">Локация</span>
+                    <h3 id="modal-title-mobile" class="type-h3 text-white">Название</h3>
+                </div>
+            </div>
+
+            <div class="w-full md:w-1/2 p-5 md:p-8 flex flex-col md:overflow-y-auto bg-brand_bg">
+                <div class="hidden md:block mb-5 pr-10">
+                    <p id="modal-location" class="type-label text-brand_accent mb-2 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                        <span>Локация</span>
+                    </p>
+                    <h3 id="modal-title-desktop" class="type-h2 text-brand_dark">Название</h3>
+                </div>
+
+                <div id="modal-details-badge" class="hidden mb-4 p-3 bg-white border border-brand_dark/10 rounded-lg type-small font-medium text-brand_dark/80"></div>
+
+                <div class="type-small text-brand_dark/85 leading-relaxed mb-6 whitespace-pre-wrap flex-1" id="modal-desc">
+                    Описание...
+                </div>
+
+                <div class="border-t border-brand_dark/10 pt-4 mt-auto">
+                    <div class="flex items-baseline justify-between mb-3">
+                        <span class="type-label text-brand_dark/50">Стоимость</span>
+                        <span id="modal-price" class="type-h3 text-brand_dark tabular">Цена</span>
+                    </div>
+
+                    <form id="modal-form" class="flex flex-col gap-2.5">
+                        <input type="hidden" id="modal-tour-name">
+                        <input type="hidden" id="modal-tour-loc">
+                        <input type="text" id="modal-client-name" placeholder="Ваше имя" required class="w-full bg-white border border-brand_dark/20 rounded-lg px-4 py-3 outline-none focus:border-brand_dark transition-colors">
+                        <input type="text" id="modal-contact" placeholder="Телефон или @telegram" required class="w-full bg-white border border-brand_dark/20 rounded-lg px-4 py-3 outline-none focus:border-brand_dark transition-colors">
+                        <button type="submit" class="w-full bg-brand_dark text-brand_bg font-bold py-3.5 rounded-lg hover:bg-brand_accent transition-colors shadow-md type-small">
+                            Хочу сюда
+                        </button>
+                        <p class="text-[11px] text-brand_dark/55 text-center">
+                            Нажимая кнопку, вы соглашаетесь с <button type="button" onclick="openPrivacy()" class="underline hover:text-brand_dark">политикой конфиденциальности</button>
+                        </p>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- ОСНОВНАЯ ПАНЕЛЬ -->
-    <div id="admin-panel" class="hidden max-w-4xl mx-auto p-4 md:p-8">
-        <header class="flex justify-between items-center pb-6 border-b border-brand_dark/10 mb-8">
-            <div>
-                <h1 class="text-2xl font-bold">Панель управления Withiv</h1>
-                <p class="text-xs text-brand_dark/60">Все изменения сразу появляются на сайте</p>
+    <!-- Политика конфиденциальности (152-ФЗ) -->
+    <div id="privacy-modal" class="fixed inset-0 z-[1100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-brand_dark/80 backdrop-blur-sm" onclick="closePrivacy()"></div>
+        <div class="relative bg-white text-brand_dark max-w-2xl w-full max-h-[85vh] overflow-y-auto rounded-xl p-6 md:p-8 shadow-2xl z-10">
+            <div class="flex items-center justify-between gap-4 mb-5 pb-4 border-b border-brand_dark/10">
+                <h3 class="type-h3">Политика конфиденциальности</h3>
+                <button type="button" onclick="closePrivacy()" aria-label="Закрыть" class="w-9 h-9 rounded-full bg-brand_dark/10 text-brand_dark hover:bg-brand_dark hover:text-white flex items-center justify-center transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
-            <button onclick="logout()" class="text-xs font-semibold text-red-600 hover:underline">Выйти</button>
-        </header>
-
-        <!-- ВКЛАДКИ -->
-        <div class="flex gap-4 mb-8">
-            <button onclick="switchTab('tours')" id="tab-btn-tours" class="px-5 py-2.5 bg-brand_dark text-white text-sm font-semibold rounded transition">Интересные предложения</button>
-            <button onclick="switchTab('reviews')" id="tab-btn-reviews" class="px-5 py-2.5 bg-white text-brand_dark border border-brand_dark/20 text-sm font-semibold rounded transition">Отзывы</button>
+            <div class="space-y-3 type-small text-brand_dark/80 leading-relaxed">
+                <p>Настоящая Политика конфиденциальности действует в отношении всей информации, которую туристическое агентство <strong>Withiv</strong> может получить о пользователе во время использования сайта.</p>
+                <p><strong>1. Какие данные собираются:</strong> имя, номер телефона, никнейм в Telegram/MAX и пожелания по подбору тура, которые пользователь добровольно указывает в формах обратной связи.</p>
+                <p><strong>2. Цель обработки:</strong> связь с пользователем для расчёта стоимости, подбора и бронирования туристических услуг в соответствии с Федеральным законом № 152-ФЗ «О персональных данных».</p>
+                <p><strong>3. Защита и передача данных:</strong> персональные данные не передаются третьим лицам, за исключением случаев, прямо необходимых для бронирования выбранного пользователем тура, либо предусмотренных законодательством РФ.</p>
+                <p><strong>4. Отзыв согласия:</strong> пользователь вправе в любой момент запросить удаление своих данных, обратившись по телефону <a href="tel:+79127415413" class="underline font-semibold">+7 (912) 741-54-13</a> или в чат менеджера.</p>
+            </div>
         </div>
+    </div>
 
-        <!-- РАЗДЕЛ: ТУРЫ -->
-        <div id="section-tours" class="space-y-8">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-brand_dark/10">
-                <h2 class="text-lg font-bold mb-4">Добавить новое предложение</h2>
-                <form id="add-tour-form" class="space-y-4">
+    <!-- Простая форма запроса в конце -->
+    <section id="request-section" class="py-14 md:py-24 bg-brand_dark text-brand_bg w-full">
+        <div class="max-w-4xl mx-auto px-4 md:px-6 lg:px-8">
+            <div class="text-center mb-8 md:mb-10">
+                <span class="type-label text-brand_accent block mb-2">Персональный подход</span>
+                <h2 class="type-h2 mb-3">Отправить запрос на подбор тура</h2>
+                <p class="text-brand_bg/75 type-small max-w-xl mx-auto">Напишите ваши пожелания и контакт — Анастасия подберёт лучшие варианты и свяжется с вами в мессенджере</p>
+            </div>
+
+            <div class="bg-white text-brand_dark rounded-xl p-6 md:p-10 shadow-2xl">
+                <form id="simple-request-form" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-bold uppercase mb-1">Название отеля / тура *</label>
-                            <input type="text" id="tour-title" required placeholder="Например: Rixos Premium Belek 5*" class="w-full px-3 py-2 border border-brand_dark/20 rounded">
+                            <label class="block type-label text-brand_dark/60 mb-1.5">Как к вам обращаться?</label>
+                            <input type="text" id="req-name" placeholder="Ваше имя" required class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-lg outline-none focus:border-brand_dark bg-white">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold uppercase mb-1">Страна и курорт *</label>
-                            <input type="text" id="tour-location" required placeholder="Например: Турция, Белек" class="w-full px-3 py-2 border border-brand_dark/20 rounded">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase mb-1">Цена *</label>
-                            <input type="text" id="tour-price" required placeholder="Например: от 245 000 ₽" class="w-full px-3 py-2 border border-brand_dark/20 rounded">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase mb-1">Краткие детали (плашка)</label>
-                            <input type="text" id="tour-details" placeholder="7 ночей • Ультра всё включено • Вылет из Казани" class="w-full px-3 py-2 border border-brand_dark/20 rounded">
+                            <label class="block type-label text-brand_dark/60 mb-1.5">Телефон, Telegram или MAX</label>
+                            <input type="text" id="req-contact" placeholder="+7 (999) 000-00-00 или @username" required class="w-full border border-brand_dark/20 px-4 py-3.5 rounded-lg outline-none focus:border-brand_dark bg-white">
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase mb-1">Подробное описание</label>
-                        <textarea id="tour-desc" rows="3" placeholder="Почему стоит выбрать этот отель, особенности пляжа, фишки..." class="w-full px-3 py-2 border border-brand_dark/20 rounded"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase mb-1">Фотография отеля *</label>
-                        <input type="file" id="tour-photo-file" accept="image/*" required class="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-brand_dark file:text-white hover:file:bg-brand_dark/90">
-                        <p class="text-[11px] text-brand_dark/50 mt-1">Фото автоматически сожмется для быстрой загрузки сайта</p>
-                    </div>
-                    <button type="submit" id="tour-submit-btn" class="px-6 py-3 bg-brand_accent text-white font-bold rounded hover:opacity-90 transition">Опубликовать тур</button>
-                </form>
-            </div>
 
-            <!-- СПИСОК ТЕКУЩИХ ТУРОВ -->
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-brand_dark/10">
-                <h3 class="text-base font-bold mb-4">Текущие предложения на сайте</h3>
-                <div id="admin-tours-list" class="space-y-3 text-sm text-brand_dark/70">Загрузка...</div>
+                    <div>
+                        <label class="block type-label text-brand_dark/60 mb-1.5">Пожелания по отдыху (необязательно)</label>
+                        <textarea id="req-notes" rows="3" placeholder="Страна, примерные даты, сколько взрослых и детей, пожелания по отелю или бюджету..." class="w-full border border-brand_dark/20 px-4 py-3 rounded-lg outline-none focus:border-brand_dark bg-white resize-none"></textarea>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" id="req-submit-btn" class="w-full bg-brand_accent text-white px-8 py-4 font-bold rounded-lg hover:bg-brand_dark transition-colors shadow-lg type-small">
+                            Отправить запрос
+                        </button>
+                        <p class="text-[11px] text-brand_dark/55 text-center mt-3">
+                            Нажимая кнопку, вы соглашаетесь с <button type="button" onclick="openPrivacy()" class="underline hover:text-brand_dark">политикой конфиденциальности</button>
+                        </p>
+                    </div>
+                </form>
+
+                <div id="req-success" class="hidden text-center py-8">
+                    <svg class="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <h3 class="type-h2 mb-2">Запрос отправлен!</h3>
+                    <p class="type-small text-brand_dark/70 max-w-md mx-auto">Спасибо! Ваша заявка уже у Анастасии, скоро она свяжется с вами с подборкой туров.</p>
+                </div>
             </div>
         </div>
+    </section>
 
-        <!-- РАЗДЕЛ: ОТЗЫВЫ -->
-        <div id="section-reviews" class="hidden space-y-8">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-brand_dark/10">
-                <h2 class="text-lg font-bold mb-4">Добавить отзыв клиента</h2>
-                <form id="add-review-form" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold uppercase mb-1">Имя клиента *</label>
-                            <input type="text" id="rev-name" required placeholder="Например: Елена и Сергей" class="w-full px-3 py-2 border border-brand_dark/20 rounded">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase mb-1">Куда летали (страна)</label>
-                            <input type="text" id="rev-location" placeholder="Например: Дагестан" class="w-full px-3 py-2 border border-brand_dark/20 rounded">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase mb-1">Дата написания</label>
-                            <input type="text" id="rev-date" placeholder="Например: 15.11.2026" class="w-full px-3 py-2 border border-brand_dark/20 rounded">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase mb-1">Текст отзыва *</label>
-                        <textarea id="rev-text" rows="3" required placeholder="Вставьте текст отзыва..." class="w-full px-3 py-2 border border-brand_dark/20 rounded"></textarea>
-                    </div>
-                    <button type="submit" id="rev-submit-btn" class="px-6 py-3 bg-brand_accent text-white font-bold rounded hover:opacity-90 transition">Опубликовать отзыв</button>
-                </form>
+    <!-- Единый блок связей -->
+    <section id="contacts" class="py-14 md:py-20 bg-brand_bg border-t border-brand_dark/10 w-full">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+            <div class="mb-8 md:mb-10 text-center md:text-left">
+                <span class="type-label text-brand_accent block mb-2">Всегда на связи</span>
+                <h2 class="type-h2">Мессенджеры и соцсети</h2>
             </div>
 
-            <!-- СПИСОК ТЕКУЩИХ ОТЗЫВОВ -->
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-brand_dark/10">
-                <h3 class="text-base font-bold mb-4">Текущие отзывы на сайте</h3>
-                <div id="admin-reviews-list" class="space-y-3 text-sm text-brand_dark/70">Загрузка...</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Карточка 1: Telegram-канал -->
+                <div class="bg-white border border-brand_dark/10 rounded-xl p-6 md:p-8 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
+                    <div class="text-center sm:text-left flex-1">
+                        <span class="type-label text-brand_accent block mb-1.5">Горящие туры и обзоры</span>
+                        <h3 class="type-h3 mb-2">Telegram-канал Withiv</h3>
+                        <p class="type-small text-brand_dark/70 mb-5">Свежие подборки отелей, выгодные вылеты и полезные заметки для туристов.</p>
+                        <a href="https://t.me/withivtravel13" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 bg-brand_dark text-white px-6 py-3 rounded-lg font-bold type-small hover:bg-brand_accent transition-colors w-full sm:w-auto">
+                            Перейти в Telegram-канал
+                        </a>
+                    </div>
+                    <div class="shrink-0 p-3 bg-brand_bg rounded-xl border border-brand_dark/10 text-center">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=https://t.me/withivtravel13&color=1B3B2B" alt="QR Telegram-канал Withiv" class="w-28 h-28 mx-auto rounded-lg" loading="lazy">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-brand_dark/60 mt-2">Сканируйте камерой</span>
+                    </div>
+                </div>
+
+                <!-- Карточка 2: Личный контакт / MAX -->
+                <div class="bg-white border border-brand_dark/10 rounded-xl p-6 md:p-8 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
+                    <div class="text-center sm:text-left flex-1">
+                        <span class="type-label text-brand_accent block mb-1.5">Личный чат с менеджером</span>
+                        <h3 class="type-h3 mb-2">Анастасия Иванова</h3>
+                        <p class="type-small text-brand_dark/70 mb-5">Напишите напрямую в MAX, Telegram или WhatsApp для консультации и бронирования.</p>
+                        <div class="flex flex-wrap justify-center sm:justify-start gap-2">
+                            <a href="https://max.ru/u/f9LHodD0cOlgvmmr_5U1zrrrK6SS4GrjfAs4tECl-mgy6XpBaTQ1mJJbcY8" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center bg-brand_accent text-white px-5 py-3 rounded-lg font-bold type-small hover:bg-brand_dark transition-colors">
+                                Написать в MAX
+                            </a>
+                            <a href="https://t.me/nast_ivn" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center border border-brand_dark/20 text-brand_dark px-4 py-3 rounded-lg font-bold type-small hover:border-brand_dark transition-colors">
+                                Telegram
+                            </a>
+                            <a href="https://wa.me/79127415413" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center border border-brand_dark/20 text-brand_dark px-4 py-3 rounded-lg font-bold type-small hover:border-brand_dark transition-colors">
+                                WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                    <div class="shrink-0 p-3 bg-brand_bg rounded-xl border border-brand_dark/10 text-center">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=https://max.ru/u/f9LHodD0cOlgvmmr_5U1zrrrK6SS4GrjfAs4tECl-mgy6XpBaTQ1mJJbcY8&color=1B3B2B" alt="QR профиль в MAX" class="w-28 h-28 mx-auto rounded-lg" loading="lazy">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-brand_dark/60 mt-2">Профиль в MAX</span>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Чистый светлый многоколоночный Footer -->
+    <footer class="bg-white text-brand_dark border-t border-brand_dark/10 mt-auto w-full">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-10 md:py-16">
+            <div class="grid grid-cols-2 lg:grid-cols-12 gap-x-6 gap-y-8">
+
+                <!-- Колонка 1 -->
+                <div class="col-span-2 lg:col-span-4 flex flex-col items-start">
+                    <a href="#" class="mb-3 block transition-opacity duration-300 hover:opacity-80">
+                        <div class="h-12 md:h-14 overflow-hidden flex items-start">
+                            <img src="logo.jpg" alt="Withiv Турагентство" class="h-[70px] md:h-[82px] w-auto max-w-none block logo-light-bg">
+                        </div>
+                    </a>
+                    <p class="type-small text-brand_dark/70 max-w-xs mb-4">
+                        Отдыхайте так, как мечтаете! Горящие туры, выгодные цены и персональный подбор — всё в одном месте.
+                    </p>
+                    <div class="flex items-center gap-2">
+                        <a href="https://t.me/withivtravel13" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1.5 rounded-full border border-brand_dark/20 text-brand_dark hover:bg-brand_dark hover:text-white transition-colors text-xs font-bold">
+                            Telegram
+                        </a>
+                        <a href="https://max.ru/u/f9LHodD0cOlgvmmr_5U1zrrrK6SS4GrjfAs4tECl-mgy6XpBaTQ1mJJbcY8" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1.5 rounded-full border border-brand_dark/20 text-brand_dark hover:bg-brand_dark hover:text-white transition-colors text-xs font-bold">
+                            MAX
+                        </a>
+                        <a href="https://wa.me/79127415413" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1.5 rounded-full border border-brand_dark/20 text-brand_dark hover:bg-brand_dark hover:text-white transition-colors text-xs font-bold">
+                            WhatsApp
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Колонка 2 -->
+                <div class="col-span-1 lg:col-span-3">
+                    <h4 class="font-bold type-small text-brand_dark mb-3">Подбор тура</h4>
+                    <ul class="space-y-2 type-small text-brand_dark/70">
+                        <li><a href="#tourvisor-search" class="hover:text-brand_accent transition-colors">Поиск туров онлайн</a></li>
+                        <li><a href="#tours" class="hover:text-brand_accent transition-colors">Интересные предложения</a></li>
+                        <li><a href="#request-section" class="hover:text-brand_accent transition-colors">Индивидуальный запрос</a></li>
+                    </ul>
+                </div>
+
+                <!-- Колонка 3 -->
+                <div class="col-span-1 lg:col-span-2">
+                    <h4 class="font-bold type-small text-brand_dark mb-3">О компании</h4>
+                    <ul class="space-y-2 type-small text-brand_dark/70">
+                        <li><a href="#reviews" class="hover:text-brand_accent transition-colors">Отзывы туристов</a></li>
+                        <li><a href="#contacts" class="hover:text-brand_accent transition-colors">Мессенджеры</a></li>
+                        <li><button type="button" onclick="openPrivacy()" class="hover:text-brand_accent transition-colors text-left">Политика данных</button></li>
+                    </ul>
+                </div>
+
+                <!-- Колонка 4 -->
+                <div class="col-span-2 lg:col-span-3">
+                    <h4 class="font-bold type-small text-brand_dark mb-3">Контакты</h4>
+                    <ul class="space-y-2 type-small text-brand_dark/75">
+                        <li><a href="tel:+79127415413" class="font-bold text-base text-brand_dark hover:text-brand_accent transition-colors tabular">+7 (912) 741-54-13</a></li>
+                        <li><a href="https://max.ru/u/f9LHodD0cOlgvmmr_5U1zrrrK6SS4GrjfAs4tECl-mgy6XpBaTQ1mJJbcY8" target="_blank" rel="noopener noreferrer" class="hover:text-brand_accent transition-colors">Чат в MAX (Анастасия)</a></li>
+                        <li><a href="https://t.me/withivtravel13" target="_blank" rel="noopener noreferrer" class="hover:text-brand_accent transition-colors">t.me/withivtravel13</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-brand_dark/10 mt-8 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-brand_dark/55">
+                <p>&copy; 2026 Withiv. Все права защищены</p>
+                <button type="button" onclick="openPrivacy()" class="hover:text-brand_dark transition-colors underline underline-offset-4">Политика конфиденциальности</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Скрипт Tourvisor -->
+    <script type="text/javascript" src="https://tourvisor.ru/module/init.js"></script>
 
     <script>
         const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyfm98Wbr_Mwar3n8924oXOSQ1ZwVMg2jB_Ik1d_kULMANbzj332Odu2D9R6w0b4ts/exec';
-        const CLOUDINARY_CLOUD_NAME = 'g9u4par5';
-        const CLOUDINARY_UPLOAD_PRESET = 'withiv_preset';
+        const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop';
+        let globalTours = [];
 
-        let adminPassword = localStorage.getItem('withiv_admin_pass') || '';
-
-        if (adminPassword) {
-            showPanel();
+        function optimizeCloudinaryUrl(url, width = 800) {
+            if (!url || !String(url).startsWith('http')) return FALLBACK_IMAGE;
+            if (url.includes('res.cloudinary.com') && url.includes('/upload/') && !url.includes('f_auto')) {
+                return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width}/`);
+            }
+            return url;
         }
 
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button');
-            const passInput = document.getElementById('admin-pass-input').value.trim();
-            const origText = btn.innerText;
-            btn.disabled = true;
-            btn.innerText = 'Проверка...';
+        try {
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIcon = document.getElementById('menu-icon');
+            const closeIcon = document.getElementById('close-icon');
 
+            function toggleMenu() {
+                const isHidden = mobileMenu.classList.contains('hidden');
+                mobileMenu.classList.toggle('hidden', !isHidden);
+                mobileMenu.classList.toggle('flex', isHidden);
+                menuIcon.classList.toggle('hidden', isHidden);
+                closeIcon.classList.toggle('hidden', !isHidden);
+                document.body.style.overflow = isHidden ? 'hidden' : '';
+            }
+
+            if (mobileBtn) {
+                mobileBtn.addEventListener('click', toggleMenu);
+                document.querySelectorAll('.mobile-link').forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (!mobileMenu.classList.contains('hidden')) toggleMenu();
+                    });
+                });
+            }
+        } catch (e) {}
+
+        window.scrollReviews = function(offset) {
+            const container = document.getElementById('reviews-container');
+            if (container) container.scrollBy({ left: offset, behavior: 'smooth' });
+        };
+
+        window.openPrivacy = function() {
+            const el = document.getElementById('privacy-modal');
+            if (!el) return;
+            el.classList.remove('hidden');
+            el.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closePrivacy = function() {
+            const el = document.getElementById('privacy-modal');
+            if (!el) return;
+            el.classList.add('hidden');
+            el.classList.remove('flex');
+            const tourModal = document.getElementById('tour-modal');
+            if (!tourModal || tourModal.classList.contains('hidden')) {
+                document.body.style.overflow = '';
+            }
+        };
+
+        async function fetchWithRetry(url, maxRetries = 3, delay = 3000) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+                    const cacheBusterUrl = new URL(url);
+                    cacheBusterUrl.searchParams.append('_t', new Date().getTime());
+
+                    const response = await fetch(cacheBusterUrl.toString(), {
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return await response.json();
+                } catch (e) {
+                    if (i === maxRetries - 1) throw e;
+                    const loadingText = document.getElementById('loading-text');
+                    if (loadingText) {
+                        loadingText.innerText = `Подключение к базе предложений (${i + 1}/${maxRetries})...`;
+                    }
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
+
+        function renderFilters(tours) {
             try {
-                adminPassword = passInput;
-                await postToGAS({ action: 'auth' });
-                localStorage.setItem('withiv_admin_pass', adminPassword);
-                showPanel();
-            } catch (err) {
-                adminPassword = '';
-                if (err.message !== 'Unauthorized') alert('Ошибка сети: ' + err.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerText = origText;
-            }
-        });
+                const tabsContainer = document.getElementById('filter-tabs');
+                if (!tabsContainer) return;
 
-        function logout() {
-            localStorage.removeItem('withiv_admin_pass');
-            location.reload();
-        }
-
-        function showPanel() {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('admin-panel').classList.remove('hidden');
-            loadAdminData();
-        }
-
-        function switchTab(tab) {
-            const isTours = tab === 'tours';
-            document.getElementById('section-tours').classList.toggle('hidden', !isTours);
-            document.getElementById('section-reviews').classList.toggle('hidden', isTours);
-
-            document.getElementById('tab-btn-tours').className = isTours
-                ? 'px-5 py-2.5 bg-brand_dark text-white text-sm font-semibold rounded transition'
-                : 'px-5 py-2.5 bg-white text-brand_dark border border-brand_dark/20 text-sm font-semibold rounded transition';
-            document.getElementById('tab-btn-reviews').className = !isTours
-                ? 'px-5 py-2.5 bg-brand_dark text-white text-sm font-semibold rounded transition'
-                : 'px-5 py-2.5 bg-white text-brand_dark border border-brand_dark/20 text-sm font-semibold rounded transition';
-        }
-
-        async function postToGAS(payload) {
-            const res = await fetch(GAS_API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ ...payload, password: adminPassword })
-            });
-            const data = await res.json();
-            if (data.status === 401) {
-                alert('Неверный пароль!');
-                if (localStorage.getItem('withiv_admin_pass')) logout();
-                throw new Error('Unauthorized');
-            }
-            if (!data.ok) {
-                throw new Error(data.error || 'Ошибка скрипта Google');
-            }
-            return data;
-        }
-
-        function compressImage(file, maxWidth = 1200, quality = 0.8) {
-            return new Promise((resolve) => {
-                if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-                    resolve(file);
+                if (!Array.isArray(tours) || tours.length === 0) {
+                    tabsContainer.innerHTML = '';
                     return;
                 }
 
-                const timeout = setTimeout(() => resolve(file), 3000);
-                const reader = new FileReader();
-                reader.onerror = () => { clearTimeout(timeout); resolve(file); };
-                reader.readAsDataURL(file);
+                const locationsRaw = tours
+                    .filter(t => t && typeof t === 'object' && t['Локация'])
+                    .map(t => String(t['Локация']).split(',')[0].trim())
+                    .filter(Boolean);
 
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.onerror = () => { clearTimeout(timeout); resolve(file); };
-                    img.src = event.target.result;
+                const uniqueLocations = [...new Set(locationsRaw)];
 
-                    img.onload = () => {
-                        try {
-                            const canvas = document.createElement('canvas');
-                            let width = img.width;
-                            let height = img.height;
-                            if (width > maxWidth) {
-                                height = Math.round((height * maxWidth) / width);
-                                width = maxWidth;
-                            }
-                            canvas.width = width;
-                            canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, width, height);
-                            canvas.toBlob((blob) => {
-                                clearTimeout(timeout);
-                                resolve(blob || file);
-                            }, 'image/jpeg', quality);
-                        } catch (e) {
-                            clearTimeout(timeout);
-                            resolve(file);
+                let html = `<button data-filter="all" class="filter-btn px-4 py-2 bg-brand_dark text-brand_bg type-small font-semibold rounded-full whitespace-nowrap transition-colors">Все направления</button>`;
+                uniqueLocations.forEach(loc => {
+                    html += `<button data-filter="${loc}" class="filter-btn px-4 py-2 border border-brand_dark/20 text-brand_dark type-small font-semibold rounded-full hover:border-brand_dark transition-colors whitespace-nowrap">${loc}</button>`;
+                });
+                tabsContainer.innerHTML = html;
+
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.filter-btn').forEach(b => {
+                            b.classList.remove('bg-brand_dark', 'text-brand_bg');
+                            b.classList.add('border', 'border-brand_dark/20', 'text-brand_dark');
+                        });
+                        e.target.classList.add('bg-brand_dark', 'text-brand_bg');
+                        e.target.classList.remove('border', 'border-brand_dark/20', 'text-brand_dark');
+
+                        const filter = e.target.dataset.filter;
+                        if (filter === 'all') {
+                            renderTours(globalTours);
+                        } else {
+                            const filtered = globalTours.filter(t => t && String(t['Локация'] || '').includes(filter));
+                            renderTours(filtered);
                         }
-                    };
-                };
-            });
+                    });
+                });
+            } catch (e) {}
         }
 
-        async function uploadToCloudinary(file) {
-            const fileToUpload = await compressImage(file);
-            const formData = new FormData();
-            formData.append('file', fileToUpload);
-            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+        function renderTours(list) {
+            const grid = document.getElementById('tours-grid');
+            if (!grid) return;
 
-            const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-                method: 'POST',
-                body: formData
-            });
-            const data = await res.json();
-            if (!res.ok) {
-                throw new Error(data.error?.message || `Ошибка Cloudinary (${res.status})`);
+            if (!Array.isArray(list) || list.length === 0) {
+                grid.innerHTML = '<div class="col-span-full py-12 text-center font-medium text-brand_dark/60 type-small">В данный момент по этому направлению нет предложений.</div>';
+                return;
             }
-            return data.secure_url;
-        }
-
-        document.getElementById('add-tour-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('tour-submit-btn');
-            const origText = btn.innerText;
-            btn.disabled = true;
 
             try {
-                btn.innerText = 'Сжимаем и грузим фото...';
-                const file = document.getElementById('tour-photo-file').files[0];
-                const photoUrl = await uploadToCloudinary(file);
+                grid.innerHTML = list.map((tour) => {
+                    if (!tour || typeof tour !== 'object') return '';
 
-                btn.innerText = 'Сохраняем в таблицу...';
-                const row = [
-                    document.getElementById('tour-title').value.trim(),
-                    document.getElementById('tour-location').value.trim(),
-                    document.getElementById('tour-price').value.trim(),
-                    document.getElementById('tour-details').value.trim(),
-                    document.getElementById('tour-desc').value.trim(),
-                    photoUrl,
-                    'both'
-                ];
+                    const realIdx = globalTours.indexOf(tour);
+                    const title = tour['Название'] ? String(tour['Название']).replace(/</g, "&lt;") : 'Предложение под запрос';
+                    const location = tour['Локация'] ? String(tour['Локация']).replace(/</g, "&lt;") : 'Направление';
+                    const price = tour['Цена'] ? String(tour['Цена']).replace(/</g, "&lt;") : 'По запросу';
+                    const details = tour['Детали'] ? String(tour['Детали']).replace(/</g, "&lt;") : '';
+                    const imgUrl = optimizeCloudinaryUrl(tour['Фото'], 800);
 
-                await postToGAS({ action: 'tour_add', row });
-
-                alert('Тур успешно опубликован!');
-                e.target.reset();
-                loadAdminData();
-            } catch (err) {
-                if (err.message !== 'Unauthorized') alert('Ошибка: ' + err.message);
-            } finally {
-                btn.innerText = origText;
-                btn.disabled = false;
-            }
-        });
-
-        document.getElementById('add-review-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('rev-submit-btn');
-            btn.disabled = true;
-            btn.innerText = 'Публикация...';
-
-            try {
-                const row = [
-                    document.getElementById('rev-name').value.trim(),
-                    document.getElementById('rev-location').value.trim(),
-                    document.getElementById('rev-text').value.trim(),
-                    document.getElementById('rev-date').value.trim()
-                ];
-
-                await postToGAS({ action: 'review_add', row });
-
-                alert('Отзыв опубликован!');
-                e.target.reset();
-                loadAdminData();
-            } catch (err) {
-                if (err.message !== 'Unauthorized') alert('Ошибка: ' + err.message);
-            } finally {
-                btn.innerText = 'Опубликовать отзыв';
-                btn.disabled = false;
-            }
-        });
-
-        function getField(obj, keys) {
-            for (const k of keys) {
-                if (obj[k] !== undefined && String(obj[k]).trim() !== '') return String(obj[k]).trim();
-            }
-            const normMap = {};
-            Object.keys(obj).forEach(ok => { normMap[ok.trim().toLowerCase()] = obj[ok]; });
-            for (const k of keys) {
-                const v = normMap[k.toLowerCase()];
-                if (v !== undefined && String(v).trim() !== '') return String(v).trim();
-            }
-            return '';
-        }
-
-        async function loadAdminData() {
-            try {
-                const [toursRes, revRes] = await Promise.all([
-                    fetch(`${GAS_API_URL}?action=tours&_t=${Date.now()}`),
-                    fetch(`${GAS_API_URL}?action=reviews&_t=${Date.now()}`)
-                ]);
-                const tours = await toursRes.json();
-                const reviews = await revRes.json();
-
-                document.getElementById('admin-tours-list').innerHTML = tours.length
-                    ? tours.map((t) => `
-                        <div class="flex justify-between items-center p-3 bg-brand_bg rounded border border-brand_dark/10">
-                            <div>
-                                <p class="font-bold text-brand_dark">${t['Название'] || ''}</p>
-                                <p class="text-xs">${t['Локация'] || ''} — ${t['Цена'] || ''}</p>
+                    return `
+                        <article onclick="openModal(${realIdx})" class="cursor-pointer group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-brand_dark/10 overflow-hidden flex flex-col">
+                            <div class="h-52 md:h-64 overflow-hidden relative bg-brand_dark">
+                                <img src="${imgUrl}" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}';" alt="${title}" loading="lazy" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700">
+                                <div class="absolute bottom-3 left-3 bg-brand_dark/90 backdrop-blur-sm text-white px-3 py-1 type-label !tracking-wider rounded-full shadow-md">${location}</div>
                             </div>
-                            <button onclick="deleteItem('tour', ${t.row_index})" class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded hover:bg-red-200">Удалить</button>
+                            <div class="p-5 flex-1 flex flex-col justify-between bg-white">
+                                <div>
+                                    <h3 class="type-h3 mb-2 group-hover:text-brand_accent transition-colors line-clamp-2">${title}</h3>
+                                    ${details ? `<p class="type-small text-brand_dark/60 mb-4 line-clamp-1">${details}</p>` : ''}
+                                </div>
+                                <div class="flex justify-between items-center border-t border-brand_dark/10 pt-4 mt-auto">
+                                    <span class="font-bold text-brand_dark tabular">${price}</span>
+                                    <span class="type-small font-bold text-brand_accent flex items-center gap-1">Подробнее <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                                </div>
+                            </div>
+                        </article>
+                    `;
+                }).join('');
+            } catch (e) {
+                grid.innerHTML = '<div class="col-span-full py-12 text-center text-red-600 type-small">Произошла ошибка при отображении предложений.</div>';
+            }
+        }
+
+        function renderReviewsHtml(reviews) {
+            const container = document.getElementById('reviews-container');
+            if (!container) return;
+
+            if (!Array.isArray(reviews) || reviews.length === 0) {
+                container.innerHTML = '<div class="w-full text-center py-12 text-brand_dark/50 type-small">Отзывы скоро появятся...</div>';
+                return;
+            }
+
+            const getVal = (obj, keys) => {
+                for (const k of keys) {
+                    if (obj[k] !== undefined && String(obj[k]).trim() !== '') return String(obj[k]).trim();
+                }
+                const normMap = {};
+                Object.keys(obj).forEach(ok => { normMap[ok.trim().toLowerCase()] = obj[ok]; });
+                for (const k of keys) {
+                    const v = normMap[k.toLowerCase()];
+                    if (v !== undefined && String(v).trim() !== '') return String(v).trim();
+                }
+                return '';
+            };
+
+            container.innerHTML = reviews.map(r => {
+                const text = getVal(r, ['Текст', 'Отзыв', 'Комментарий', 'text']).replace(/</g, "&lt;");
+                const name = (getVal(r, ['Имя', 'Клиент', 'Автор', 'name']) || 'Гость').replace(/</g, "&lt;");
+                const countryRaw = getVal(r, ['Страна', 'Локация', 'Куда летали', 'Направление', 'Тур', 'country', 'location']).replace(/</g, "&lt;");
+                const country = countryRaw ? countryRaw.charAt(0).toUpperCase() + countryRaw.slice(1) : '';
+                const reviewDate = getVal(r, ['Дата', 'Дата написания', 'Дата отзыва', 'Дата поездки', 'date']).replace(/</g, "&lt;");
+
+                return `
+                <div class="w-80 md:w-96 shrink-0 bg-white border border-brand_dark/10 p-6 md:p-8 rounded-xl snap-center shadow-sm flex flex-col">
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <div class="flex items-center gap-1 text-brand_accent">
+                            ${'<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'.repeat(5)}
                         </div>
-                    `).join('')
-                    : 'Туров пока нет';
-
-                document.getElementById('admin-reviews-list').innerHTML = reviews.length
-                    ? reviews.map((r) => {
-                        const name = getField(r, ['Имя', 'Клиент', 'Автор', 'name']);
-                        const country = getField(r, ['Страна', 'Локация', 'Куда летали', 'Направление', 'location', 'country']);
-                        const revDate = getField(r, ['Дата', 'Дата написания', 'Дата отзыва', 'Дата поездки', 'date']);
-                        const text = getField(r, ['Текст', 'Отзыв', 'Комментарий', 'text']);
-                        const meta = [country, revDate].filter(Boolean).join(' • ');
-
-                        return `
-                        <div class="flex justify-between items-center p-3 bg-brand_bg rounded border border-brand_dark/10">
-                            <div class="pr-4">
-                                <p class="font-bold text-brand_dark">${name} ${meta ? `<span class="font-normal text-xs text-brand_dark/60">(${meta})</span>` : ''}</p>
-                                <p class="text-xs line-clamp-1">${text}</p>
-                            </div>
-                            <button onclick="deleteItem('review', ${r.row_index})" class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded hover:bg-red-200 shrink-0">Удалить</button>
-                        </div>`;
-                    }).join('')
-                    : 'Отзывов пока нет';
-            } catch (e) {
-                console.error(e);
-            }
+                        ${reviewDate ? `<span class="text-xs font-medium text-brand_dark/50 tabular">${reviewDate}</span>` : ''}
+                    </div>
+                    <p class="text-brand_dark/80 type-small leading-relaxed mb-6 italic flex-1">«${text}»</p>
+                    <div class="mt-auto border-t border-brand_dark/10 pt-4 flex items-center justify-between gap-3">
+                        <p class="font-bold type-small text-brand_dark">${name}</p>
+                        ${country ? `
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand_bg border border-brand_dark/10 text-xs font-semibold text-brand_dark shrink-0">
+                            <svg class="w-3.5 h-3.5 text-brand_accent shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            ${country}
+                        </span>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
         }
 
-        async function deleteItem(type, rowIndex) {
-            if (!confirm('Точно удалить эту запись с сайта?')) return;
+        async function loadTours() {
+            const grid = document.getElementById('tours-grid');
+            if (!grid) return;
+
+            const cached = localStorage.getItem('withiv_cache_tours');
+            if (cached) {
+                try {
+                    globalTours = JSON.parse(cached);
+                    renderFilters(globalTours);
+                    renderTours(globalTours);
+                } catch (e) {}
+            }
+
             try {
-                await postToGAS({ action: `${type}_delete`, row_index: rowIndex });
-                loadAdminData();
-            } catch (e) {
-                if (e.message !== 'Unauthorized') alert('Ошибка при удалении: ' + e.message);
+                const data = await fetchWithRetry(`${GAS_API_URL}?action=tours&site=1`);
+                const fresh = Array.isArray(data) ? data : [];
+                const freshStr = JSON.stringify(fresh);
+                if (freshStr !== cached) {
+                    localStorage.setItem('withiv_cache_tours', freshStr);
+                    globalTours = fresh;
+                    renderFilters(globalTours);
+                    renderTours(globalTours);
+                }
+            } catch (err) {
+                if (!cached) {
+                    grid.innerHTML = '<div class="col-span-full py-12 text-center font-medium text-brand_dark/60 bg-white border border-brand_dark/10 rounded-xl p-6 type-small">Временно не удалось загрузить предложения.</div>';
+                }
             }
         }
+
+        async function loadReviews() {
+            const container = document.getElementById('reviews-container');
+            if (!container) return;
+
+            const cached = localStorage.getItem('withiv_cache_reviews');
+            if (cached) {
+                try { renderReviewsHtml(JSON.parse(cached)); } catch (e) {}
+            }
+
+            try {
+                const reviews = await fetchWithRetry(`${GAS_API_URL}?action=reviews`, 2, 2000);
+                const fresh = Array.isArray(reviews) ? reviews : [];
+                const freshStr = JSON.stringify(fresh);
+                if (freshStr !== cached) {
+                    localStorage.setItem('withiv_cache_reviews', freshStr);
+                    renderReviewsHtml(fresh);
+                }
+            } catch (err) {
+                if (!cached) {
+                    container.innerHTML = '<div class="w-full text-center py-10 text-brand_dark/50 type-small">Временно не удалось загрузить отзывы</div>';
+                }
+            }
+        }
+
+        const modal = document.getElementById('tour-modal');
+        const modalBackdrop = document.getElementById('modal-backdrop');
+
+        window.openModal = function(idx) {
+            try {
+                const t = globalTours[idx];
+                if (!t || !modal || !modalBackdrop) return;
+
+                const imgEl = document.getElementById('modal-img');
+                imgEl.src = optimizeCloudinaryUrl(t['Фото'], 1200);
+                imgEl.onerror = function() { this.onerror=null; this.src=FALLBACK_IMAGE; };
+
+                document.getElementById('modal-title-desktop').innerText = t['Название'] || 'Предложение';
+                document.getElementById('modal-title-mobile').innerText = t['Название'] || 'Предложение';
+                document.getElementById('modal-location').querySelector('span').innerText = t['Локация'] || '';
+                document.getElementById('modal-location-mobile').innerText = t['Локация'] || '';
+
+                const detailsBadge = document.getElementById('modal-details-badge');
+                const descEl = document.getElementById('modal-desc');
+
+                if (t['Описание'] && t['Детали']) {
+                    detailsBadge.innerText = t['Детали'];
+                    detailsBadge.classList.remove('hidden');
+                    descEl.innerText = String(t['Описание']);
+                } else {
+                    detailsBadge.classList.add('hidden');
+                    descEl.innerText = String(t['Описание'] || t['Детали'] || 'Подробную программу тура уточняйте у менеджера');
+                }
+
+                document.getElementById('modal-price').innerText = t['Цена'] || 'По запросу';
+                document.getElementById('modal-tour-name').value = t['Название'] || 'Без названия';
+                document.getElementById('modal-tour-loc').value = t['Локация'] || '';
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+
+                requestAnimationFrame(() => {
+                    modalBackdrop.classList.remove('opacity-0');
+                    modal.classList.remove('modal-closed');
+                    modal.classList.add('modal-open');
+                });
+            } catch (e) {}
+        };
+
+        window.closeModal = function() {
+            if (!modal || !modalBackdrop) return;
+            modalBackdrop.classList.add('opacity-0');
+            modal.classList.remove('modal-open');
+            modal.classList.add('modal-closed');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = '';
+            }, 350);
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const privacyEl = document.getElementById('privacy-modal');
+                if (privacyEl && !privacyEl.classList.contains('hidden')) {
+                    window.closePrivacy();
+                } else if (modal && !modal.classList.contains('hidden')) {
+                    window.closeModal();
+                }
+            }
+        });
+
+        // 1. Заявка из карточки «Интересные предложения» («Хочу сюда»)
+        const modalForm = document.getElementById('modal-form');
+        if (modalForm) {
+            modalForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button[type="submit"]');
+                if (!btn || btn.disabled) return;
+
+                const origText = btn.innerText;
+                btn.innerText = 'Отправка...';
+                btn.disabled = true;
+
+                try {
+                    const clientName = document.getElementById('modal-client-name').value.trim();
+                    const clientContact = document.getElementById('modal-contact').value.trim();
+                    const tourTitle = document.getElementById('modal-tour-name').value;
+                    const tourLoc = document.getElementById('modal-tour-loc').value;
+                    const tourPrice = document.getElementById('modal-price').innerText;
+
+                    const commentLines = [
+                        'Тип: Заявка по подборке сайта («Хочу сюда»)',
+                        `Тур: ${tourTitle}`,
+                        tourLoc ? `Направление: ${tourLoc}` : '',
+                        `Стоимость: ${tourPrice}`
+                    ].filter(Boolean).join('\n');
+
+                    const response = await fetch(GAS_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({
+                            action: 'lead',
+                            name: clientName,
+                            contact: clientContact,
+                            comment: commentLines
+                        })
+                    });
+
+                    const resData = await response.json();
+                    if (!resData.ok) throw new Error("Server rejected lead");
+
+                    btn.innerText = 'Успешно отправлено!';
+                    btn.classList.replace('bg-brand_dark', 'bg-green-600');
+                    setTimeout(window.closeModal, 1500);
+                } catch(err) {
+                    btn.innerText = 'Ошибка. Попробуйте позже';
+                    btn.classList.replace('bg-brand_dark', 'bg-red-600');
+                } finally {
+                    setTimeout(() => {
+                        btn.innerText = origText;
+                        btn.classList.remove('bg-green-600', 'bg-red-600');
+                        btn.classList.add('bg-brand_dark');
+                        btn.disabled = false;
+                        e.target.reset();
+                    }, 3000);
+                }
+            });
+        }
+
+        // 2. Заявка с формы консультации внизу сайта («Отправить запрос на подбор тура»)
+        const simpleForm = document.getElementById('simple-request-form');
+        if (simpleForm) {
+            simpleForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('req-submit-btn');
+                if (!btn || btn.disabled) return;
+
+                const origText = btn.innerText;
+                btn.innerText = 'Отправка запроса...';
+                btn.disabled = true;
+
+                try {
+                    const name = document.getElementById('req-name').value.trim();
+                    const contact = document.getElementById('req-contact').value.trim();
+                    const notes = document.getElementById('req-notes').value.trim();
+
+                    const commentLines = [
+                        'Тип: Запрос на консультацию / подбор тура',
+                        notes ? `Пожелания туриста:\n${notes}` : 'Пожелания туриста: не указаны'
+                    ].join('\n');
+
+                    const response = await fetch(GAS_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({
+                            action: 'lead',
+                            name: name,
+                            contact: contact,
+                            comment: commentLines
+                        })
+                    });
+
+                    const resData = await response.json();
+                    if (!resData.ok) throw new Error("Server rejected request");
+
+                    simpleForm.classList.add('hidden');
+                    document.getElementById('req-success').classList.remove('hidden');
+                } catch (err) {
+                    btn.innerText = 'Ошибка сети. Попробуйте ещё раз';
+                    btn.classList.add('bg-red-600');
+                    setTimeout(() => {
+                        btn.innerText = origText;
+                        btn.classList.remove('bg-red-600');
+                        btn.disabled = false;
+                    }, 3000);
+                }
+            });
+        }
+
+        // 3. Чистый перехват реальных заявок (с телефоном/почтой) из виджета Tourvisor
+        (function() {
+            let lastLeadHash = '';
+            const origFetch = window.fetch;
+
+            function getTourCardContext() {
+                const modalEl = document.querySelector('.TVModalContainer, [class*="TVOrder"], [class*="TVBooking"], [class*="TVPopup"], [class*="TVTourInfo"]');
+                const scope = modalEl || document;
+                const pick = (selectors) => {
+                    for (const sel of selectors) {
+                        const el = scope.querySelector(sel);
+                        if (el && el.innerText && el.innerText.trim()) return el.innerText.trim().replace(/\s+/g, ' ');
+                    }
+                    return '';
+                };
+
+                const hotel = pick(['[class*="HotelName"]', '[class*="hotel-name"]', '.TVTourTitle', 'h1', 'h2']);
+                const country = pick(['[class*="Country"]', '[class*="Resort"]', '[class*="Location"]']);
+                const price = pick(['[class*="PriceValue"]', '[class*="TourPrice"]', '[class*="total-price"]']);
+                const dates = pick(['[class*="TourDate"]', '[class*="FlyDate"]', '[class*="Nights"]']);
+                const meal = pick(['[class*="Meal"]', '[class*="Food"]']);
+
+                return [
+                    hotel ? `Отель: ${hotel}` : '',
+                    country ? `Курорт: ${country}` : '',
+                    dates ? `Даты / ночи: ${dates}` : '',
+                    meal ? `Питание: ${meal}` : '',
+                    price ? `Стоимость в поиске: ${price}` : ''
+                ].filter(Boolean);
+            }
+
+            function sendCleanTourvisorLead(clientName, clientContact, extraLines) {
+                const cleanContact = String(clientContact || '').trim();
+                const hasRealContact = /(?:\+?\d[\d\s\-()]{6,}\d)|(?:[^\s@]+@[^\s@]+\.[^\s@]+)/.test(cleanContact);
+                if (!hasRealContact) return;
+
+                const hash = `${clientName}|${cleanContact}`;
+                if (hash === lastLeadHash) return;
+                lastLeadHash = hash;
+                setTimeout(() => { lastLeadHash = ''; }, 8000);
+
+                const tourContext = getTourCardContext();
+                const allLines = [
+                    'Тип: Бронирование / заявка из поиска туров (Tourvisor)',
+                    ...tourContext,
+                    ...(extraLines || [])
+                ].filter(Boolean);
+
+                origFetch(GAS_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: 'lead',
+                        name: String(clientName || '').trim() || 'Клиент из поиска туров',
+                        contact: cleanContact,
+                        comment: allLines.join('\n')
+                    })
+                }).catch(() => {});
+            }
+
+            function inspectPayload(rawBody) {
+                if (!rawBody || typeof rawBody !== 'string') return;
+                let data = {};
+                try {
+                    data = JSON.parse(rawBody);
+                } catch (e) {
+                    new URLSearchParams(rawBody).forEach((v, k) => { data[k] = v; });
+                }
+
+                if (data.sessionId && !data.phone && !data.tel && !data.email) return;
+
+                const phone = data.phone || data.tel || data.clientPhone || data.email || '';
+                const name = data.name || data.clientName || data.fio || data.touristName || '';
+                const userComment = data.comment || data.note || data.message || '';
+
+                if (phone) {
+                    sendCleanTourvisorLead(name, phone, userComment ? [`Комментарий туриста: ${userComment}`] : []);
+                }
+            }
+
+            window.fetch = function(input, init) {
+                try {
+                    const url = typeof input === 'string' ? input : (input && input.url) || '';
+                    if (url.includes('tourvisor.ru') && init && init.body) {
+                        inspectPayload(String(init.body));
+                    }
+                } catch (e) {}
+                return origFetch.apply(this, arguments);
+            };
+
+            const origOpen = XMLHttpRequest.prototype.open;
+            const origSend = XMLHttpRequest.prototype.send;
+            XMLHttpRequest.prototype.open = function(method, url) {
+                this._tvUrl = String(url || '');
+                return origOpen.apply(this, arguments);
+            };
+            XMLHttpRequest.prototype.send = function(body) {
+                try {
+                    if (this._tvUrl.includes('tourvisor.ru') && typeof body === 'string') {
+                        inspectPayload(body);
+                    }
+                } catch (e) {}
+                return origSend.apply(this, arguments);
+            };
+
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('button, input[type="submit"], [class*="TVButton"], [class*="TVSubmit"]');
+                if (!btn) return;
+                const modalEl = btn.closest('.TVModalContainer, [class*="TVOrder"], [class*="TVBooking"], [class*="TVPopup"]');
+                if (!modalEl) return;
+
+                const inputs = Array.from(modalEl.querySelectorAll('input, textarea'))
+                    .filter(el => el.type !== 'hidden' && el.type !== 'submit' && el.value && el.value.trim());
+
+                let phone = '';
+                let name = '';
+                const extra = [];
+
+                inputs.forEach(el => {
+                    const val = el.value.trim();
+                    const hint = `${el.name || ''} ${el.placeholder || ''} ${el.type || ''}`.toLowerCase();
+                    if (!phone && (/tel|phone|телефон|mail|почт/.test(hint) || /(?:\+?\d[\d\s\-()]{6,}\d)|(?:@)/.test(val))) {
+                        phone = val;
+                    } else if (!name && /name|имя|фио/.test(hint)) {
+                        name = val;
+                    } else {
+                        extra.push(`${el.placeholder || 'Доп. поле'}: ${val}`);
+                    }
+                });
+
+                if (phone) {
+                    sendCleanTourvisorLead(name, phone, extra);
+                }
+            }, true);
+        })();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Promise.allSettled([
+                loadTours(),
+                loadReviews()
+            ]);
+        });
     </script>
 </body>
 </html>
