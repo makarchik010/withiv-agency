@@ -91,7 +91,6 @@
         }
         .reviews-scroll::-webkit-scrollbar, .hide-scrollbar::-webkit-scrollbar { display: none; }
 
-        /* Виджет Tourvisor */
         #tourvisor-widget-container {
             width: 100%;
             max-width: 100%;
@@ -299,6 +298,8 @@
 
                     <form id="modal-form" class="flex flex-col gap-2.5">
                         <input type="hidden" id="modal-tour-name">
+                        <input type="hidden" id="modal-tour-loc">
+                        <input type="text" id="modal-client-name" placeholder="Ваше имя" required class="w-full bg-white border border-brand_dark/20 rounded-lg px-4 py-3 outline-none focus:border-brand_dark transition-colors">
                         <input type="text" id="modal-contact" placeholder="Телефон или @telegram" required class="w-full bg-white border border-brand_dark/20 rounded-lg px-4 py-3 outline-none focus:border-brand_dark transition-colors">
                         <button type="submit" class="w-full bg-brand_dark text-brand_bg font-bold py-3.5 rounded-lg hover:bg-brand_accent transition-colors shadow-md type-small">
                             Хочу сюда
@@ -511,13 +512,6 @@
             }
             return url;
         }
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const utmData = {
-            source: urlParams.get('utm_source') || 'Органика',
-            medium: urlParams.get('utm_medium') || 'Неизвестно',
-            campaign: urlParams.get('utm_campaign') || 'Без кампании'
-        };
 
         try {
             const mobileBtn = document.getElementById('mobile-menu-btn');
@@ -798,6 +792,7 @@
 
                 document.getElementById('modal-price').innerText = t['Цена'] || 'По запросу';
                 document.getElementById('modal-tour-name').value = t['Название'] || 'Без названия';
+                document.getElementById('modal-tour-loc').value = t['Локация'] || '';
 
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
@@ -835,6 +830,7 @@
             }
         });
 
+        // 1. Заявка из карточки «Интересные предложения» («Хочу сюда»)
         const modalForm = document.getElementById('modal-form');
         if (modalForm) {
             modalForm.addEventListener('submit', async (e) => {
@@ -847,14 +843,27 @@
                 btn.disabled = true;
 
                 try {
+                    const clientName = document.getElementById('modal-client-name').value.trim();
+                    const clientContact = document.getElementById('modal-contact').value.trim();
+                    const tourTitle = document.getElementById('modal-tour-name').value;
+                    const tourLoc = document.getElementById('modal-tour-loc').value;
+                    const tourPrice = document.getElementById('modal-price').innerText;
+
+                    const commentLines = [
+                        'Тип: Заявка по подборке сайта («Хочу сюда»)',
+                        `Тур: ${tourTitle}`,
+                        tourLoc ? `Направление: ${tourLoc}` : '',
+                        `Стоимость: ${tourPrice}`
+                    ].filter(Boolean).join('\n');
+
                     const response = await fetch(GAS_API_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify({
                             action: 'lead',
-                            name: 'Запрос по туру: ' + document.getElementById('modal-tour-name').value,
-                            contact: document.getElementById('modal-contact').value,
-                            comment: `Цена: ${document.getElementById('modal-price').innerText}\nUTM: ${utmData.source} | ${utmData.medium} | ${utmData.campaign}`
+                            name: clientName,
+                            contact: clientContact,
+                            comment: commentLines
                         })
                     });
 
@@ -879,6 +888,7 @@
             });
         }
 
+        // 2. Заявка с формы консультации внизу сайта («Отправить запрос на подбор тура»)
         const simpleForm = document.getElementById('simple-request-form');
         if (simpleForm) {
             simpleForm.addEventListener('submit', async (e) => {
@@ -893,7 +903,12 @@
                 try {
                     const name = document.getElementById('req-name').value.trim();
                     const contact = document.getElementById('req-contact').value.trim();
-                    const notes = document.getElementById('req-notes').value.trim() || 'Без комментария';
+                    const notes = document.getElementById('req-notes').value.trim();
+
+                    const commentLines = [
+                        'Тип: Запрос на консультацию / подбор тура',
+                        notes ? `Пожелания туриста:\n${notes}` : 'Пожелания туриста: не указаны'
+                    ].join('\n');
 
                     const response = await fetch(GAS_API_URL, {
                         method: 'POST',
@@ -902,7 +917,7 @@
                             action: 'lead',
                             name: name,
                             contact: contact,
-                            comment: `[ЗАПРОС С САЙТА]\nПожелания: ${notes}\nUTM: ${utmData.source} | ${utmData.medium} | ${utmData.campaign}`
+                            comment: commentLines
                         })
                     });
 
@@ -923,109 +938,142 @@
             });
         }
 
-        // Тройной перехват заявок Tourvisor (fetch + XHR + клики в окне тура)
+        // 3. Чистый перехват реальных заявок (с телефоном/почтой) из виджета Tourvisor
         (function() {
-            let lastLeadTime = 0;
+            let lastLeadHash = '';
             const origFetch = window.fetch;
 
-            function forwardToWithivBot(payloadText, contactHint, nameHint) {
-                const now = Date.now();
-                if (now - lastLeadTime < 4000) return;
-                lastLeadTime = now;
+            function getTourCardContext() {
+                const modalEl = document.querySelector('.TVModalContainer, [class*="TVOrder"], [class*="TVBooking"], [class*="TVPopup"], [class*="TVTourInfo"]');
+                const scope = modalEl || document;
+                const pick = (selectors) => {
+                    for (const sel of selectors) {
+                        const el = scope.querySelector(sel);
+                        if (el && el.innerText && el.innerText.trim()) return el.innerText.trim().replace(/\s+/g, ' ');
+                    }
+                    return '';
+                };
+
+                const hotel = pick(['[class*="HotelName"]', '[class*="hotel-name"]', '.TVTourTitle', 'h1', 'h2']);
+                const country = pick(['[class*="Country"]', '[class*="Resort"]', '[class*="Location"]']);
+                const price = pick(['[class*="PriceValue"]', '[class*="TourPrice"]', '[class*="total-price"]']);
+                const dates = pick(['[class*="TourDate"]', '[class*="FlyDate"]', '[class*="Nights"]']);
+                const meal = pick(['[class*="Meal"]', '[class*="Food"]']);
+
+                return [
+                    hotel ? `Отель: ${hotel}` : '',
+                    country ? `Курорт: ${country}` : '',
+                    dates ? `Даты / ночи: ${dates}` : '',
+                    meal ? `Питание: ${meal}` : '',
+                    price ? `Стоимость в поиске: ${price}` : ''
+                ].filter(Boolean);
+            }
+
+            function sendCleanTourvisorLead(clientName, clientContact, extraLines) {
+                const cleanContact = String(clientContact || '').trim();
+                // Отправляем ТОЛЬКО если есть реальный телефон или email (отсекаем технические запросы поиска)
+                const hasRealContact = /(?:\+?\d[\d\s\-()]{6,}\d)|(?:[^\s@]+@[^\s@]+\.[^\s@]+)/.test(cleanContact);
+                if (!hasRealContact) return;
+
+                const hash = `${clientName}|${cleanContact}`;
+                if (hash === lastLeadHash) return;
+                lastLeadHash = hash;
+                setTimeout(() => { lastLeadHash = ''; }, 8000);
+
+                const tourContext = getTourCardContext();
+                const allLines = [
+                    'Тип: Бронирование / заявка из поиска туров (Tourvisor)',
+                    ...tourContext,
+                    ...(extraLines || [])
+                ].filter(Boolean);
 
                 origFetch(GAS_API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({
                         action: 'lead',
-                        name: nameHint || 'Заявка из поиска Tourvisor',
-                        contact: contactHint || 'См. детали заявки',
-                        comment: `[ЗАЯВКА ИЗ TOURVISOR]\n${payloadText}\nUTM: ${utmData.source} | ${utmData.medium} | ${utmData.campaign}`
+                        name: String(clientName || '').trim() || 'Клиент из поиска туров',
+                        contact: cleanContact,
+                        comment: allLines.join('\n')
                     })
                 }).catch(() => {});
             }
 
-            function parseBodyString(bodyStr) {
-                if (!bodyStr) return null;
-                let obj = null;
+            function inspectPayload(rawBody) {
+                if (!rawBody || typeof rawBody !== 'string') return;
+                let data = {};
                 try {
-                    obj = JSON.parse(bodyStr);
+                    data = JSON.parse(rawBody);
                 } catch (e) {
-                    const params = new URLSearchParams(bodyStr);
-                    obj = {};
-                    params.forEach((v, k) => { obj[k] = v; });
+                    new URLSearchParams(rawBody).forEach((v, k) => { data[k] = v; });
                 }
-                if (!obj || typeof obj !== 'object') return null;
 
-                const lines = [];
-                let contact = '';
-                let name = '';
-                Object.entries(obj).forEach(([k, v]) => {
-                    const val = String(v || '').trim();
-                    if (!val || /^(session|hash|module|format|token)$/i.test(k)) return;
-                    lines.push(`${k}: ${val}`);
-                    if (/phone|tel/i.test(k)) contact = val;
-                    if (/name|client/i.test(k)) name = val;
-                });
-                return lines.length ? { text: lines.join('\n'), contact, name } : null;
+                // Игнорируем технические запросы поиска отелей
+                if (data.sessionId && !data.phone && !data.tel && !data.email) return;
+
+                const phone = data.phone || data.tel || data.clientPhone || data.email || '';
+                const name = data.name || data.clientName || data.fio || data.touristName || '';
+                const userComment = data.comment || data.note || data.message || '';
+
+                if (phone) {
+                    sendCleanTourvisorLead(name, phone, userComment ? [`Комментарий туриста: ${userComment}`] : []);
+                }
             }
 
-            // 1. Перехват fetch запросов на tourvisor.ru
+            // Перехват fetch и XHR только при наличии реального телефона/email
             window.fetch = function(input, init) {
                 try {
                     const url = typeof input === 'string' ? input : (input && input.url) || '';
-                    const body = init && init.body ? String(init.body) : '';
-                    if (url.includes('tourvisor.ru') && /phone|tel|order|request|booking|lead/i.test(url + body)) {
-                        const parsed = parseBodyString(body);
-                        if (parsed) forwardToWithivBot(parsed.text, parsed.contact, parsed.name);
+                    if (url.includes('tourvisor.ru') && init && init.body) {
+                        inspectPayload(String(init.body));
                     }
                 } catch (e) {}
                 return origFetch.apply(this, arguments);
             };
 
-            // 2. Перехват XHR запросов на tourvisor.ru
             const origOpen = XMLHttpRequest.prototype.open;
             const origSend = XMLHttpRequest.prototype.send;
-
             XMLHttpRequest.prototype.open = function(method, url) {
                 this._tvUrl = String(url || '');
                 return origOpen.apply(this, arguments);
             };
-
             XMLHttpRequest.prototype.send = function(body) {
                 try {
-                    if (this._tvUrl.includes('tourvisor.ru') && body) {
-                        const bodyStr = typeof body === 'string' ? body : '';
-                        if (/phone|tel|order|request|booking|lead/i.test(this._tvUrl + bodyStr)) {
-                            const parsed = parseBodyString(bodyStr);
-                            if (parsed) forwardToWithivBot(parsed.text, parsed.contact, parsed.name);
-                        }
+                    if (this._tvUrl.includes('tourvisor.ru') && typeof body === 'string') {
+                        inspectPayload(body);
                     }
                 } catch (e) {}
                 return origSend.apply(this, arguments);
             };
 
-            // 3. Резервный перехват кастомного события и клика внутри модального окна Tourvisor
-            ['tv:order', 'tv:booking', 'tv:request'].forEach(evt => {
-                document.addEventListener(evt, (e) => {
-                    const d = e.detail || {};
-                    forwardToWithivBot(JSON.stringify(d, null, 2), d.phone || d.contact || '', d.name || '');
-                });
-            });
-
+            // Перехват клика по кнопке отправки в окне бронирования Tourvisor
             document.addEventListener('click', (e) => {
                 const btn = e.target.closest('button, input[type="submit"], [class*="TVButton"], [class*="TVSubmit"]');
                 if (!btn) return;
-                const modal = btn.closest('.TVModalContainer, [class*="TVOrder"], [class*="TVBooking"], [class*="TVPopup"]');
-                if (!modal) return;
+                const modalEl = btn.closest('.TVModalContainer, [class*="TVOrder"], [class*="TVBooking"], [class*="TVPopup"]');
+                if (!modalEl) return;
 
-                const inputs = Array.from(modal.querySelectorAll('input, textarea'))
+                const inputs = Array.from(modalEl.querySelectorAll('input, textarea'))
                     .filter(el => el.type !== 'hidden' && el.type !== 'submit' && el.value && el.value.trim());
-                const phoneEl = inputs.find(el => /tel|phone|телефон/i.test((el.name || '') + (el.placeholder || '') + (el.type || '')));
-                const nameEl = inputs.find(el => /name|имя/i.test((el.name || '') + (el.placeholder || '')));
-                if (phoneEl) {
-                    const details = inputs.map(el => `${el.placeholder || el.name || 'Поле'}: ${el.value.trim()}`).join('\n');
-                    forwardToWithivBot(details, phoneEl.value.trim(), nameEl ? nameEl.value.trim() : '');
+
+                let phone = '';
+                let name = '';
+                const extra = [];
+
+                inputs.forEach(el => {
+                    const val = el.value.trim();
+                    const hint = `${el.name || ''} ${el.placeholder || ''} ${el.type || ''}`.toLowerCase();
+                    if (!phone && (/tel|phone|телефон|mail|почт/.test(hint) || /(?:\+?\d[\d\s\-()]{6,}\d)|(?:@)/.test(val))) {
+                        phone = val;
+                    } else if (!name && /name|имя|фио/.test(hint)) {
+                        name = val;
+                    } else {
+                        extra.push(`${el.placeholder || 'Доп. поле'}: ${val}`);
+                    }
+                });
+
+                if (phone) {
+                    sendCleanTourvisorLead(name, phone, extra);
                 }
             }, true);
         })();
