@@ -50,14 +50,14 @@
 
         <!-- ВКЛАДКИ -->
         <div class="flex gap-4 mb-8">
-            <button onclick="switchTab('tours')" id="tab-btn-tours" class="px-5 py-2.5 bg-brand_dark text-white text-sm font-semibold rounded transition">Коллекция туров</button>
+            <button onclick="switchTab('tours')" id="tab-btn-tours" class="px-5 py-2.5 bg-brand_dark text-white text-sm font-semibold rounded transition">Интересные предложения</button>
             <button onclick="switchTab('reviews')" id="tab-btn-reviews" class="px-5 py-2.5 bg-white text-brand_dark border border-brand_dark/20 text-sm font-semibold rounded transition">Отзывы</button>
         </div>
 
         <!-- РАЗДЕЛ: ТУРЫ -->
         <div id="section-tours" class="space-y-8">
             <div class="bg-white p-6 rounded-lg shadow-sm border border-brand_dark/10">
-                <h2 class="text-lg font-bold mb-4">Добавить новый тур в коллекцию</h2>
+                <h2 class="text-lg font-bold mb-4">Добавить новое предложение</h2>
                 <form id="add-tour-form" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -92,7 +92,7 @@
 
             <!-- СПИСОК ТЕКУЩИХ ТУРОВ -->
             <div class="bg-white p-6 rounded-lg shadow-sm border border-brand_dark/10">
-                <h3 class="text-base font-bold mb-4">Текущие туры на сайте</h3>
+                <h3 class="text-base font-bold mb-4">Текущие предложения на сайте</h3>
                 <div id="admin-tours-list" class="space-y-3 text-sm text-brand_dark/70">Загрузка...</div>
             </div>
         </div>
@@ -102,14 +102,18 @@
             <div class="bg-white p-6 rounded-lg shadow-sm border border-brand_dark/10">
                 <h2 class="text-lg font-bold mb-4">Добавить отзыв клиента</h2>
                 <form id="add-review-form" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-bold uppercase mb-1">Имя клиента *</label>
                             <input type="text" id="rev-name" required placeholder="Например: Елена и Сергей" class="w-full px-3 py-2 border border-brand_dark/20 rounded">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold uppercase mb-1">Куда летали</label>
-                            <input type="text" id="rev-location" placeholder="Например: Мальдивы, ноябрь 2026" class="w-full px-3 py-2 border border-brand_dark/20 rounded">
+                            <label class="block text-xs font-bold uppercase mb-1">Куда летали (страна)</label>
+                            <input type="text" id="rev-location" placeholder="Например: Дагестан" class="w-full px-3 py-2 border border-brand_dark/20 rounded">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase mb-1">Дата написания</label>
+                            <input type="text" id="rev-date" placeholder="Например: 15.11.2026" class="w-full px-3 py-2 border border-brand_dark/20 rounded">
                         </div>
                     </div>
                     <div>
@@ -308,7 +312,8 @@
                 const row = [
                     document.getElementById('rev-name').value.trim(),
                     document.getElementById('rev-location').value.trim(),
-                    document.getElementById('rev-text').value.trim()
+                    document.getElementById('rev-text').value.trim(),
+                    document.getElementById('rev-date').value.trim()
                 ];
 
                 await postToGAS({ action: 'review_add', row });
@@ -323,6 +328,19 @@
                 btn.disabled = false;
             }
         });
+
+        function getField(obj, keys) {
+            for (const k of keys) {
+                if (obj[k] !== undefined && String(obj[k]).trim() !== '') return String(obj[k]).trim();
+            }
+            const normMap = {};
+            Object.keys(obj).forEach(ok => { normMap[ok.trim().toLowerCase()] = obj[ok]; });
+            for (const k of keys) {
+                const v = normMap[k.toLowerCase()];
+                if (v !== undefined && String(v).trim() !== '') return String(v).trim();
+            }
+            return '';
+        }
 
         async function loadAdminData() {
             try {
@@ -346,15 +364,22 @@
                     : 'Туров пока нет';
 
                 document.getElementById('admin-reviews-list').innerHTML = reviews.length
-                    ? reviews.map((r) => `
+                    ? reviews.map((r) => {
+                        const name = getField(r, ['Имя', 'Клиент', 'Автор', 'name']);
+                        const country = getField(r, ['Страна', 'Локация', 'Куда летали', 'Направление', 'location', 'country']);
+                        const revDate = getField(r, ['Дата', 'Дата написания', 'Дата отзыва', 'Дата поездки', 'date']);
+                        const text = getField(r, ['Текст', 'Отзыв', 'Комментарий', 'text']);
+                        const meta = [country, revDate].filter(Boolean).join(' • ');
+
+                        return `
                         <div class="flex justify-between items-center p-3 bg-brand_bg rounded border border-brand_dark/10">
                             <div class="pr-4">
-                                <p class="font-bold text-brand_dark">${r['Имя'] || r.name || ''} <span class="font-normal text-xs">(${r['Локация'] || r['Куда летали'] || r.location || ''})</span></p>
-                                <p class="text-xs line-clamp-1">${r['Текст'] || r['Отзыв'] || r.text || ''}</p>
+                                <p class="font-bold text-brand_dark">${name} ${meta ? `<span class="font-normal text-xs text-brand_dark/60">(${meta})</span>` : ''}</p>
+                                <p class="text-xs line-clamp-1">${text}</p>
                             </div>
                             <button onclick="deleteItem('review', ${r.row_index})" class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded hover:bg-red-200 shrink-0">Удалить</button>
-                        </div>
-                    `).join('')
+                        </div>`;
+                    }).join('')
                     : 'Отзывов пока нет';
             } catch (e) {
                 console.error(e);
