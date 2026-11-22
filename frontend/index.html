@@ -2,6 +2,11 @@
 <html lang="ru" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
+    <script>
+        if (window.location.hash && window.location.hash.includes('tvcartid=')) {
+            window.location.replace('https://tourcart.ru/' + window.location.hash);
+        }
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Withiv — Турагентство индивидуальных путешествий</title>
     <link rel="icon" type="image/jpeg" href="logo.jpg">
