@@ -1,9 +1,0 @@
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-CHANNEL_ID = os.getenv("CHANNEL_ID")
-SPREADSHEET_ID = os.getenv("SPREADSHEET_ID")
-ADMIN_ID = int(os.getenv("ADMIN_ID"))
